@@ -1,0 +1,231 @@
+---
+- name: Create Namespace
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/'+item) }}"
+  loop:
+  - gitops-ns.yml.j2
+
+- name: Install GitOps Operator 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/'+item) }}"
+  loop:
+  - gitops-sub.yml.j2
+
+- name: Wait for Internal Registry Ready
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: v1
+    kind: Pod
+    namespace: openshift-image-registry
+    label_selectors:
+      - docker-registry = default
+    wait: yes
+    wait_sleep: 5
+    wait_timeout: 150
+
+- name: Add Argo Repo Server Build
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/gitops-repo-server-bc.yml.j2') }}"
+  register: current_bc
+
+- name: Set Build Number
+  set_fact:
+    build_revision: "{{ current_bc.result.status.lastVersion + 1 }}"
+  when: current_bc.changed
+
+- block:
+  - name: Create Build for Repo Server Image
+    k8s:
+      api_key: "{{ K8S_AUTH_API_KEY  }}"
+      host: "{{ K8S_AUTH_HOST }}"
+      state: present
+      definition: "{{ lookup('template', 'argo/gitops-repo-server-build.yml.j2') }}"
+    when: current_bc.changed
+  rescue: 
+  - name: Create Build for Repo Server Image
+    k8s:
+      api_key: "{{ K8S_AUTH_API_KEY  }}"
+      host: "{{ K8S_AUTH_HOST }}"
+      state: absent
+      definition: "{{ lookup('template', 'argo/gitops-repo-server-build.yml.j2') }}"
+    when: current_bc.changed
+  - name: Create Build for Repo Server Image
+    k8s:
+      api_key: "{{ K8S_AUTH_API_KEY  }}"
+      host: "{{ K8S_AUTH_HOST }}"
+      state: present
+      definition: "{{ lookup('template', 'argo/gitops-repo-server-build.yml.j2') }}"
+    when: current_bc.changed
+
+- name: Create GitOps Argo Objects
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/'+item) }}"
+  loop:
+  - gitops-secrets.yml.j2
+
+- name: Wait for GitopsService be defined...
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: pipelines.openshift.io/v1alpha1
+    kind: GitopsService
+    name: cluster
+  register: gitops_service_status_out
+  until:
+  - gitops_service_status_out is defined
+  - gitops_service_status_out.resources is defined
+  - gitops_service_status_out.resources[0] is defined
+  retries: 6
+  delay: 10
+  ignore_errors: True
+
+- block:
+    - name: Wait for Cluster Argo Instance to be defined...
+      k8s_info:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        api_version: argoproj.io/v1alpha1
+        kind: ArgoCD
+        name: openshift-gitops
+        namespace: openshift-gitops
+      register: argocd_status_out
+      until:
+      - argocd_status_out is defined
+      - argocd_status_out.resources is defined
+      - argocd_status_out.resources[0] is defined
+      retries: 6
+      delay: 10
+  rescue:
+    - name: Add ArgoCD SA  
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'argo/'+item) }}"
+        apply: yes
+      loop:
+      - gitops-sa.yml.j2
+
+- name: Wait for ArgoCD CustomResourceDefinition to be defined...
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: argocds.argoproj.io
+  register: argocd_crd_status_out
+  until:
+  - argocd_crd_status_out is defined
+  - argocd_crd_status_out.resources is defined
+  - argocd_crd_status_out.resources[0] is defined
+  - argocd_crd_status_out.resources[0].status is defined
+  - argocd_crd_status_out.resources[0].status.conditions is defined
+  retries: 30
+  delay: 10
+
+- name: Get token
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true
+    oc serviceaccounts get-token openshift-gitops-argocd-dex-server -n {{ gitops_namespace }} --insecure-skip-tls-verify=true
+  register: dextoken
+
+- name: Link Docker Config
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true
+    oc secrets link default docker-artifactory --for=pull -n {{ gitops_namespace }} --insecure-skip-tls-verify=true
+
+- name: Link Docker Config for Builds 
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true
+    oc secrets link builder redhat-registries --for=pull -n {{ gitops_namespace }}  --insecure-skip-tls-verify=true
+
+- name: Waiting for Image to be defined...
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: image.openshift.io/v1
+    kind: ImageStream
+    name: gitops-repo-server-sops
+    namespace: "{{ gitops_namespace }}"
+  register: repo_server_build_status
+  until:
+  - repo_server_build_status is defined
+  - repo_server_build_status.resources is defined
+  - repo_server_build_status.resources[0] is defined
+  retries: 30
+  delay: 10
+
+- name: Add ArgoCD Instance  
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/'+item) }}"
+    apply: yes
+  loop:
+  - gitops-instance.yml.j2
+  - gitops-secrets.yml.j2
+
+- name: Waiting for Deployment to be defined...
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: apps/v1
+    kind: Deployment
+    name: openshift-gitops-server
+    namespace: "{{ gitops_namespace }}"
+  register: argo_server_status
+  until:
+  - argo_server_status is defined
+  - argo_server_status.resources is defined
+  - argo_server_status.resources[0] is defined
+  retries: 30
+  delay: 10
+
+- name: Update Argo Roles  
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/'+item) }}"
+    apply: yes
+  loop:
+  - gitops-roles.yml.j2
+
+- name: Wait for Application CustomResourceDefinition to be defined...
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: applications.argoproj.io
+  register: application_crd_status_out
+  until:
+  - application_crd_status_out is defined
+  - application_crd_status_out.resources is defined
+  - application_crd_status_out.resources[0] is defined
+  - application_crd_status_out.resources[0].status is defined
+  - application_crd_status_out.resources[0].status.conditions is defined
+  retries: 30
+  delay: 10
+
+- name: Refresh CM with Users
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'argo/gitops-cm.yml.j2') }}"

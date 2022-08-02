@@ -1,0 +1,12 @@
+---
+- name: Gather classic ELB info
+  community.aws.elb_classic_lb_info:
+    region: "{{ region | default('us-east-1') }}"
+  register: elb_info
+
+- name: Remove classic ELBs
+  community.aws.elb_classic_lb:
+    name: "{{ item.load_balancer_name }}"
+    region: "{{ region | default('us-east-1') }}"
+    state: absent
+  loop: "{{ elb_info.elbs }}"

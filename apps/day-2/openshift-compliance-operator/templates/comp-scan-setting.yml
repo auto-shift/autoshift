@@ -1,0 +1,33 @@
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSetting
+metadata:
+  name: default-gp2
+  namespace: openshift-compliance
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+autoUpdateRemediations: true 
+autoApplyRemediations: false 
+rawResultStorage:
+  storageClassName: gp2
+  pvAccessModes:
+    - ReadWriteOnce
+  rotation: 3
+  size: 1Gi
+schedule: 0 2 * * *
+roles:
+  - worker
+  - master
+scanTolerations:
+- effect: NoSchedule
+  key: node-role.kubernetes.io/master
+  operator: Exists
+- effect: NoSchedule
+  key: node.ocs.openshift.io/storage
+  value: 'true'
+- effect: NoSchedule
+  key: infra
+  value: reserved
+- effect: NoExecute
+  key: infra
+  value: reserved
+

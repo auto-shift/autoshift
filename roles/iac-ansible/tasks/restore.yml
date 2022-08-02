@@ -1,0 +1,152 @@
+---
+- name: Install OADP
+  block:
+    - name: Install OADP
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'oadp/'+item) }}"
+      loop: 
+      - adp-ns.yml.j2
+      - adp-og.yml.j2
+      - adp-sub.yml.j2
+
+    - name: Check if Namespaces Backup exists...
+      k8s_info:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        api_version: velero.io/v1
+        kind: Backup
+        name: "{{ resources_backup_name }}"
+        namespace: "open-cluster-management-backup"
+      register: check_backup
+      until:
+      - check_backup is defined
+      - check_backup.resources is defined
+      - check_backup.resources[0] is defined
+      - check_backup.resources[0].status is defined
+      when: resources_backup_name is defined
+
+    - name: Waiting for DataApp CustomResourceDefinition to be defined...
+      k8s_info:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        api_version: apiextensions.k8s.io/v1
+        kind: CustomResourceDefinition
+        name: dataprotectionapplications.oadp.openshift.io
+      register: dataprotectionapp_status_out
+      until:
+      - dataprotectionapp_status_out is defined
+      - dataprotectionapp_status_out.resources is defined
+      - dataprotectionapp_status_out.resources[0] is defined
+      - dataprotectionapp_status_out.resources[0].status is defined
+      - dataprotectionapp_status_out.resources[0].status.conditions is defined
+      retries: 60
+      delay: 10
+
+    - name: Set ADP Secret Fact
+      set_fact:
+        adp_aws_access: |
+          [default]
+          aws_access_key_id = {{ ocp_install_aws_access_key }}
+          aws_secret_access_key = {{ ocp_install_aws_secret_key }}
+
+    - name: Add ADP Secret
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
+
+    - name: Install DataProtectionApp
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'oadp/'+item) }}"
+      loop: 
+      - adp-dpa.yml.j2
+
+    - name: Wait for backups to populate completely
+      wait_for:
+        timeout: 300
+      delegate_to: localhost
+  
+  when: cluster_name != 'mgmt' and cluster_name != 'infra'
+  # END BLOCK: Install OADP
+
+- name: Restore AAP and ACM
+  block:
+
+    - name: Install AAP Operators
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'restore-additional-blank-templates/'+item) }}"
+      loop: 
+      - aap-ns.yml.j2
+      - aap-og.yml.j2
+      - aap-sub.yml.j2
+
+    - name: Apply Restore for ACM
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'oadp/'+item) }}"
+      loop: 
+      - acm-restore.yml.j2
+      when: restore_acm is true
+
+    - name: Waiting for ACM Backup to finish...
+      k8s_info:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        api_version:  cluster.open-cluster-management.io/v1beta1
+        kind: Restore
+        namespace: "open-cluster-management-backup"
+        name: "restore-acm"
+      register: restor_acm_status
+      until:
+      - restor_acm_status is defined
+      - restor_acm_status.resources is defined
+      - restor_acm_status.resources[0] is defined
+      - restor_acm_status.resources[0].status is defined
+      - restor_acm_status.resources[0].status.phase is defined
+      - restor_acm_status.resources[0].status.phase == "Completed" or restor_acm_status.resources[0].status.phase == "FinishedWithErrors"
+      retries: 100 
+      delay: 15
+      when: restore_acm is true
+
+    - name: Apply Cluster Resources Restore AAP
+      k8s:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        state: present
+        definition: "{{ lookup('template', 'oadp/'+item) }}"
+      loop:
+      - resources-restore-aap.yml.j2
+
+    - name: Waiting for Cluster Resources Restore for AAP to finish...
+      k8s_info:
+        api_key: "{{ K8S_AUTH_API_KEY  }}"
+        host: "{{ K8S_AUTH_HOST }}"
+        api_version: velero.io/v1
+        kind: Restore
+        namespace: "open-cluster-management-backup"
+        name: "resources-restore-aap"
+      register: restore_status_aap
+      until:
+      - restore_status_aap is defined
+      - restore_status_aap.resources is defined
+      - restore_status_aap.resources[0] is defined
+      - restore_status_aap.resources[0].status is defined
+      - restore_status_aap.resources[0].status.phase is defined
+      - restore_status_aap.resources[0].status.phase == "Completed" or restore_status_aap.resources[0].status.phase == "PartiallyFailed"
+      retries: 100
+      delay: 15
+    
+  when: cluster_name == 'mgmt' or cluster_name == 'infra'
+  # END BLOCK: Restore AAP and ACM 

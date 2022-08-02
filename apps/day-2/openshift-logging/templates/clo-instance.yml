@@ -1,0 +1,62 @@
+# cluster logging operator instance
+
+apiVersion: "logging.openshift.io/v1"
+kind: "ClusterLogging"
+metadata:
+  name: "instance"
+  namespace: "openshift-logging"
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  managementState: "Managed"
+  logStore:
+    type: "elasticsearch"
+    retentionPolicy:
+      application:
+        maxAge: "{{ .Values.application_logs_max_age }}"
+      infra:
+        maxAge: "{{ .Values.infra_logs_max_age }}"
+      audit:
+        maxAge: "{{ .Values.audit_logs_max_age }}"
+    elasticsearch:
+      nodeCount: {{ .Values.elasticsearch_node_count }}
+      tolerations:
+      - key: infra
+        value: reserved
+        effect: NoSchedule
+      - key: infra
+        value: reserved
+        effect: NoExecute
+      storage:
+        storageClassName: "{{ .Values.elasticsearch_storage_class }}"
+        size: "{{ .Values.elasticsearch_storage_size }}"
+      redundancyPolicy: "SingleRedundancy"
+  visualization:
+    type: "kibana"
+    kibana:
+      replicas: {{ .Values.kibana_replicas }}
+      tolerations:
+      - key: infra
+        value: reserved
+        effect: NoSchedule
+      - key: infra
+        value: reserved
+        effect: NoExecute
+  curation:
+    type: "curator"
+    curator:
+      schedule: "{{ .Values.curator_schedule }}"
+  collection:
+    logs:
+      type: "fluentd"
+      fluentd:
+        tolerations:
+        - key: infra
+          value: reserved
+          effect: NoSchedule
+        - key: infra
+          value: reserved
+          effect: NoExecute
+        - key: node.ocs.openshift.io/storage
+          value: 'true'
+          effect: NoSchedule

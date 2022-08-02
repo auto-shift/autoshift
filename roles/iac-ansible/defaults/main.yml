@@ -1,0 +1,81 @@
+---
+setup_dependencies: true
+create_cluster: true
+install_argo_apps: true
+
+vpc_name: vpc-name
+cluster_name: cluster
+openshift_version: 4.9.11
+region: us-east-1
+availability_zones:
+  - "{{ region }}a"
+  - "{{ region }}b"
+  - "{{ region }}c"
+base_domain: cmscloud.local
+home_dir: "{{ lookup('env', 'HOME') }}"
+install_dir: "{{ lookup('env', 'HOME') }}/{{ cluster_name }}-openshift-install"
+
+openshift:
+  release: "{{ lookup('vars', 'openshift_version') | default('latest', true) }}"
+  release_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp"
+
+credentials_mode: Passthrough
+
+worker:
+  ec2_type: m5.4xlarge
+  rootvolume:
+    iops: 2000
+    size: 120
+    type: io1
+  replicas: 3
+
+master:
+  ec2_type: m5.2xlarge
+  rootvolume:
+    iops: 2000
+    size: 120
+    type: io1
+  replicas: 3
+
+infra:
+  ec2_type: m5.4xlarge
+
+# Storage class used for monitoring (alert manager and prometheus)
+monitoring_storage_class: gp2
+
+# Number of days to retain monitoring data
+prometheus_retention: 15d
+
+# PV size for prometheus metrics
+prometheus_storage: 40Gi
+
+# PV size for alertmanager
+alertmanager_storage: 40Gi
+
+# Image version should argo-containers/argocd-repo-server-sops/Dockerfile
+argocd_image_version: 'v1.4.4'
+
+# Security Group Variables
+cloudbees_cidr: 10.223.128.0/22
+vpn_cidr: 10.232.32.0/19
+
+console_cert: "{{ lookup('env', 'CONSOLE_CERT') }}"
+console_cert_key: "{{ lookup('env', 'CONSOLE_CERT_KEY') }}"
+
+#machineautoscaler vars
+machineset_types:
+  infra:
+    replicas:
+      min: 1
+      max: 2
+  worker:
+    replicas:
+      min: 1
+      max: 2
+  storage:
+    replicas:
+      min: 1
+      max: 2
+
+loop_count: 0
+app_set_ready: False

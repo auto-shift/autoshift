@@ -1,0 +1,21 @@
+// Load the Ploigos Jenkins Library
+library identifier: 'jenkins-library@feature/cms-workflow',
+retriever: modernSCM([
+    $class: 'GitSCMSource',
+    remote: 'https://github.com/enba417/jenkins-library.git',
+    credentialsId: 'svc_acct'
+])
+
+// run the pipeline
+cmsWorkflowMsfIac(
+    stepRunnerConfigDir: 'cicd/ploigos-step-runner-config/',
+    pgpKeysSecretName: 'pgp-keys-ploigos-workflow-ref-quarkus-mvn-fruit',
+
+    workflowServiceAccountName: 'ploigos-workflow-ref-quarkus-mvn-fruit',
+    trustedCABundleConfigMapName: 'reference-quarkus-mvn-workflow-trusted-certs',
+
+    //just for development
+    verbose: true,
+    stepRunnerUpdateLibrary: true,
+
+)

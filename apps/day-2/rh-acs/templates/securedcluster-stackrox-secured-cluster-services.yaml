@@ -1,0 +1,32 @@
+﻿apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: stackrox-secured-cluster-services
+  namespace: stackrox
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  auditLogs:
+    collection: Auto
+  admissionControl:
+    listenOnUpdates: true
+    bypass: BreakGlassAnnotation
+    contactImageScanners: DoNotScanInline
+    listenOnCreates: true
+    timeoutSeconds: 3
+    listenOnEvents: true
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Enabled
+        maxReplicas: 5
+        minReplicas: 2
+        replicas: 3
+    scannerComponent: AutoSense
+  perNode:
+    collector:
+      collection: KernelModule
+      imageFlavor: Regular
+    taintToleration: TolerateTaints
+  clusterName: {{ .Values.cluster_name }}
+  centralEndpoint: "central-stackrox.apps.mgmt.{{ .Values.base_domain }}:443"

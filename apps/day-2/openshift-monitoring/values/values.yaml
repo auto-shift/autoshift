@@ -1,0 +1,5 @@
+# Default values for openshift-monitoring.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+pagerduty_prometheus_key: 
+pagerduty_events_key: 

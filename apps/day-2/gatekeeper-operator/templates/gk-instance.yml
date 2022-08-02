@@ -1,0 +1,17 @@
+apiVersion: operator.gatekeeper.sh/v1alpha1
+kind: Gatekeeper
+metadata:
+  name: gatekeeper
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  validatingWebhook: Enabled
+  webhook:
+    logLevel: INFO
+    replicas: 2
+  image:
+    image: >-
+      registry.redhat.io/rhacm2/gatekeeper-rhel8:{{ .Values.gk_img_tag }}
+  audit:
+    logLevel: INFO
+    replicas: 1

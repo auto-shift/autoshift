@@ -1,0 +1,221 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ArgoCD
+metadata:
+  name: openshift-gitops
+  namespace: {{ gitops_namespace }}
+spec:
+  initialRepositories: |
+    - url: {{ gitops_repo_url }}
+      passwordSecret:
+        name: cms-github
+        key: password
+      usernameSecret:
+        name: cms-github
+        key: username
+    - url: {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
+      passwordSecret:
+        name: cms-github
+        key: password
+      usernameSecret:
+        name: cms-github
+        key: username
+  server:
+    autoscale:
+      enabled: false
+    grpc:
+      ingress:
+        enabled: false
+    ingress:
+      enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 125m
+        memory: 128Mi
+    route:
+      enabled: true
+    host: 'argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
+    service:
+      type: ''
+  grafana:
+    enabled: false
+    ingress:
+      enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    route:
+      enabled: false
+  prometheus:
+    enabled: false
+    ingress:
+      enabled: false
+    route:
+      enabled: false
+  initialSSHKnownHosts: {}
+  applicationSet:
+    resources:
+      limits:
+        cpu: '2'
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  rbac:
+{% if (cluster_name == 'mgmt') or (cluster_name == 'infra') %}
+    policy: |
+      p, role:edit-{{ organization }}, projects, *, {{ organization }}*, allow
+      p, role:edit-{{ organization }}, repositories, *, {{ organization }}/{{ github_url }}*, allow
+      p, role:edit-{{ organization }}, repositories, *, {{ github_url }}*, allow
+      p, role:edit-{{ organization }}, clusters, *, {{ organization }}*, allow
+      p, role:edit-{{ organization }}, applications, *, {{ organization }}*, allow
+      p, role:view-{{ organization }}, projects, get, {{ organization }}*, allow
+      p, role:view-{{ organization }}, clusters, get, {{ organization }}*, allow
+      p, role:view-{{ organization }}, applications, get, {{ organization }}*, allow
+      p, role:edit-hub, projects, *, hub*, allow
+      p, role:edit-hub, repositories, *, hub/https://github.cms.gov/HUB*, allow
+      p, role:edit-hub, repositories, *, https://github.cms.gov/HUB*, allow
+      p, role:edit-hub, clusters, *, hub*, allow
+      p, role:edit-hub, applications, *, hub*, allow
+      p, role:view-hub, projects, get, hub*, allow
+      p, role:view-hub, clusters, get, hub*, allow
+      p, role:view-hub, applications, get, hub*, allow
+      p, role:edit-msisf, projects, *, msi*, allow
+      p, role:edit-msisf, repositories, *, msi/https://github.cms.gov/MSI*, allow
+      p, role:edit-msisf, repositories, *, https://github.cms.gov/MSI*, allow
+      p, role:edit-msisf, clusters, *, msi*, allow
+      p, role:edit-msisf, applications, *, msi*, allow
+      p, role:view-msisf, projects, get, msi*, allow
+      p, role:view-msisf, clusters, get, msi*, allow
+      p, role:view-msisf, applications, get, msi*, allow
+      g, {{ organization }}_argo_user, role:edit-{{ organization }}
+      g, hub_argo_user, role:edit-hub
+      g, msisf_argo_user, role:edit-msisf
+      g, {{ cluster_admin_group }}, role:admin
+    defaultPolicy: ''
+{% else %}
+    defaultPolicy: |
+      g, system:cluster-admins, role:admin
+      g, cluster-admins, role:admin
+    policy: |
+      p, role:repo, repositories, get, *, allow
+      p, role:repo, repositories, create, *, allow
+      g, {{ cluster_admin_group }}, role:admin
+{% endif %}
+    scopes: '[email,groups]'
+  repo:
+    image: >-
+      image-registry.openshift-image-registry.svc:5000/openshift-gitops/gitops-repo-server-sops
+    version: latest
+    initContainers:
+      - command:
+          - /bin/sh
+          - '-c'
+          - >-
+            export HOME=/home/argocd && gpg --import /app/config/gpg/private/*
+            && gpg --export-secret-keys > /home/argocd/.gnupg/secring.gpg
+        image: >-
+          image-registry.openshift-image-registry.svc:5000/openshift-gitops/gitops-repo-server-sops
+        version: latest
+        name: gpg-import-keys
+        resources: {}
+        securityContext:
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /app/config/gpg/private
+            name: gpg-private-keys
+          - mountPath: /home/argocd
+            name: home
+    serviceaccount: openshift-gitops-argocd-server
+    resources:
+      limits:
+        cpu: '1'
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    volumeMounts:
+      - mountPath: /app/config/gpg/private
+        name: gpg-private-keys
+      - mountPath: /home/argocd
+        name: home
+    volumes:
+      - emptyDir: {}
+        name: home
+      - name: gpg-private-keys
+        secret:
+          defaultMode: 420
+          secretName: openshift-gitops-gpg-private-keys
+  resourceExclusions: |
+    - apiGroups:
+      - tekton.dev
+      clusters:
+      - '*'
+      kinds:
+      - TaskRun
+      - PipelineRun
+  dex:
+    openShiftOAuth: true
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    config: |
+      connectors:
+        # OpenShift
+        - type: openshift
+          id: openshift
+          name: OpenShift
+          config:
+            issuer: https://api.{{ cluster_name }}.{{ base_domain }}:6443
+            clientID: system:serviceaccount:{{ gitops_namespace }}:openshift-gitops-argocd-dex-server
+            clientSecret: {{ dextoken.stdout_lines[dextoken.stdout_lines|length-1] }}
+            redirectURI: https://argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}/api/dex/callback
+            insecureCA: true
+            groups:
+              - {{ cluster_admin_group }}
+{% if ado_groups is defined %}
+{% for group in ado_groups %}
+              - {{ group }}
+{% endfor %}
+{% endif %}
+  ha:
+    enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+  tls:
+    ca: {}
+  redis:
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+  image: registry.redhat.io/openshift-gitops-1/argocd-rhel8
+  version: {{ argocd_image_version }}
+  controller:
+    processors: {}
+    resources:
+      limits:
+        cpu: '4'
+        memory: 8Gi
+      requests:
+        cpu: '2'
+        memory: 2Gi
+    sharding: {}

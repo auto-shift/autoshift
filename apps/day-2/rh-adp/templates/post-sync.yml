@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: update-annotations
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+  namespace: "openshift-gitops"
+spec:
+  template:
+    spec:
+      containers:
+      - name: update-annotations
+        image: registry.redhat.io/openshift4/ose-cli:v4.9.0
+        command:
+            - "/bin/bash"
+            - "-c"
+            - >- 
+              for i in `oc get Backups -n open-cluster-management-backup -o name`; do                
+              oc annotate $i argocd.argoproj.io/compare-options=IgnoreExtraneous -n open-cluster-management-backup --overwrite=true;               
+              done;
+      restartPolicy: Never
+      serviceAccountName: openshift-gitops-argocd-application-controller

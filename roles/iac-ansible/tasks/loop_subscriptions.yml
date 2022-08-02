@@ -1,0 +1,40 @@
+---
+- name: Define Temp
+  set_fact:
+    temp: []
+
+- name: Get CSV
+  set_fact: 
+    temp: 
+    - csv: "{{ sub.status.currentCSV }}"
+      namespace: "{{ sub.metadata.namespace }}"
+  when: 
+  - sub.status.currentCSV is defined
+
+- name: Check CSV is Healthy
+  set_fact:
+    temp: []
+  when:
+  - item.status is defined
+  - item.status == "True" and 
+    (item.type == "InstallPlanMissing" or 
+      item.type == "ReferencedInstallPlanMissing" or 
+      item.type == "ResolutionFailed" or 
+      item.type == "CatalogSourcesUnhealthy")
+  loop: '{{ sub.status.conditions }}'
+  loop_control:
+    label: "{{ item.type }} {{ item.status }}"
+
+- name: Save CSVs
+  set_fact:
+    good_csvs: "{{ good_csvs + temp }}"
+
+- name: Save if Degraded Subscriptions
+  set_fact:
+    bad_subs: "{{ bad_subs + bad_sub }}"
+  vars:
+    bad_sub: 
+    - name: "{{ sub.metadata.name }}"
+      namespace: "{{ sub.metadata.namespace }}"
+  when: temp | length == 0
+

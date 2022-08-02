@@ -1,0 +1,8 @@
+﻿apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: rhacs-operator
+  namespace: stackrox
+  annotations:
+    olm.providedAPIs: >-
+      Central.v1alpha1.platform.stackrox.io,SecuredCluster.v1alpha1.platform.stackrox.io

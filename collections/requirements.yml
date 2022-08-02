@@ -1,0 +1,11 @@
+collections:
+  # Install a collection from Ansible Galaxy.
+  - name: community.aws
+    version: 3.2.1
+    source: https://galaxy.ansible.com
+  - name:  community.crypto
+    version: 2.2.4
+    source: https://galaxy.ansible.com
+  - name:  awx.awx
+    version: 21.0.0
+    source: https://galaxy.ansible.com

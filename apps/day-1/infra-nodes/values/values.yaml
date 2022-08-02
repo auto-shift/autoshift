@@ -1,0 +1,10 @@
+# Default values for infra-nodes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+infra_id:
+region:
+ami_id:
+instance_type:
+subnets:
+cluster_name:

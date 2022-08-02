@@ -1,0 +1,256 @@
+<html lang="en">
+  <head>
+    {{ range $provider := .Providers }}
+      {{ if eq $provider.Name "okta" }}
+       <meta http-equiv="refresh" content="0; URL={{$provider.URL}}" />
+      {{ end }}
+    {{ end }}
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="none">
+
+    <title>CMS Openshift Login - Sign In</title>
+
+    <link rel="stylesheet" type="text/css" href="https://ok5static.oktacdn.com/assets/js/sdk/okta-signin-widget/5.16.1/css/okta-sign-in.min.css">
+
+    <!-- Customizable css theme options. Link your own stylesheet or override styles inline. -->
+    <link rel="stylesheet" type="text/css" href="">
+
+    <!-- styles for custom sign in -->
+    <link rel="stylesheet" type="text/css" href="https://ok5static.oktacdn.com/assets/loginpage/css/custom-signin.bb8f4ce4363dd17160adb27f2ab5f478.css">
+
+    <style>
+        #okta-sign-in.auth-container.main-container {
+            box-shadow: 0 0px 0 rgba(175, 175, 175, 0.12);
+        }
+
+        #ocp-login-container .login-container {
+            margin-top: 5px;
+        }
+
+        #okta-sign-in .auth-content {
+            background-color: #22334e;
+            overflow: hidden;
+
+        }
+
+        #okta-sign-in {
+            border-width: 0;
+            margin-bottom: 0;
+        }
+
+        #okta-sign-in.auth-container.main-container {
+            background-color: #22334e;
+        }
+
+        #okta-sign-in.no-beacon .auth-content {
+            padding-top: 20px;
+            padding-bottom: 0px;
+        }
+
+        #okta-sign-in.auth-container .okta-sign-in-header {
+            background-color: #22334e;
+            border-bottom-color: #22334e;
+
+        }
+
+        #okta-sign-in .button.button-primary, #okta-sign-in.auth-container .button-primary:hover, .button.button-primary {
+            /* -- Buttons' Colors -- */
+            color: #fff;
+            background-color: #2e8540;
+            border-color: #2e8540;
+            background-image: none;
+            box-shadow: none;
+        }
+
+        #okta-sign-in.auth-container main-container can-remove-beacon {
+            background-color: #ddd;
+
+        }
+
+        h2.okta-form-title .o-form-head {
+            color: #FFF;
+        }
+
+        /*h2.o-form-head, .auth-footer {*/
+        div.auth-footer {
+            display: none;
+        }
+
+        #okta-sign-in .auth-footer {
+            padding-bottom: 10px;
+        }
+
+        #t-and-c-container {
+            border-color: #22334e;
+            z-index: 99;
+            background-image: none;
+            box-shadow: none;
+            margin-top: -10px;
+            text-align: left;
+            background-color: #22334e;
+            color: #ffffff;
+            padding: 5px 30px 20px 30px;
+            max-width: 340px;
+            overflow: hidden;
+            margin-bottom: 0px;
+            font-size: 12px;
+            font-family: 'Source Sans Pro', 'Helvetica Neue', 'Helvetica', 'Roboto', 'Arial', sans-serif;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #t-and-c {
+            z-index: 100;
+            font-size: 16px;
+            text-align: left;
+            padding: 12px;
+            font-weight: normal;
+            color: #FFF;
+            display: block;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #tnc-href {
+            font-weight: normal !important;
+            color: #FFF !important;
+            text-decoration: underline !important;
+        }
+
+        #tnc-href:focus {
+            outline: solid 1px;
+        }
+
+        p.t-c {
+            color: #000;
+        }
+
+        #okta-sign-in.auth-container .okta-form-subtitle, #okta-sign-in.auth-container .okta-form-label {
+            color: #FFF;
+        }
+
+        #okta-sign-in.auth-container .link:link {
+            color: #FFF;
+        }
+
+        label {
+            color: #FFF;
+        }
+
+        div a {
+            font-weight: normal;
+            color: #FFF;
+        }
+
+        @media only screen and (max-width: 600px) {
+            #okta-sign-in.auth-container .auth-content,
+            .cms-newreg-container,
+            #t-and-c-container {
+                max-width: none;
+            }
+        }
+
+        #app-header {
+            background: #112e51;
+            padding: 30px 0;
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            -moz-align-items: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            opacity: 1;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #okta-sign-in.auth-container h2 {
+            color: #FFF;
+        }
+
+        .piv-button-custom {
+            background-color: white !important;
+            color: #1662dd !important;
+            border: 2px solid #1662dd !important;
+            border-radius: 3px !important;
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="login-bg-image" style="background-image: url('https://ok5static.oktacdn.com/fs/bco/7/fs023r05t71byxSAe297');opacity: 0.4"></div>
+    <div id="ocp-login-container">
+      <main data-se="auth-container" tabindex="-1" id="okta-sign-in" class="auth-container main-container no-beacon" style="display: block;">
+        <div class="okta-sign-in-header auth-header">
+          <h1>
+            <img src="https://ok5static.oktacdn.com/fs/bco/1/fs023hjdf3pMMueqz297" class="auth-org-logo" alt="CMS logo logo" aria-label="CMS logo logo">
+          </h1>
+          <div data-type="beacon-container" class="beacon-container"></div>
+        </div>
+        <div data-se="o-form-content" class="o-form-content o-form-theme clearfix">
+          <h2 data-se="o-form-head" class="okta-form-title o-form-head">If you are not redirected, choose a provider</h2>
+        </div>
+        <div class="auth-content">
+          <div class="auth-content-inner">
+            <div class="primary-auth">
+                {{ range $provider := .Providers }}
+                  {{ if ne $provider.Name  "ldapidp" }}
+                    <div class="primary-auth-container">
+                      <a data-se="piv-card-button" class="piv-button link-button" href="{{$provider.URL}}" style="display: none;">{{$provider.Name}}</a>
+                      <a class="piv-button-custom default-custom-button link-button" href="{{$provider.URL}}">{{$provider.Name}}</a>
+                    </div>
+                  {{ end }}
+                {{ end }}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="t-and-c-container">
+      <div class="connected list no2" style="border: 1px solid black; background: beige; color: #22334e; padding-left: 10px">
+        <p>This warning banner provides privacy and security notices consistent with applicable federal laws,
+           directives, and other federal guidance for accessing this Government system, which
+           includes (1) this computer network, (2) all computers connected to this network, and (3) all devices and
+           storage media attached to this network or to a computer on this network.</p>
+        <p>This system is provided for Government authorized use only.</p>
+        <p>Unauthorized or improper use of this system is prohibited and may result in disciplinary action and/or civil and criminal penalties. </p>
+        <p>Personal use of social media and networking sites on this system is limited as to not interfere withofficial work duties and is subject to monitoring.</p>
+        <p>By using this system, you understand and consent to the following:</p>
+        <ul>
+          <li>The Government may monitor, record, and audit your system usage, including usage of personal devices and
+              email systems for official duties or to conduct HHS business. Therefore,
+              you have no reasonable expectation of privacy regarding any communication or data transiting or stored
+              on this system. At any time, and for any lawful Government purpose, the
+              government may monitor, intercept, and search and seize any communication or data transiting or stored
+              on this system.
+          </li>
+          <li>Any communication or data transiting or stored on this system may be disclosed or used for any lawful
+              Government purpose
+          </li>
+        </ul>
+      </div>
+      <div class="okta-sign-in-header auth-header">
+        <h1>
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI0LjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxvZ29zIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB3aWR0aD0iMzIwcHgiIGhlaWdodD0iNDcuNnB4IiB2aWV3Qm94PSIwIDAgMzIwIDQ3LjYiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMyMCA0Ny42OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+Cgkuc3Qwe2ZpbGw6I0ZGRkZGRjt9Cgkuc3Qxe2ZpbGw6I0VFMDAwMDt9Cjwvc3R5bGU+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik01Mi4xLDQzLjZjLTQuMiwwLTcuNS0zLjMtNy41LTcuNXMzLjMtNy41LDcuNS03LjVzNy42LDMuMyw3LjYsNy41UzU2LjMsNDMuNiw1Mi4xLDQzLjZ6IE01Mi4xLDMwLjYKCWMtMywwLTUuMywyLjQtNS4zLDUuNXMyLjMsNS41LDUuMyw1LjVjMywwLDUuMy0yLjQsNS4zLTUuNVM1NS4xLDMwLjYsNTIuMSwzMC42eiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjEuNywzMi44aDJ2MWMwLjktMC44LDItMS4yLDMuMi0xLjJjMywwLDUuMywyLjQsNS4zLDUuNHMtMi4zLDUuNC01LjQsNS40Yy0xLjEsMC0yLjMtMC40LTMuMi0xdjUuMmgtMi4xCglMNjEuNywzMi44eiBNNjMuOCwzNS43djQuOGMwLjcsMC44LDEuOCwxLjIsMi45LDEuMmMyLDAsMy42LTEuNiwzLjYtMy42YzAtMi4xLTEuNi0zLjYtMy42LTMuNkM2NS41LDM0LjQsNjQuNCwzNC45LDYzLjgsMzUuN3oiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTc5LjQsNDMuNWMtMy4xLDAtNS41LTIuNC01LjUtNS41YzAtMywyLjMtNS40LDUuMy01LjRjMi45LDAsNS4xLDIuNCw1LjEsNS41djAuNmgtOC4zYzAuMywxLjgsMS44LDMsMy42LDMKCWMxLDAsMS45LTAuMywyLjctMC45bDEuMywxLjNDODIuMyw0My4xLDgwLjgsNDMuNSw3OS40LDQzLjV6IE03NS45LDM3LjJoNi4zYy0wLjMtMS42LTEuNi0yLjgtMy4xLTIuOAoJQzc3LjUsMzQuNCw3Ni4yLDM1LjUsNzUuOSwzNy4yeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODYuMiwzMi44aDIuMXYxLjFjMC44LTAuOCwyLTEuMywzLjItMS4zYzIuNCwwLDQuMSwxLjcsNC4xLDQuMXY2LjZoLTIuMVYzN2MwLTEuNy0xLTIuNy0yLjYtMi43CgljLTEuMSwwLTIsMC41LTIuNiwxLjR2Ny42aC0yLjFMODYuMiwzMi44eiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNOTguMiwzOS40YzEuNiwxLjUsMy4yLDIuMyw1LDIuM2MyLjEsMCwzLjUtMSwzLjUtMi40YzAtMS4zLTAuOC0xLjktMi45LTIuM2wtMi40LTAuNGMtMi43LTAuNC00LTEuNy00LTMuOAoJYzAtMi41LDIuMS00LjIsNS4zLTQuMmMyLjEsMCw0LjIsMC43LDUuOCwybC0xLjIsMS43Yy0xLjYtMS4yLTMuMS0xLjgtNC43LTEuOGMtMS45LDAtMy4xLDAuOS0zLjEsMi4yYzAsMS4yLDAuNywxLjcsMi42LDIuMQoJbDIuMywwLjRjMy4xLDAuNSw0LjUsMS44LDQuNSw0YzAsMi43LTIuMyw0LjUtNS44LDQuNWMtMi4zLDAtNC42LTAuOS02LjItMi42TDk4LjIsMzkuNHoiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTExMC42LDI4LjhsMi4xLTAuNXY1LjVjMC44LTAuOCwyLTEuMywzLjItMS4zYzIuNCwwLDQuMSwxLjcsNC4xLDQuMXY2LjZoLTIuMVYzN2MwLTEuNy0xLTIuNy0yLjYtMi43CgljLTEsMC0yLDAuNS0yLjYsMS40djcuNmgtMi4xVjI4Ljh6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjIuMSwyOS44YzAtMC43LDAuNi0xLjMsMS4zLTEuM2MwLDAsMCwwLDAsMGMwLjcsMCwxLjMsMC41LDEuMywxLjJjMCwwLjctMC41LDEuMy0xLjIsMS4zYzAsMC0wLjEsMC0wLjEsMAoJQzEyMi43LDMxLjEsMTIyLjEsMzAuNSwxMjIuMSwyOS44QzEyMi4xLDI5LjgsMTIyLjEsMjkuOCwxMjIuMSwyOS44eiBNMTI0LjQsNDMuM2gtMi4xVjMyLjhoMi4xVjQzLjN6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjguNCwzMi44di0xLjZjMC0yLjIsMS4zLTMuNCwzLjYtMy40YzAuNSwwLDEsMC4xLDEuNSwwLjJ2MS44Yy0wLjQtMC4xLTAuOS0wLjItMS4zLTAuMgoJYy0xLjEsMC0xLjcsMC41LTEuNywxLjZ2MS42aDN2MS43aC0zdjguOGgtMi4xdi04LjhIMTI2di0xLjdIMTI4LjR6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMzYuNywzNC41aC0yLjJ2LTEuN2gyLjJ2LTIuN2wyLTAuNXYzLjJoMy4xdjEuN2gtMy4xdjUuN2MwLDEuMSwwLjQsMS41LDEuNiwxLjVjMC41LDAsMS0wLjEsMS41LTAuMnYxLjcKCWMtMC42LDAuMi0xLjMsMC4zLTIsMC4zYy0yLjEsMC0zLjEtMS0zLjEtMi44TDEzNi43LDM0LjV6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xNTkuNiw0MC4xbDEsMS4xYy0xLjUsMS41LTMuNiwyLjQtNS43LDIuNGMtNC4xLDAuMS03LjUtMy4yLTcuNi03LjRjLTAuMS00LjEsMy4yLTcuNSw3LjQtNy42CgljMC4xLDAsMC4yLDAsMC4yLDBjMi4zLDAsNC4zLDAuOSw1LjcsMi40bC0xLjEsMS4xYy0xLjItMS4zLTIuOS0yLTQuNy0yYy0zLjQsMC01LjksMi42LTUuOSw2YzAsMy40LDIuNiw2LDYsNgoJQzE1Ni43LDQyLjEsMTU4LjUsNDEuMywxNTkuNiw0MC4xeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTY3LjEsMzIuN2MyLjksMCw1LjMsMi40LDUuMyw1LjRzLTIuMyw1LjQtNS4zLDUuNHMtNS4zLTIuNC01LjMtNS40UzE2NC4yLDMyLjcsMTY3LjEsMzIuN3ogTTE3MC45LDM4LjEKCWMwLTIuMy0xLjctNC0zLjgtNGMtMi4xLDAtMy44LDEuOC0zLjgsNGMwLDIuMywxLjcsNCwzLjgsNFMxNzAuOSw0MC40LDE3MC45LDM4LjFMMTcwLjksMzguMXoiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTE3NC42LDMyLjloMS41djEuMmMwLjgtMSwxLjktMS40LDMuMy0xLjRjMi40LDAsNCwxLjYsNCw0djYuNmgtMS41di02LjNjMC0xLjgtMS4xLTMtMi45LTMKCWMtMS4yLDAtMi4zLDAuNi0yLjksMS42djcuNmgtMS41TDE3NC42LDMyLjl6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xODYuOCwzNC4zaC0yLjJ2LTEuM2gyLjJ2LTIuNmwxLjUtMC40djNoMy4xdjEuM2gtMy4xdjYuNGMwLDEuMSwwLjUsMS42LDEuNiwxLjZjMC41LDAsMS0wLjEsMS41LTAuM3YxLjMKCWMtMC42LDAuMi0xLjIsMC4zLTEuOCwwLjNjLTEuOCwwLTIuOC0wLjktMi44LTIuNUwxODYuOCwzNC4zeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTkyLjUsNDAuNGMwLTEuOSwxLjYtMy4yLDQuMS0zLjJjMS4xLDAsMi4xLDAuMiwzLDAuN3YtMS40YzAtMS43LTEtMi41LTIuOC0yLjVjLTEsMC0yLDAuMy0zLjMsMC45bC0wLjYtMS4yCgljMS41LTAuNywyLjctMSw0LTFjMi42LDAsNC4xLDEuMyw0LjEsMy42djdoLTEuNXYtMWMtMC45LDAuOC0yLjEsMS4yLTMuNCwxLjJDMTk0LjEsNDMuNSwxOTIuNSw0Mi4yLDE5Mi41LDQwLjR6IE0xOTYuNiw0Mi4zCgljMS4yLDAsMi4zLTAuNCwzLjEtMS4ydi0xLjljLTAuOS0wLjYtMS44LTAuOC0zLTAuOGMtMS43LDAtMi43LDAuOC0yLjcsMkMxOTQsNDEuNSwxOTUuMSw0Mi4zLDE5Ni42LDQyLjN6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yMDMuNSwyOS45YzAtMC42LDAuNS0xLDEtMWMwLjYsMCwxLDAuNCwxLDFjMCwwLDAsMCwwLDBjMCwwLjYtMC41LDEtMSwxQzIwNCwzMSwyMDMuNSwzMC41LDIwMy41LDI5Ljl6CgkgTTIwNS4zLDQzLjNoLTEuNVYzMi45aDEuNVY0My4zeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjA3LjksMzIuOWgxLjV2MS4yYzAuOC0xLDEuOS0xLjQsMy4zLTEuNGMyLjQsMCw0LDEuNiw0LDR2Ni42aC0xLjV2LTYuM2MwLTEuOC0xLjEtMy0yLjktMwoJYy0xLjIsMC0yLjMsMC42LTIuOSwxLjZ2Ny42aC0xLjVWMzIuOXoiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyNC4xLDQzLjVjLTIuOSwwLTUuMy0yLjMtNS4zLTUuMmMwLDAsMC0wLjEsMC0wLjFjMC0zLDIuMy01LjMsNS4xLTUuM2MyLjgsMCw0LjksMi40LDQuOSw1LjN2MC41aC04LjUKCWMwLjIsMiwxLjgsMy42LDMuOSwzLjZjMS4xLDAsMi4yLTAuNCwyLjktMWwxLDFDMjI2LjksNDMuMSwyMjUuNSw0My41LDIyNC4xLDQzLjV6IE0yMjAuNCwzNy40aDYuOWMtMC4zLTEuOC0xLjctMy4zLTMuNC0zLjMKCUMyMjIuMSwzNC4xLDIyMC42LDM1LjUsMjIwLjQsMzcuNEwyMjAuNCwzNy40eiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjMxLDMyLjloMS41djEuNWMwLjYtMS4xLDEuNy0xLjcsMi45LTEuN2MwLjMsMCwwLjcsMCwxLDAuMXYxLjRjLTAuMy0wLjEtMC43LTAuMi0xLjEtMC4yCgljLTEuMywwLTIuMywwLjctMi44LDIuMXY3LjFIMjMxTDIzMSwzMi45eiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjQyLjksMjguOGg2LjNjMi44LDAsNC43LDEuNyw0LjcsNC4ycy0xLjksNC4yLTQuNyw0LjJoLTQuN3Y2LjFoLTEuNkwyNDIuOSwyOC44eiBNMjQ0LjUsMzAuM3Y1LjZoNC42CgljMiwwLDMuMi0xLjEsMy4yLTIuOGMwLTEuNy0xLjItMi44LTMuMi0yLjhMMjQ0LjUsMzAuM3oiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTI1Ny41LDQzLjNIMjU2VjI4LjhsMS41LTAuM1Y0My4zeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjU5LjYsNDAuNGMwLTEuOSwxLjYtMy4yLDQuMS0zLjJjMS4xLDAsMi4xLDAuMiwzLDAuN3YtMS40YzAtMS43LTEtMi41LTIuOC0yLjVjLTEsMC0yLDAuMy0zLjMsMC45bC0wLjYtMS4yCgljMS41LTAuNywyLjctMSw0LTFjMi42LDAsNC4xLDEuMyw0LjEsMy42djdoLTEuNXYtMWMtMC45LDAuOC0yLjEsMS4yLTMuNCwxLjJDMjYxLjEsNDMuNSwyNTkuNiw0Mi4yLDI1OS42LDQwLjR6IE0yNjMuNyw0Mi4zCgljMS4yLDAsMi4zLTAuNCwzLjEtMS4ydi0xLjljLTAuOC0wLjYtMS44LTAuOC0zLTAuOGMtMS43LDAtMi43LDAuOC0yLjcsMkMyNjEsNDEuNSwyNjIuMSw0Mi4zLDI2My43LDQyLjN6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yNzEuNywzNC4zaC0yLjJ2LTEuM2gyLjJ2LTIuNmwxLjUtMC40djNoMy4xdjEuM2gtMy4xdjYuNGMwLDEuMSwwLjUsMS42LDEuNiwxLjZjMC41LDAsMS0wLjEsMS41LTAuM3YxLjMKCWMtMC42LDAuMi0xLjIsMC4zLTEuOCwwLjNjLTEuOCwwLTIuOC0wLjktMi44LTIuNUwyNzEuNywzNC4zeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjc5LjYsMzIuOXYtMmMwLTIsMS4xLTMuMSwzLjItMy4xYzAuNSwwLDAuOSwwLDEuNCwwLjJ2MS40Yy0wLjQtMC4xLTAuOC0wLjItMS4zLTAuMmMtMS4yLDAtMS44LDAuNi0xLjgsMS44CglWMzNoMy4xdjEuM2gtMy4xdjkuMWgtMS41di05LjFoLTIuNHYtMS4zTDI3OS42LDMyLjl6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0yOTAuMiwzMi43YzIuOSwwLDUuMywyLjQsNS4zLDUuNHMtMi4zLDUuNC01LjMsNS40cy01LjMtMi40LTUuMy01LjRDMjg0LjksMzUuMSwyODcuMiwzMi43LDI5MC4yLDMyLjd6CgkgTTI5NCwzOC4xYzAtMi4zLTEuNy00LTMuOC00Yy0yLjEsMC0zLjgsMS44LTMuOCw0YzAsMi4zLDEuNyw0LDMuOCw0UzI5NCw0MC40LDI5NCwzOC4xTDI5NCwzOC4xeiIvPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjk3LjYsMzIuOWgxLjV2MS41YzAuNi0xLjEsMS43LTEuNywyLjktMS43YzAuMywwLDAuNywwLDEsMC4xdjEuNGMtMC4zLTAuMS0wLjctMC4yLTEuMS0wLjIKCWMtMS4zLDAtMi4zLDAuNy0yLjgsMi4xdjcuMWgtMS41TDI5Ny42LDMyLjl6Ii8+CjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0zMDQuOCwzMi45aDEuNXYxLjFjMC44LTAuOSwxLjktMS40LDMtMS4zYzEuNCwwLDIuNiwwLjcsMy4zLDEuOWMwLjgtMS4yLDIuMS0xLjksMy42LTEuOWMyLjMsMCwzLjgsMS42LDMuOCw0Cgl2Ni42aC0xLjV2LTYuM2MwLTEuOC0xLTMtMi43LTNjLTEuMSwwLTIuMSwwLjYtMi44LDEuN2MwLjEsMC4zLDAuMSwwLjYsMC4xLDF2Ni42aC0xLjV2LTYuM2MwLTEuOC0xLTMtMi43LTNjLTEuMSwwLTIsMC41LTIuNywxLjUKCXY3LjdoLTEuNUwzMDQuOCwzMi45eiIvPgo8cGF0aCBjbGFzcz0ic3QxIiBkPSJNMjUuMywxNi41YzIuNSwwLDYuMS0wLjUsNi4xLTMuNWMwLTAuMiwwLTAuNS0wLjEtMC43bC0xLjUtNi40Yy0wLjMtMS40LTAuNi0yLjEtMy4xLTMuMwoJYy0xLjktMS02LjEtMi42LTcuNC0yLjZjLTEuMiwwLTEuNSwxLjUtMi45LDEuNWMtMS4zLDAtMi4zLTEuMS0zLjYtMS4xYy0xLjIsMC0yLDAuOC0yLjYsMi41YzAsMC0xLjcsNC43LTEuOSw1LjQKCWMwLDAuMS0wLjEsMC4zLDAsMC40QzguNCwxMC41LDE1LjYsMTYuNSwyNS4zLDE2LjUgTTMxLjgsMTQuM2MwLjMsMS42LDAuMywxLjgsMC4zLDJjMCwyLjgtMy4xLDQuMy03LjMsNC4zCgljLTkuMywwLTE3LjUtNS41LTE3LjUtOS4xYzAtMC41LDAuMS0xLDAuMy0xLjVDNC4zLDEwLjMsMCwxMC45LDAsMTQuN2MwLDYuMywxNC45LDE0LDI2LjYsMTRjOSwwLDExLjMtNC4xLDExLjMtNy4zCglDMzcuOSwxOC44LDM1LjcsMTYsMzEuOCwxNC4zIi8+CjxwYXRoIGQ9Ik0zMS44LDE0LjNjMC4zLDEuNiwwLjMsMS44LDAuMywyYzAsMi44LTMuMSw0LjMtNy4zLDQuM2MtOS4zLDAtMTcuNS01LjUtMTcuNS05LjFjMC0wLjUsMC4xLTEsMC4zLTEuNWwwLjctMS44CgljMCwwLjEtMC4xLDAuMywwLDAuNGMwLDEuOCw3LjIsNy45LDE2LjksNy45YzIuNSwwLDYuMS0wLjUsNi4xLTMuNWMwLTAuMiwwLTAuNS0wLjEtMC43TDMxLjgsMTQuM3oiLz4KPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNS40LDE4LjRjMCwyLjQsMS40LDMuNSw0LDMuNWMwLjgsMCwxLjYtMC4xLDIuNC0wLjN2LTIuN2MtMC41LDAuMi0xLDAuMi0xLjUsMC4yYy0xLjEsMC0xLjUtMC4zLTEuNS0xLjMKCXYtNC4yaDMuMXYtMi44aC0zLjFWNy4xbC0zLjQsMC43djIuOWgtMi4ydjIuOGgyLjJMMTE1LjQsMTguNHogTTEwNC44LDE4LjRjMC0wLjcsMC43LTEuMSwxLjgtMS4xYzAuNywwLDEuNCwwLjEsMiwwLjNWMTkKCWMtMC42LDAuNC0xLjQsMC41LTIuMSwwLjVDMTA1LjUsMTkuNiwxMDQuOCwxOS4xLDEwNC44LDE4LjQgTTEwNS44LDIxLjljMS4yLDAsMi4yLTAuMywzLjEtMC45djAuN2gzLjN2LTcuMWMwLTIuNy0xLjgtNC4yLTQuOS00LjIKCWMtMS43LDAtMy40LDAuNC01LjIsMS4ybDEuMiwyLjVjMS4zLTAuNSwyLjQtMC45LDMuNC0wLjljMS40LDAsMi4xLDAuNSwyLjEsMS43djAuNWMtMC44LTAuMi0xLjctMC4zLTIuNS0wLjMKCWMtMi45LDAtNC42LDEuMi00LjYsMy4zQzEwMS44LDIwLjUsMTAzLjQsMjEuOSwxMDUuOCwyMS45IE04Ny40LDIxLjhIOTFWMTZoNnY1LjdoMy42VjcuMWgtMy42djUuNmgtNlY3LjFoLTMuNkw4Ny40LDIxLjh6CgkgTTczLjcsMTYuMmMwLTEuNiwxLjMtMi44LDIuOS0yLjhjMC45LDAsMS43LDAuMywyLjMsMC45djMuOWMtMC42LDAuNi0xLjUsMC45LTIuMywwLjlDNzUsMTksNzMuNywxNy44LDczLjcsMTYuMiBNNzksMjEuN2gzLjRWNi40CglMNzksNy4xdjQuMmMtMC45LTAuNS0xLjgtMC43LTIuOC0wLjdjLTMuMiwwLTUuOCwyLjUtNS44LDUuN2MwLDMuMSwyLjQsNS43LDUuNiw1LjdjMCwwLDAuMSwwLDAuMSwwYzEuMSwwLDIuMS0wLjMsMy0xVjIxLjd6CgkgTTYzLjYsMTMuMmMxLjEsMCwyLDAuNywyLjMsMS44aC00LjZDNjEuNywxMy45LDYyLjUsMTMuMiw2My42LDEzLjIgTTU3LjksMTYuMmMwLDMuMiwyLjYsNS43LDYsNS43YzEuOSwwLDMuMi0wLjUsNC42LTEuN2wtMi4yLTIKCWMtMC41LDAuNS0xLjMsMC44LTIuMiwwLjhjLTEuMiwwLTIuMy0wLjctMi43LTEuOGg3Ljl2LTAuOGMwLTMuNS0yLjQtNi4xLTUuNi02LjFjLTMuMSwwLTUuNywyLjUtNS44LDUuNgoJQzU3LjksMTYuMSw1Ny45LDE2LjIsNTcuOSwxNi4yIE01Mi4xLDEwLjJjMS4yLDAsMS45LDAuOCwxLjksMS43cy0wLjcsMS43LTEuOSwxLjdoLTMuNnYtMy4zSDUyLjF6IE00NC45LDIxLjhoMy42di01LjNoMi43CglsMi44LDUuM2g0bC0zLjItNS45YzEuNy0wLjcsMi44LTIuMywyLjgtNC4xYzAtMi42LTIuMS00LjctNS4yLTQuN2gtNy41TDQ0LjksMjEuOHoiLz4KPC9zdmc+Cg==" alt="Red Hat OpenShift Container Platform logo" class="auth-org-logo">
+        </h1>
+      </div>
+    </div>
+  </body>
+</html>

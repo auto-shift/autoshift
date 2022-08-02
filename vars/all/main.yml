@@ -1,0 +1,108 @@
+#msf-iac-day-1 options
+# setup_dependencies: true
+# create_cluster: true
+# install_argo: true
+# install_argo_apps: true
+# remove_kubeadmin: true
+
+#msf-iac-day-1 variables
+# Image version should match argo-containers/argocd-repo-server-sops/Dockerfile
+argocd_image_version: 'v1.4.4'
+
+region: us-east-1
+branch_tag: ''
+organization: enba417
+github_url: https://github.com/enba417
+
+# ArgoCD Variables
+gitops_repo_url: https://github.com/enba417/iac-automation.git
+
+#LDAP groupsync vars
+basedn: 
+
+# ACM Vars
+cluster_set:
+
+# AWS SecretsManager vars
+# Secret Locations for nested secrets
+ocp_secrets: "{{ lookup('community.aws.aws_secret', 'ocp_secrets', region=vars['region']) }}"
+# aws user for cloudwatch log forwarding 
+cw_secrets: "{{ lookup('community.aws.aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
+# aws user for install
+ocp_install_secrets: "{{ lookup('community.aws.aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+
+# OCP Install Secrets
+pull_secret: "{{ lookup('community.aws.aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
+ocp_install_aws_access_key: "{{ ocp_install_secrets.aws_access_key_id }}"
+ocp_install_aws_secret_key: "{{ ocp_install_secrets.aws_secret_access_key }}"
+
+# Certs
+custome_certs_enabled: true
+api_cert: "{{ lookup('community.aws.aws_secret', 'ocp_api_cert', region=vars['region']) }}"
+api_cert_key: "{{ lookup('community.aws.aws_secret', 'ocp_api_cert_key', region=vars['region']) }}"
+console_cert: "{{ lookup('community.aws.aws_secret', 'ocp_console_cert', region=vars['region']) }}"
+console_cert_key: "{{ lookup('community.aws.aws_secret', 'ocp_console_cert_key', region=vars['region']) }}"
+ingress_cert: "{{ lookup('community.aws.aws_secret', 'ocp_ingress_cert', region=vars['region']) }}"
+ingress_cert_key: "{{ lookup('community.aws.aws_secret', 'ocp_ingress_cert_key', region=vars['region']) }}"
+ingress_cert_ca: "{{ lookup('community.aws.aws_secret', 'ocp_ingress_cert_ca', region=vars['region']) }}"
+ca_cert: "{{ lookup('community.aws.aws_secret', 'ocp_ldap_ca', region=vars['region']) }}"
+
+# Cloud Watch Logging
+cw_log_forwarding_enabled: true
+cloudwatch_aws_access_key: "{{ cw_secrets.aws_access_key_id }}"
+cloudwatch_aws_secret_key: "{{ cw_secrets.aws_secret_access_key }}"
+
+# Oauth Secrets
+ldap_enabled: true
+binddn: "{{ ocp_secrets.binddn }}"
+ldapurl: "{{ ocp_secrets.ldapurl }}"
+ldap_password: "{{ ocp_secrets.ldap_password }}"
+radiant_ldab_enabled: true
+radiant_binddn: "{{ ocp_secrets.radiant_binddn }}"
+radiant_url: "{{ ocp_secrets.radiant_url }}"
+radiant_password: "{{ ocp_secrets.radiant_password }}"
+okta_oath_enabled: true
+okta_client_id: "{{ ocp_secrets.okta_client_id }}"
+okta_client_secret: "{{ ocp_secrets.okta_client_secret }}"
+okta_issuer: "{{ ocp_secrets.okta_issuer }}"
+
+# New Relic Secrets
+new_relic_enabled: true
+new_relic_license_key: "{{ ocp_secrets.new_relic_license_key }}"
+new_relic_pixie_deploy_key: "{{ ocp_secrets.new_relic_pixie_deploy_key }}"
+new_relic_pixie_api_key: "{{ ocp_secrets.new_relic_pixie_api_key }}"
+
+# Docker Registry Secrets
+artifactory_pull_secret: "{{ ocp_secrets.artifactory_pull_secret }}"
+svc_acct: "{{ lookup('aws_secret', 'svc-acct', region=vars['region']) }}"
+svc_acct_name: "{{ svc_acct.account_name }}"
+svc_acct_password: "{{ svc_acct.account_password }}"
+
+# Openshift Gitops Secrets
+gitops_enabled: true
+argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
+git_user: "{{ ocp_secrets.git_user }}"
+git_token: "{{ ocp_secrets.git_token }}"
+gitops_namespace: "openshift-gitops"
+gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
+
+# Pager Duty Secrets
+pager_duty_enabled: true
+pagerduty_events_key: "{{ ocp_secrets.pagerduty_events_key }}"
+pagerduty_prometheus_key: "{{ ocp_secrets.pagerduty_prometheus_key }}"
+
+# ACS Secrets
+acs_enabled: true
+acs_init_bundle: "{{ ocp_secrets.acs_init_bundle }}"
+
+# AAP Secrets
+aap_enabled: true
+aap_host: "{{ ocp_secrets.aap_host }}"
+aap_username: "{{ ocp_secrets.aap_username }}"
+aap_password: "{{ ocp_secrets.aap_password }}"
+
+# Fluentbit Splunk Log Forwarding
+fluentbit_enabled: true
+splunk_hec_token: "{{ ocp_secrets.splunk_hec_token }}"
+splunk_channel_id: "{{ ocp_secrets.splunk_channel_id }}"
+cloud_account: "{{ ocp_secrets.cloud_account }}"

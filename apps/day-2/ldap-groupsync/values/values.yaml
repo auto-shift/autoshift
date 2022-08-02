@@ -1,0 +1,19 @@
+# Default values for ldap-groupsnc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+
+#ldap_groupsync vars
+group_membership_attr: uniquemember
+group_name_attr: cn
+user_name_attr: uid
+user_uid_attr: dn
+sync_schedule: 0,10,20,30,40,50 * * * *
+
+# ldap values passed in
+group_filter:
+cluster_admin_group:
+radiant_url: 
+basedn:

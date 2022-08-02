@@ -1,0 +1,63 @@
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: namespaces-resources-restore-gitops
+  namespace: open-cluster-management-backup
+spec:
+{% if resources_backup_name is defined %}
+  backupName: {{ resources_backup_name }}
+{% else %}
+  backupName: ""
+  scheduleName: resources-schedule
+{% endif %}
+  excludedResources:
+    - nodes
+    - events
+    - events.events.k8s.io
+    - backups.velero.io
+    - restores.velero.io
+    - resticrepositories.velero.io
+    - applications.argoproj.io
+    - applicationsets.argoproj.io
+    - hostsubnets.network.openshift.io
+    - networks.operator.openshift.io
+    - apiservers.config.openshift.io
+    - authentications.config.openshift.io
+    - networks.config.openshift.io
+    - builds.config.openshift.io
+    - clusteroperators.config.openshift.io
+    - clusterversions.config.openshift.io
+    - consoles.config.openshift.io
+    - dnss.config.openshift.io
+    - featureGates.config.openshift.io
+    - infrastructures.operator.openshift.io
+    - oauths.operator.openshift.io
+    - operatorhubs.operator.openshift.io
+    - projects.operator.openshift.io
+    - proxies.operator.openshift.io
+    - schedulers.operator.openshift.io
+    - clusternetworks.network.openshift.io
+    - flowschemas.flowcontrol.apiserver.k8s.io
+    - helmreleases.apps.open-cluster-management.io
+    - validatingwebhookconfigurations.admissionregistration.k8s.io
+    - mutatingwebhookconfigurations.admissionregistration.k8s.io
+    - users.user.openshift.io
+    - groups.user.openshift.io
+    - identities.user.openshift.io
+    - apiservices.apiregistration.k8s.io
+    - imagestreams.image.openshift.io
+    - replicationcontroller
+    - deploymentconfig
+    - templateinstances.template.openshift.io
+  includedNamespaces:
+    - openshift-gitops
+  includedResources:
+    - serviceaccounts
+    - roles.rbac.authorization.k8s.io
+    - rolebindings.rbac.authorization.k8s.io
+    - secrets
+    - configmaps
+    - appprojects.argoproj.io
+  includeClusterResources: true
+  preserveNodePorts: false
+  restorePVs: false

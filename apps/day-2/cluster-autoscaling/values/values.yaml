@@ -1,0 +1,16 @@
+#clusterautoscaler vars
+pod_priority_threshold: -10
+resource_limits:
+  max_nodes_total: 12
+  cores:
+    min: 72
+    max: 96
+  memory:
+    min: 288
+    max: 384
+scaledown:
+  enabled: true
+  delay_after_add: 10m
+  delay_after_delete: 5m
+  delay_after_failure: 30s
+  unneeded_time: 60s

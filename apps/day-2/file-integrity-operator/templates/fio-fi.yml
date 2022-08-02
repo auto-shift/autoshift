@@ -1,0 +1,13 @@
+{{ if .Capabilities.APIVersions.Has "fileintegrity.openshift.io/v1alpha1" -}}
+apiVersion: fileintegrity.openshift.io/v1alpha1
+kind: FileIntegrity
+metadata:
+  name: worker-fileintegrity
+  namespace: openshift-file-integrity
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  nodeSelector:
+      node-role.kubernetes.io/worker: ""
+  config: {}
+{{- end }}

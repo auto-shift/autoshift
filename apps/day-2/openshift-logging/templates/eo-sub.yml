@@ -1,0 +1,12 @@
+# yaml file to subscribe namespace to elasticsearch operator
+
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: "elasticsearch-operator"
+  namespace: "openshift-operators-redhat"
+spec:
+  installPlanApproval: "{{ .Values.cluster_logging_install_plan_approval }}"
+  source: "redhat-operators"
+  sourceNamespace: "openshift-marketplace"
+  name: "elasticsearch-operator"

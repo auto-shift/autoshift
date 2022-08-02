@@ -1,0 +1,60 @@
+apiVersion: v1
+baseDomain: {{ base_domain }}
+credentialsMode: {{ credentials_mode }}
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    aws:
+      rootVolume:
+        iops: {{ worker.rootvolume.iops }}
+        size: {{ worker.rootvolume.size }}
+        type: {{ worker.rootvolume.type }}
+      type: {{ worker.ec2_type }}
+      zones:
+      - {{ region | default('us-east-1') }}a
+      - {{ region | default('us-east-1') }}b
+      - {{ region | default('us-east-1') }}c
+  replicas: {{ worker.replicas }}
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform:
+    aws:
+      rootVolume:
+        iops: {{ master.rootvolume.iops }}
+        size: {{ master.rootvolume.size }}
+        type: {{ master.rootvolume.type }}
+      type: {{ master.ec2_type }}
+      zones:
+      - {{ region | default('us-east-1') }}a
+      - {{ region | default('us-east-1') }}b
+      - {{ region | default('us-east-1') }}c
+  replicas: {{ master.replicas }}
+fips: {{ fips_enabled | default('true') }}
+metadata:
+  name: {{ cluster_name }}
+networking:
+  clusterNetwork:
+  - cidr: {{ cluster_network_cidr | default('100.64.0.0/14') }}
+    hostPrefix: {{ cluster_network_host_prefix | default('23') }}
+  machineNetwork:
+  - cidr: {{ vpc_facts.vpcs[0].cidr_block}}
+  networkType: {{ ocp_network_type | default('OpenShiftSDN') }}
+  serviceNetwork:
+  -  {{ service_network_cidr | default('172.30.0.0/16') }}
+platform:
+  aws:
+    region: {{ region | default('us-east-1') }}
+    userTags:
+      autoOff: True
+    subnets:
+{% for subnet in subnet_facts.subnets %}
+    - {{ subnet.id }}
+{% endfor %}
+{% if hosted_zone_id is defined %}
+    hostedZone: {{ hosted_zone_id }}
+{% endif %}
+publish: {{ publish_type | default('Internal') }}
+pullSecret: '{{ pull_secret }}'
+sshKey: {{ ssh_key }}

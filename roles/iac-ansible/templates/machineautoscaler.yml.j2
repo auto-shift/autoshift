@@ -1,0 +1,15 @@
+{% for availability_zone in availability_zones %}
+---
+apiVersion: "autoscaling.openshift.io/v1beta1"
+kind: "MachineAutoscaler"
+metadata:
+  name: "{{ infra_id }}-{{ item.key }}-{{ availability_zone }}" 
+  namespace: "openshift-machine-api"
+spec:
+  minReplicas: {{ item.value.replicas.min }} 
+  maxReplicas: {{  item.value.replicas.max }} 
+  scaleTargetRef: 
+    apiVersion: machine.openshift.io/v1beta1
+    kind: MachineSet 
+    name: {{ infra_id }}-{{ item.key }}-{{ availability_zone }}
+{% endfor %}

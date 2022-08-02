@@ -1,0 +1,145 @@
+---
+- name: Gather s3 Bucket Names Facts
+  aws_s3_bucket_info:
+  register: s3_facts
+
+- name: buckets
+  set_fact:
+    bucket_names: "{{ s3_facts.buckets | map(attribute='name') | flatten }}"
+
+- name: Gather s3 Bucket Contents Facts
+  aws_s3:
+    bucket: "{{ cluster_name }}-openshift-install"
+    mode: list
+  register: bucket_contents
+  when: 'cluster_name+"-openshift-install" in bucket_names'
+    
+- block:
+    - name: Get openshift_install.tgz from {{ cluster_name }}-openshift-install s3 Bucket
+      aws_s3:
+        bucket: "{{ cluster_name }}-openshift-install"
+        object: openshift_install.tgz
+        dest: "{{ home_dir }}/openshift_install.tgz"
+        mode: get
+
+    - name: Extract openshift_install.tgz
+      unarchive:
+        src: "{{ home_dir }}/openshift_install.tgz"
+        dest: "{{ home_dir }}"
+
+    - name: Remove {{ home_dir }}/openshift_install.tgz
+      file:
+        path: "{{ home_dir }}/openshift_install.tgz"
+        state: absent
+  when: 'cluster_name+"-openshift-install" in bucket_names and "openshift_install.tgz" in bucket_contents.s3_keys'
+
+- name: Destroy OCP Cluster
+  script: openshift-install.sh {{ install_dir }} destroy
+
+- name: Delete openshift_install.tgz from {{ cluster_name }}-openshift-install s3 Bucket
+  aws_s3:
+    bucket: "{{ cluster_name }}-openshift-install"
+    object: openshift_install.tgz
+    mode: delobj
+  when: 'cluster_name+"-openshift-install" in bucket_names and "openshift_install.tgz" in bucket_contents.s3_keys'
+
+- name: Remove Installation Artifacts
+  file:
+    path: "{{ item }}"
+    state: absent
+  become: yes
+  become_method: sudo
+  loop:
+    - "{{ install_dir }}"
+    - "{{ home_dir }}/.kube"
+    - "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}"
+    - "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}.pub"
+    - /usr/local/bin/oc
+    - /usr/local/bin/kubectl
+    - /usr/local/bin/openshift-install
+
+- name: Gather Hosted Zones
+  route53_info:
+    query: hosted_zone
+  register: hz_facts
+
+- name: Define hosted_zone_id
+  set_fact:
+    hosted_zone_id: "{{ item.Id.split('/')[2] }}"
+  when: item.Name == cluster_name+'.'+base_domain+'.'
+  loop: "{{ hz_facts.list }}"
+
+- name: Retrieve api_int details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "api-int.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: api_int
+
+- name: Retrieve api details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "api.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: api
+
+- name: Retrieve app details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "*.apps.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: apps
+
+- name: Retrieve cname details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "openshift.{{ cluster_name }}.{{ base_domain }}"
+    type: CNAME
+  register: cname
+
+- name: Delete api_int record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ api_int.set.record }}"
+    type: "{{ api_int.set.type }}"
+    value: "{{ api_int.set.value }}"
+    alias: "{{ api_int.set.alias }}"
+    alias_hosted_zone_id: "{{ api_int.set.alias_hosted_zone_id }}"
+  when: api_int.set.record is defined
+
+- name: Delete api record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ api.set.record }}"
+    type: "{{ api.set.type }}"
+    value: "{{ api.set.value }}"
+    alias: "{{ api.set.alias }}"
+    alias_hosted_zone_id: "{{ api.set.alias_hosted_zone_id }}"
+  when: api.set.record is defined
+
+- name: Delete apps record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ apps.set.record }}"
+    type: "{{ apps.set.type }}"
+    value: "{{ apps.set.value }}"
+    alias: "{{ apps.set.alias }}"
+    alias_hosted_zone_id: "{{ apps.set.alias_hosted_zone_id }}"
+  when: apps.set.record is defined
+
+- name: Delete cname record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ cname.set.record }}"
+    type: "{{ cname.set.type }}"
+    value: "{{ cname.set.value }}"
+    ttl: "{{ cname.set.ttl }}"
+  when: cname.set.record is defined

@@ -1,0 +1,13 @@
+﻿apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/rhacs-operator.rhacs-operator: ''
+  name: rhacs-operator
+  namespace: stackrox
+spec:
+  channel: latest
+  installPlanApproval: Automatic
+  name: rhacs-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace

@@ -1,0 +1,33 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: {{ .Values.logging_namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  outputs:
+   - name: cw 
+     type: cloudwatch 
+     cloudwatch:
+       groupBy: logType 
+       groupPrefix: "/custom/openshift-{{ .Values.cluster_name }}"
+       region: {{ .Values.region }}
+     secret:
+         name: cw-secret
+  pipelines:
+  - inputRefs:
+      - application
+    name: container-logs
+    outputRefs:
+      - cw
+  - inputRefs:
+      - infrastructure
+    name: infra-logs
+    outputRefs:
+      - cw
+  - inputRefs:
+      - audit
+    name: audit-logs
+    outputRefs:
+      - cw

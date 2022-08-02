@@ -1,0 +1,39 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: GroupSync
+metadata:
+  name: ldap-groupsync
+  namespace: group-sync-operator
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  providers:
+  - ldap:
+      caSecret:
+        name: ca-secret
+        namespace: group-sync-operator
+      credentialsSecret:
+        name: ldap-group-sync
+        namespace: group-sync-operator
+      rfc2307:
+        groupMembershipAttributes:
+        - {{ .Values.group_membership_attr }}
+        groupNameAttributes:
+        - {{ .Values.group_name_attr }}
+        groupUIDAttribute: dn
+        groupsQuery:
+          baseDN: {{ .Values.basedn }}
+          derefAliases: never
+          filter: {{ .Values.group_filter }}
+          scope: sub
+        tolerateMemberNotFoundErrors: true
+        tolerateMemberOutOfScopeErrors: true
+        userNameAttributes:
+        - {{ .Values.user_name_attr }}
+        userUIDAttribute: {{ .Values.user_uid_attr }}
+        usersQuery:
+          baseDN: {{ .Values.basedn }}
+          derefAliases: never
+          scope: sub
+      url: {{ .Values.radiant_url }}
+    name: ldap
+  schedule: {{ .Values.sync_schedule }}

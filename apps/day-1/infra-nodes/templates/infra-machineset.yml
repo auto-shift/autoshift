@@ -1,0 +1,74 @@
+
+{{- range .Values.subnets }}
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: {{ $.Values.infra_id }}
+  name: {{ $.Values.infra_id }}-infra-{{ .availability_zone }}
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-options: PrunePropagationPolicy=orphan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{ $.Values.infra_id }} 
+      machine.openshift.io/cluster-api-machineset: {{ $.Values.infra_id }}-infra-{{ .availability_zone }}
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{ $.Values.infra_id }} 
+        machine.openshift.io/cluster-api-machine-role: infra 
+        machine.openshift.io/cluster-api-machine-type: worker 
+        machine.openshift.io/cluster-api-machineset: {{ $.Values.infra_id }}-infra-{{ .availability_zone }}
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/infra: ""
+      taints:
+      - effect: NoSchedule
+        key: infra
+        value: reserved
+      - effect: NoExecute
+        key: infra
+        value: reserved
+      providerSpec:
+        value:
+          ami:
+            id: {{ $.Values.ami_id }} 
+          apiVersion: awsproviderconfig.openshift.io/v1beta1
+          blockDevices:
+            - ebs:
+                encrypted: true
+                iops: 0
+                volumeSize: 120
+                volumeType: gp2
+          credentialsSecret:
+            name: aws-cloud-credentials
+          deviceIndex: 0
+          iamInstanceProfile:
+            id: {{ $.Values.infra_id }}-worker-profile 
+          instanceType: {{ $.Values.instance_type }}
+          kind: AWSMachineProviderConfig
+          placement:
+            availabilityZone: {{ .availability_zone }}
+            region: {{ $.Values.region }}
+          securityGroups:
+            - filters:
+                - name: tag:Name
+                  values:
+                    - {{ $.Values.infra_id }}-worker-sg 
+          subnet: 
+            id: {{ .subnet_id }}
+          tags:
+          - name: kubernetes.io/cluster/{{ $.Values.infra_id }}
+            value: owned
+          - name: autoOff
+            value: "true"
+          - name: cms-cloud-exempt:scan-exempt
+            value: "CLDSPT-12416"
+          userDataSecret:
+            name: worker-user-data
+{{- end }}

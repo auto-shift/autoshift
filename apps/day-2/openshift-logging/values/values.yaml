@@ -1,0 +1,35 @@
+# Default values for openshift-logging.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+logging_namespace: openshift-logging
+fluentd_loglevel: warn
+region:
+cluster_name:
+
+# How long to keep application logs
+application_logs_max_age: 1d
+
+# How long to keep infrastructure logs
+infra_logs_max_age: 7d
+
+# How long to keep audit logs
+audit_logs_max_age: 7d
+
+# Number of elasticsearch instances
+elasticsearch_node_count: 3
+
+# Storage class for elasticsearch persistent volumes
+elasticsearch_storage_class: "gp2"
+
+# Size of each elasticsearch volume
+elasticsearch_storage_size: "200G"
+
+# Number of kibana replicas
+kibana_replicas: 1
+
+# Curator log pruning schedule
+curator_schedule: "30 3 * * *"
+
+# Method for installation plan approval
+cluster_logging_install_plan_approval: "Automatic"

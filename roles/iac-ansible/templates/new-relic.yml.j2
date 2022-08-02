@@ -1,0 +1,167 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: newrelic
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: newrelic
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: newrelic
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    chart: nri-bundle
+    helm:
+      parameters:
+        - name: logging.enabled
+          value: 'false'
+        - name: prometheus.enabled
+          value: 'true'
+        - name: kubeEvents.enabled
+          value: 'true'
+        - name: metrics-adapter.enabled
+          value: 'false'
+        - name: global.cluster
+          value: msi_{{ cluster_name }}_{{ organization }}_infrastructure
+        - name: newrelic-infrastructure.privileged
+          value: 'true'
+        - name: newrelic.customSecretName
+          value: newrelic-license
+        - name: nri-kube-events.customSecretName
+          value: newrelic-license
+        - name: nri-prometheus.customSecretName
+          value: newrelic-license
+        - name: newrelic.customSecretLicenseKey
+          value: license
+        - name: nri-kube-events.customSecretLicenseKey
+          value: license
+        - name: nri-prometheus.customSecretLicenseKey
+          value: license
+        - name: global.customSecretName
+          value: newrelic-license
+        - name: global.customSecretLicenseKey
+          value: license
+    repoURL: 'https://helm-charts.newrelic.com'
+    targetRevision: 3.5.1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  name: newrelic-license
+  namespace: newrelic
+type: Opaque
+data:
+  license: {{ new_relic_license_key | b64encode }}
+
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: docker-artifactory
+  namespace: newrelic
+stringData:
+  .dockerconfigjson: |
+    {"auths":{"artifactory.cloud.cms.gov":{"username":"{{ svc_acct_name }}","password":"{{ svc_acct_password }}","auth":"{{ docker_artifactory_auth | b64encode }}"}}}
+type: kubernetes.io/dockerconfigjson
+
+---
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+- '*'
+allowedUnsafeSysctls:
+- '*'
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups:
+- system:cluster-admins
+- system:nodes
+- system:masters
+kind: SecurityContextConstraints
+metadata:
+  annotations:
+    kubernetes.io/description: 'For newrelic logging. Relaxed policies for log aggregation'
+  name: newrelic-anyuid
+priority: null
+readOnlyRootFilesystem: false
+requiredDropCapabilities: null
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+seccompProfiles:
+- '*'
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:newrelic:newrelic-bundle-nri-metadata-injection-admission
+- system:serviceaccount:newrelic:newrelic-nri-metadata-injection-admission
+- system:serviceaccount:newrelic:newrelic-nri-kube-events
+- system:serviceaccount:newrelic:nri-bundle-kube-state-metrics
+- system:serviceaccount:newrelic:nri-bundle-nri-kube-events
+- system:serviceaccount:newrelic:nri-bundle-nri-metadata-injection-admission
+- system:serviceaccount:newrelic:nri-prometheus
+volumes:
+- '*'
+---
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+- '*'
+allowedUnsafeSysctls:
+- '*'
+apiVersion: security.openshift.io/v1
+defaultAddCapabilities: null
+fsGroup:
+  type: RunAsAny
+groups:
+- system:cluster-admins
+- system:nodes
+- system:masters
+kind: SecurityContextConstraints
+metadata:
+  annotations:
+    kubernetes.io/description: 'For newrelic logging. Relaxed policies for log aggregation'
+  name: newrelic-privileged
+priority: null
+readOnlyRootFilesystem: false
+requiredDropCapabilities: null
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+seccompProfiles:
+- '*'
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:newrelic:newrelic-newrelic-infrastructure
+- system:serviceaccount:newrelic:newrelic-newrelic-logging
+volumes:
+- '*'

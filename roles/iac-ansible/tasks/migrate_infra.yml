@@ -1,0 +1,60 @@
+---
+- name: Create the MachineConfigPool
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('file', 'infra-mcp.yml') | from_yaml }}"
+
+- name: Migrate the router
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition:
+      kind: IngressController
+      apiVersion: operator.openshift.io/v1
+      metadata:
+        name: default
+        namespace: openshift-ingress-operator
+      spec:
+        nodePlacement:
+          nodeSelector:
+            matchLabels:
+              node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: infra
+            value: reserved
+          - effect: NoExecute
+            key: infra
+            value: reserved
+
+- name: Migrate the registry
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition:
+      kind: Config
+      apiVersion: imageregistry.operator.openshift.io/v1
+      metadata:
+        name: cluster
+        namespace: openshift-image-registry
+      spec:
+        nodeSelector:
+          node-role.kubernetes.io/infra: ""
+        tolerations:
+        - effect: NoSchedule
+          key: infra
+          value: reserved
+        - effect: NoExecute
+          key: infra
+          value: reserved
+
+- name: Update the monitoring config map
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'cluster-monitoring-config-cm.yml.j2') | from_yaml }}"

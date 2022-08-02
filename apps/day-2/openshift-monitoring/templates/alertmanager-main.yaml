@@ -1,0 +1,53 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: alertmanager-main
+  namespace: openshift-monitoring
+  labels:
+    alertmanager: main
+    app.kubernetes.io/component: alert-router
+    app.kubernetes.io/name: alertmanager
+    app.kubernetes.io/part-of: openshift-monitoring
+    app.kubernetes.io/version: 0.22.2
+stringData:
+  alertmanager.yaml: >-
+    global:
+      resolve_timeout: 5m
+    inhibit_rules:
+      - equal:
+          - namespace
+          - alertname
+        source_match:
+          severity: critical
+        target_match_re:
+          severity: warning|info
+      - equal:
+          - namespace
+          - alertname
+        source_match:
+          severity: warning
+        target_match_re:
+          severity: info
+    receivers:
+      - name: Default
+        pagerduty_configs:
+          - service_key: {{ .Values.pagerduty_prometheus_key }}
+            url: 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
+      - name: Watchdog
+      - name: Critical
+        pagerduty_configs:
+          - routing_key: {{ .Values.pagerduty_events_key }}
+    route:
+      group_by:
+        - namespace
+      group_interval: 5m
+      group_wait: 30s
+      receiver: Default
+      repeat_interval: 12h
+      routes:
+        - match:
+            alertname: Watchdog
+          receiver: Watchdog
+        - receiver: Critical
+          match:
+            severity: critical

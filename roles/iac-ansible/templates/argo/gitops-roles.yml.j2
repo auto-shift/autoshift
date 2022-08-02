@@ -1,0 +1,340 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: openshift-gitops-argocd-application-controller
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-application-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - argoproj.io
+  resources:
+  - applications
+  - appprojects
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: dex-server
+    app.kubernetes.io/name: openshift-gitops-argocd-dex-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-dex-server
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: openshift-gitops-argocd-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-server
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - applications
+  - appprojects
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: openshift-gitops-argocd-application-controller
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-application-controller
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: openshift-gitops-argocd-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-server
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - delete
+  - get
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: openshift-gitops-argocd-application-controller
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-application-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift-gitops-argocd-application-controller
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: dex-server
+    app.kubernetes.io/name: openshift-gitops-argocd-dex-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-dex-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift-gitops-argocd-dex-server
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-dex-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: redis
+    app.kubernetes.io/name: openshift-gitops-argocd-redis
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-redis
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift-gitops-argocd-redis
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-redis
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: openshift-gitops-argocd-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshift-gitops-argocd-server
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-server
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: openshift-gitops-argocd-application-controller
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-application-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-gitops-argocd-application-controller
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: {{ gitops_namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  namespace: {{ gitops_namespace }}
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/name: openshift-gitops-argocd-server
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-argocd-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openshift-gitops-argocd-server
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-server
+  namespace: {{ gitops_namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: self-provisioner-gitops-application-controller
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespace
+  - namespaces
+  verbs:
+  - create
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ gitops_namespace}}-gitops-application-controller-self-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: {{ gitops_namespace}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: self-provisioner-gitops-application-controller
+---
+allowHostPorts: true
+priority: null
+requiredDropCapabilities: null
+allowPrivilegedContainer: true
+runAsUser:
+  type: RunAsAny
+users:
+  - system:serviceaccount:openshift-gitops:openshift-gitops-argocd-server
+allowHostDirVolumePlugin: true
+seccompProfiles:
+  - '*'
+allowHostIPC: true
+seLinuxContext:
+  type: RunAsAny
+readOnlyRootFilesystem: false
+metadata:
+  annotations:
+    kubernetes.io/description: For repo server pod to set 999 uid. 
+  name: gitops-anyuid
+fsGroup:
+  type: RunAsAny
+groups:
+  - 'system:cluster-admins'
+  - 'system:nodes'
+  - 'system:masters'
+kind: SecurityContextConstraints
+defaultAddCapabilities: null
+allowedUnsafeSysctls:
+  - '*'
+supplementalGroups:
+  type: RunAsAny
+volumes:
+  - '*'
+allowHostPID: true
+allowHostNetwork: true
+allowPrivilegeEscalation: true
+apiVersion: security.openshift.io/v1
+allowedCapabilities:
+  - '*'

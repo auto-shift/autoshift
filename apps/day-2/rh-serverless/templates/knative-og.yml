@@ -1,0 +1,10 @@
+{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: serverless-operatorgroup
+  namespace: openshift-serverless
+spec:
+  targetNamespaces:
+  - openshift-serverless
+{{ end }}

@@ -1,0 +1,4 @@
+---
+- name: Run Harden Tasks
+  include_tasks: compliance.yml
+

@@ -1,0 +1,11 @@
+kind: Subscription
+metadata:
+  name: compliance-operator-sub
+  namespace: openshift-compliance
+spec:
+  installPlanApproval: Automatic
+  name: compliance-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+apiVersion: operators.coreos.com/v1alpha1
+

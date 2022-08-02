@@ -1,0 +1,8 @@
+{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: global-operators
+  namespace: openshift-operators
+spec: {}
+{{ end }}

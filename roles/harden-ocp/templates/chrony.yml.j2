@@ -1,0 +1,50 @@
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-masters-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.2.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,aW5jbHVkZSAvZXRjL2Nocm9ueS5kLyouY29uZgpwb3J0IDAKY21kcG9ydCAwCmRyaWZ0ZmlsZSAvdmFyL2xpYi9jaHJvbnkvZHJpZnQKbWFrZXN0ZXAgMS4wIDMKcnRjc3luYwprZXlmaWxlIC9ldGMvY2hyb255LmtleXMKbGVhcHNlY3R6IHJpZ2h0L1VUQwpsb2dkaXIgL3Zhci9sb2cvY2hyb255CnBvb2wgMC5yaGVsLnBvb2wubnRwLm9yZyBpYnVyc3QKc2VydmVyIDAucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKc2VydmVyIDEucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKc2VydmVyIDIucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKCg==
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
+  osImageURL: ""
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-workers-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.2.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,aW5jbHVkZSAvZXRjL2Nocm9ueS5kLyouY29uZgpwb3J0IDAKY21kcG9ydCAwCmRyaWZ0ZmlsZSAvdmFyL2xpYi9jaHJvbnkvZHJpZnQKbWFrZXN0ZXAgMS4wIDMKcnRjc3luYwprZXlmaWxlIC9ldGMvY2hyb255LmtleXMKbGVhcHNlY3R6IHJpZ2h0L1VUQwpsb2dkaXIgL3Zhci9sb2cvY2hyb255CnBvb2wgMC5yaGVsLnBvb2wubnRwLm9yZyBpYnVyc3QKc2VydmVyIDAucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKc2VydmVyIDEucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKc2VydmVyIDIucmhlbC5wb29sLm50cC5vcmcgaWJ1cnN0IG1heHBvbGwgMTAKCg==
+        mode: 420
+        overwrite: true
+        path: /etc/chrony.conf
+  osImageURL: ""

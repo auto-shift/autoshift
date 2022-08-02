@@ -1,0 +1,51 @@
+---
+- name: Check {{ item }} ComplianceCheckResult Status
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: compliance.openshift.io/v1alpha1
+    kind: ComplianceCheckResult
+    namespace: openshift-compliance
+    name: "{{ item }}"
+  register: compliancecheck_status_out
+
+- debug:
+    msg: "ComplianceCheck for {{ item }} passed. Skipping remediation."
+  when: compliancecheck_status_out.resources[0] is defined and compliancecheck_status_out.resources[0].status == "PASS"
+
+- debug:
+    msg: "ComplianceCheck for {{ item }} does not exist. Please review remediation_list."
+  when: compliancecheck_status_out.resources[0] is not defined
+
+- block: 
+  - name: Check if {{ item }} Compliance Remediation Exists
+    k8s_info:
+      api_key: "{{ K8S_AUTH_API_KEY }}"
+      host: "{{ K8S_AUTH_HOST }}"
+      api_version: compliance.openshift.io/v1alpha1
+      kind: ComplianceRemediation
+      namespace: openshift-compliance
+      name: "{{ item }}"
+    register: complianceremediation_status_out
+    until:
+    - complianceremediation_status_out is defined
+    - complianceremediation_status_out.resources is defined
+    - complianceremediation_status_out.resources[0] is defined
+    retries: 3
+    delay: 10
+  - name: Patch {{ item }} Remediation
+    kubernetes.core.k8s_json_patch:
+      api_key: "{{ K8S_AUTH_API_KEY }}"
+      host: "{{ K8S_AUTH_HOST }}"
+      api_version: compliance.openshift.io/v1alpha1
+      kind: ComplianceRemediation
+      namespace: openshift-compliance
+      name: "{{ item }}"
+      patch:
+        - op: replace
+          path: /spec/apply
+          value: true
+  rescue:
+  - debug:
+      msg: "ComplianceRemediation {{ item }} does not exist. Please review remediation_list"
+  when: compliancecheck_status_out.resources[0] is defined and compliancecheck_status_out.resources[0].status == "FAIL"

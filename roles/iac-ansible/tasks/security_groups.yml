@@ -1,0 +1,69 @@
+---
+- name: Gather VPC Facts
+  ec2_vpc_net_info:
+    filters:
+      "tag:Name": "{{ vpc_name }}"
+  register: vpc_facts
+
+- name: Set VPC ID fact
+  set_fact:
+    vpc_id: "{{ vpc_facts.vpcs[0].vpc_id }}"
+
+- name: Check for Existing Cloudbees Security Group
+  ec2_group_info:
+    filters:
+      group-name: cloudbees
+  register: cb_sg
+
+- name: Create Security Group for Cloudbees
+  ec2_group:
+    name: cloudbees
+    vpc_id: "{{ vpc_id }}"
+    description: "Cloudbees Access to OpenShift API"
+    rules:
+    - proto: tcp
+      ports: 
+      - 6443
+      cidr_ip: "{{ cloudbees_cidr }}"
+    tags:
+      Name: cloudbees
+  when: cb_sgcb_sg.security_groups[0] is not defined
+
+- name: Get OpenShift Infra Cluster Facts
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    kind: Infrastructure
+    name: cluster
+  register: infra_facts
+
+- name: Set Infra ID
+  set_fact:
+    infra_id: "{{ infra_facts.resources[0].status.infrastructureName }}"
+
+- name: Get Master Machine Facts
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api: machine.openshift.io/v1beta1
+    kind: Machine
+    namespace: openshift-machine-api
+    label_selectors:
+    - machine.openshift.io/cluster-api-machine-type=master
+  register: machine_facts
+
+- name: Get Master SG Facts
+  ec2_group_info:
+    filters:
+      tag:Name: "{{ infra_id }}-master-sg"
+  register: master_sg
+
+- name: Add Cloudbees Security Group to Master Nodes
+  ec2_instance:
+    security_groups: 
+    - cloudbees
+    - "{{ master_sg.security_groups[0].group_name }}"
+    vpc_subnet_id: "{{ item.spec.providerSpec.value.subnet.id }}"
+    instance_ids:
+    - "{{ item.status.providerStatus.instanceId }}"
+  loop: "{{ machine_facts.resources }}"

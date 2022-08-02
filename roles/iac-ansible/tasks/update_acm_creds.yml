@@ -1,0 +1,134 @@
+---
+- name: Get token
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify
+    oc serviceaccounts get-token openshift-gitops-argocd-application-controller -n {{ gitops_namespace }}
+  register: argotoken
+  no_log: true
+
+- name: Store Env
+  set_fact:
+    oc_sa_token: "{{ argotoken.stdout_lines[argotoken.stdout_lines|length-1] }}"
+  no_log: true
+
+- name: create config
+  set_fact:
+    acm_cluster_config: 
+      bearerToken: "{{ oc_sa_token }}"
+      tlsClientConfig:
+        insecure: true
+  no_log: true
+
+- name: Update Cluster Secret
+  k8s:
+    state: present
+    definition: "{{ lookup('template','secrets/' + 'acm-cluster-secret.yml.j2') }}"
+    apply: yes
+
+- name: Create a valid openshift credential oc-sa-{{ cluster_name }} and verify connection
+  awx.awx.credential:
+    name: "oc-sa-{{ cluster_name }}"
+    organization: Default
+    controller_username : "{{ aap_username }}"
+    controller_password : "{{ aap_password }}"
+    controller_host: "{{ aap_host }}"
+    validate_certs: no
+    state: present
+    credential_type: openshift-service-account
+    inputs:
+      host: "{{ K8S_AUTH_HOST }}"
+      token: "{{ oc_sa_token }}"
+  retries: 100 
+  delay: 15
+  register: aap_cred_set
+  until: 
+    - aap_cred_set is defined
+    - aap_cred_set.changed is defined
+    - aap_cred_set.changed is true
+
+- name: Get kubeconfig Facts
+  k8s_info:
+    kind: Secret
+    namespace: "{{ cluster_name }}"
+    label_selectors:
+      - hive.openshift.io/cluster-deployment-name = {{ cluster_name }}
+      - hive.openshift.io/secret-type = kubeconfig
+  register: kubeconfig_facts
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Set kubeconfig secret name
+  set_fact:
+    kubeconfig_secret_name: "{{ kubeconfig_facts.resources[0].metadata.name }}"
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Set kubeconfig provision name
+  set_fact:
+    kubeconfig_provision_name: "{{ kubeconfig_facts.resources[0].metadata.labels['hive.openshift.io/cluster-provision-name'] }}"
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Get kubeadmincreds Facts
+  k8s_info:
+    kind: Secret
+    namespace: "{{ cluster_name }}"
+    label_selectors:
+      - hive.openshift.io/cluster-deployment-name = {{ cluster_name }}
+      - hive.openshift.io/secret-type = kubeadmincreds
+  register: kubeadmincreds_facts
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Set kubeadmincreds secret name
+  set_fact:
+    kubeadmincreds_secret_name: "{{ kubeadmincreds_facts.resources[0].metadata.name }}"
+  when: cluster_name != 'mgmt'
+
+- name: Set kubeadmincreds provision name
+  set_fact:
+    kubeadmincreds_provision_name: "{{ kubeadmincreds_facts.resources[0].metadata.labels['hive.openshift.io/cluster-provision-name'] }}"
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Update Cluster Kubeconfig
+  k8s:
+    state: present
+    definition: "{{ lookup('template','secrets/' + 'acm-kubeconfig-secret.yml.j2') }}"
+    apply: yes
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Update Cluster Kubeconfig
+  k8s:
+    state: present
+    definition: "{{ lookup('template','secrets/' + 'acm-admin-secret.yml.j2') }}"
+    apply: yes
+  when: cluster_name != 'mgmt'
+  no_log: true
+
+- name: Get token
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify
+    oc serviceaccounts get-token ansible-cluster-create -n ansible-automation-platform
+  register: ansibletoken
+  no_log: true
+  when: cluster_name == 'mgmt'
+  ignore_errors: true
+
+- name: Add AAP Credential for MGMT API
+  awx.awx.credential:
+    name: "{{ cluster_name }}-sa"
+    organization: Default
+    controller_username : "{{ aap_username }}"
+    controller_password : "{{ aap_password }}"
+    controller_host: "{{ aap_host }}"
+    validate_certs: no
+    state: present
+    credential_type: "OpenShift or Kubernetes API Bearer Token"
+    inputs:
+      host: "{{ K8S_AUTH_HOST }}"
+      verify_ssl: false
+      bearer_token: "{{ ansibletoken.stdout_lines[ansibletoken.stdout_lines|length-1] }}"
+  when: cluster_name == 'mgmt'
+  ignore_errors: true

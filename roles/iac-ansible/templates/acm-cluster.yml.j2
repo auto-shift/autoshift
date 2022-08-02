@@ -1,0 +1,135 @@
+apiVersion: hive.openshift.io/v1
+kind: ClusterDeployment
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ cluster_name }}
+  labels:
+    cloud: AWS
+    region: {{ region | default('us-east-1') }}
+    vendor: OpenShift
+    cluster.open-cluster-management.io/clusterset: {{ cluster_set }}
+spec:
+  baseDomain: {{ base_domain }}
+  clusterName: {{ cluster_name }}
+  controlPlaneConfig:
+    servingCertificates: {}
+  installAttemptsLimit: 1
+  installed: false
+  platform:
+    aws:
+      credentialsSecretRef:
+        name: {{ cluster_name }}-aws-creds
+      region: {{ region | default('us-east-1') }}
+  provisioning:
+    installConfigSecretRef:
+      name: {{ cluster_name }}-install-config
+    sshPrivateKeySecretRef:
+      name: {{ cluster_name }}-ssh-private-key
+    imageSetRef:
+      name: img{{ openshift_version }}-x86-64
+    manifestsConfigMapRef:
+      name: {{ cluster_name }}-manifest
+  pullSecretRef:
+    name: {{ cluster_name }}-pull-secret
+---
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  labels:
+    cloud: Amazon
+    region: {{ region | default('us-east-1') }}
+    name: {{ cluster_name }}
+    vendor: OpenShift
+    cluster.open-cluster-management.io/clusterset: {{ cluster_set }}
+  name: {{ cluster_name }}
+spec:
+  hubAcceptsClient: true
+---
+apiVersion: hive.openshift.io/v1
+kind: ClusterImageSet
+metadata:
+  name: img{{ openshift_version }}-x86-64
+spec:
+  releaseImage: quay.io/openshift-release-dev/ocp-release:{{ openshift_version }}-x86_64
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ cluster_name }}-pull-secret
+  namespace: {{ cluster_name }}
+stringData:
+  .dockerconfigjson: '{{ pull_secret }}'
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ cluster_name }}-install-config
+  namespace: {{ cluster_name }}
+type: Opaque
+data:
+  install-config.yaml: >-
+    {{ lookup('template', 'install-config.yaml.j2') | b64encode }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ cluster_name }}-ssh-private-key
+  namespace: {{ cluster_name }}
+stringData:
+  ssh-privatekey: {{ ssh_key }}
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: {{ cluster_name }}-aws-creds
+  namespace: {{ cluster_name }}
+stringData:
+  aws_access_key_id: {{ ocp_install_aws_access_key }}
+  aws_secret_access_key: {{ ocp_install_aws_secret_key }}
+---
+apiVersion: agent.open-cluster-management.io/v1
+kind: KlusterletAddonConfig
+metadata:
+  name: {{ cluster_name }}
+  namespace: {{ cluster_name }}
+spec:
+  clusterName: {{ cluster_name }}
+  clusterNamespace: {{ cluster_name }}
+  clusterLabels:
+    cloud: Amazon
+    vendor: OpenShift
+  applicationManager:
+    enabled: true
+  policyController:
+    enabled: true
+  searchCollector:
+    enabled: true
+  certPolicyController:
+    enabled: true
+  iamPolicyController:
+    enabled: true
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ cluster_name }}-manifest
+  namespace: {{ cluster_name }}
+data:
+  cluster-ingress-default-ingresscontroller.yaml: |
+    apiVersion: operator.openshift.io/v1
+    kind: IngressController
+    metadata:
+      name: default
+      namespace: openshift-ingress-operator
+    spec:
+      endpointPublishingStrategy:
+        loadBalancer:
+          providerParameters:
+            aws:
+              type: NLB
+            type: AWS
+          scope: Internal
+        type: LoadBalancerService

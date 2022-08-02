@@ -1,0 +1,20 @@
+---
+- name: Apply Cluster Resources Restore 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'oadp/'+item) }}"
+  loop:
+  - cluster-resources-restore.yml.j2
+
+- name: Apply Namespaces Resources Restore 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'oadp/'+item) }}"
+  loop:
+  - namespaces-resources-restore.yml.j2
+
+

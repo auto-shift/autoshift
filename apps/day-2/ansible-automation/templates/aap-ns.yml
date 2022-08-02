@@ -1,0 +1,10 @@
+{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ansible-automation-platform
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+{{ end }}

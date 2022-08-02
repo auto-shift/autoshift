@@ -1,0 +1,54 @@
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-options: PrunePropagationPolicy=orphan
+spec:
+  tokenConfig:
+    accessTokenMaxAgeSeconds: 28800
+    accessTokenInactivityTimeout: 10m
+  identityProviders:
+  - ldap:
+      attributes:
+        email:
+        - mail
+        id:
+        - dn
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "{{ .Values.binddn_uid }},ou=System Accounts,dc=cms,dc=hhs,dc=gov"
+      bindPassword:
+        name: ldap-secret
+      ca:
+        name: ca-config-map
+      insecure: false
+      url: {{ .Values.ldapurl }}{{ .Values.ldap_filter }}
+    mappingMethod: claim
+    name: ldapidp
+    type: LDAP
+  - mappingMethod: claim
+    name: okta
+    openID:
+      claims:
+        email:
+        - email
+        name:
+        - name
+        - email
+        preferredUsername:
+        - preferred_username
+        - email
+      clientID: {{ .Values.okta_client_id }}
+      clientSecret:
+        name: openid-okta-secret
+      extraScopes:
+      - email
+      - profile
+      issuer: {{ .Values.okta_issuer }}
+    type: OpenID
+  templates:
+    providerSelection:
+      name: providers-template

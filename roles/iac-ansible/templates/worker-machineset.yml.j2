@@ -1,0 +1,65 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: {{ infra_id }} 
+  name: {{ infra_id }}-worker-{{ item }}
+  namespace: openshift-machine-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: {{ infra_id }} 
+      machine.openshift.io/cluster-api-machineset: {{ infra_id }}-infra-{{ item }}
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: {{ infra_id }} 
+        machine.openshift.io/cluster-api-machine-role: worker 
+        machine.openshift.io/cluster-api-machine-type: worker 
+        machine.openshift.io/cluster-api-machineset: {{ infra_id }}-infra-{{ item }}
+    spec:
+      metadata: {}
+      taints:
+      - effect: NoSchedule
+        key: worker
+        value: reserved
+      - effect: NoExecute
+        key: worker
+        value: reserved
+      providerSpec:
+        value:
+          ami:
+            id: {{ ami_id }} 
+          apiVersion: awsproviderconfig.openshift.io/v1beta1
+          blockDevices:
+            - ebs:
+                iops: {{ worker.ebs.iops | default('0') }}
+                volumeSize: {{ worker.ebs.volumesize | default('120') }}
+                volumeType: {{ worker.ebs.volumetype | default('gp2') }}
+          credentialsSecret:
+            name: aws-cloud-credentials
+          deviceIndex: 0
+          iamInstanceProfile:
+            id: {{ infra_id }}-worker-profile 
+          instanceType: {{ worker.ec2_type | default('m5.2xlarge') }}
+          kind: AWSMachineProviderConfig
+          placement:
+            availabilityZone: {{ item }}
+            region: {{ region | default('us-east-1') }}
+          securityGroups:
+            - filters:
+                - name: tag:Name
+                  values:
+                    - {{ infra_id }}-worker-sg 
+          subnet: 
+            id: {{ subnet_id }}
+          tags:
+          - name: kubernetes.io/cluster/{{ cluster_name }}-{{ infra_id }}
+            value: owned
+          - name: autoOff
+            value: "true"
+          - name: cms-cloud-exempt:scan-exempt
+            value: "CLDSPT-12416"
+          userDataSecret:
+            name: worker-user-data 

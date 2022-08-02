@@ -1,0 +1,233 @@
+---
+- name: Set artifactory auth 
+  set_fact: 
+    docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
+
+- name: Create Secret for New Relic 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
+
+- name: Link Docker Config
+  shell: oc secrets link default docker-artifactory --for=pull -n newrelic
+
+- name: Create OpenShift Custom Web Console URL Certificate Secret
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'web-console-cert-secret.yml.j2') }}"
+  no_log: true
+
+- name: Get Ingress Facts
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    kind: Service
+    name: router-default
+    namespace: openshift-ingress
+  register: ingress_facts
+
+- name: Set Ingress Hostname Fact
+  set_fact:
+    ingress_hostname: "{{ ingress_facts.resources[0].status.loadBalancer.ingress[0].hostname }}"
+
+- name: Add Custom Console DNS Entry to Route 53
+  route53:
+    state: present
+    zone: "{{ cluster_name }}.{{ base_domain }}."
+    record: "openshift.{{ cluster_name }}.{{ base_domain }}"
+    type: CNAME
+    ttl: 300
+    value: "{{ ingress_hostname }}."
+    private_zone: true
+    overwrite: true
+
+- name: Create Group Sync Operator Namespace 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        annotations:
+          openshift.io/node-selector: ''
+        labels:
+          app.kubernetes.io/instance: ldap-groupsync
+          openshift.io/cluster-monitoring: 'true'
+        name: group-sync-operator
+
+- name: Create Secret for Groupsync 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ item }}"
+  loop:
+    - "{{ lookup('template','secrets/' + 'gso-creds.yml.j2') }}"
+    - "{{ lookup('template','secrets/' + 'gso-ca.yml.j2') }}"
+  no_log: true
+  
+- name: Create Secret for LDAP
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ item }}"
+  loop:
+    - "{{ lookup('template','secrets/' + 'ldap-secret.yml.j2') }}"
+    - "{{ lookup('template','secrets/' + 'ldap-ca-config-map.yml.j2') }}"
+  no_log: true
+
+- name: Create Secret for Okta 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'openid-okta-secret.yml.j2') }}"
+
+- name: Create Logging Namespace 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        annotations:
+          openshift.io/node-selector: ''
+        labels:
+          openshift.io/cluster-monitoring: 'true'
+        name: openshift-logging
+
+- name: Create Secret for Cloudwatch 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'cw-secret.yml.j2') }}"
+
+- name: Create Custom Ingress Certificate Workloads
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ item }}"
+  loop:
+  - "{{ lookup('template', 'secrets/ingress-certs.yml.j2') }}"
+  - "{{ lookup('template', 'secrets/api-certs.yml.j2') }}"
+  no_log: true
+
+- name: Create ACS Namespace 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        annotations:
+          openshift.io/node-selector: ''
+        labels:
+          openshift.io/cluster-monitoring: 'true'
+        name: stackrox
+
+- name: Create Secret for ACS 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'acs-init-bundle.yml.j2') }}"
+
+- name: Create Hibernation Namespace 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        annotations:
+          openshift.io/node-selector: ''
+        labels:
+          openshift.io/cluster-monitoring: 'true'
+        name: cluster-hibernation-resource-ns-0
+  when: cluster_name == 'mgmt'
+
+- name: Create Secret for Hibernation 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'git-secret.yml.j2') }}"
+  when: cluster_name == 'mgmt'
+
+- name: Create ADP Namespace 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: 
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        annotations:
+          openshift.io/node-selector: ''
+        labels:
+          openshift.io/cluster-monitoring: 'true'
+        name: open-cluster-management-backup
+
+- name: Set Ingress Hostname Fact
+  set_fact:
+    adp_aws_access: |
+      [default]
+      aws_access_key_id = {{ ocp_install_aws_access_key }}
+      aws_secret_access_key = {{ ocp_install_aws_secret_key }}
+
+- name: Create Secret for ADP 
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
+
+- name: Disable Server Version CR
+  k8s: 
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    force: yes
+    definition: "{{ lookup('template','public-info-cluster-role.yml.j2') }}"
+
+- name: Get AAP Password
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    name: "{{ cluster_name }}-admin-password"
+    api_version: v1
+    kind: Secret
+    namespace: ansible-automation-platform
+  register: admin_password
+
+- name: Apply TSSC App for MGMT
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/tssc-cluster-resources.yml.j2') }}"
+  when: cluster_name == 'mgmt'

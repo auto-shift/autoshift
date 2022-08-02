@@ -1,0 +1,32 @@
+# Default values for project-defaults.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+quotas:
+  - name: requests.cpu
+    enabled: true
+    qty: 1
+  - name: requests.memory
+    enabled: true
+    qty: 1Gi
+  - name: requests.ephemeral-storage
+    enabled: true
+    qty: 2Gi
+  - name: limits.cpu
+    enabled: true
+    qty: 2
+  - name: limits.memory
+    enabled: true
+    qty: 2Gi
+  - name: limits.ephemeral-storage
+    enabled: true
+    qty: 4Gi
+  - name: requests.storage
+    enabled: true
+    qty: 50Gi
+  - name: persistentvolumeclaims
+    enabled: true
+    qty: 10
+  - name: pods
+    enabled: true
+    qty: 10

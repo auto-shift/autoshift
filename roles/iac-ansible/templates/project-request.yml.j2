@@ -1,0 +1,144 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: project-request
+objects:
+- apiVersion: project.openshift.io/v1
+  kind: Project
+  metadata:
+    annotations:
+      openshift.io/description: ${PROJECT_DESCRIPTION}
+      openshift.io/display-name: ${PROJECT_DISPLAYNAME}
+      openshift.io/requester: ${PROJECT_REQUESTING_USER}
+    creationTimestamp: null
+    name: ${PROJECT_NAME}
+  spec: {}
+  status: {}
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin
+    namespace: ${PROJECT_NAME}
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: admin
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: ${PROJECT_ADMIN_USER}
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: storage-consumption
+  spec:
+    hard:
+{% if requests_cpu_quota %}
+      requests.cpu: {{ requests_cpu_qty }}
+{% endif %}
+{% if requests_memory_quota %}
+      requests.memory: {{ requests_memory_qty }}
+{% endif %} 
+{% if requests_ephemeral_quota %}
+      requests.ephemeral-storage: {{ requests_ephemeral_qty }}
+{% endif %}
+{% if limits_cpu_quota %} 
+      limits.cpu: {{ limits_cpu_qty }}
+{% endif %}
+{% if limits_memory_quota %}
+      limits.memory: {{ limits_memory_qty }}
+{% endif %}
+{% if limits_ephemeral_quota %}
+      limits.ephemeral-storage: {{ limits_ephemeral_qty }}
+{% endif %}
+{% if requests_storage_quota %}
+      requests.storage: {{ requests_storage_qty }}
+{% endif %}
+{% if pvc_quota %}
+      persistentvolumeclaims: {{ pvc_qty }}
+{% endif %}
+{% if pods_quota %}
+      pods: {{ pods_qty }}
+{% endif %}
+{% if rc_quota %}
+      replicationcontrollers: {{ rc_qty }}
+{% endif %}
+{% if resource_quota %}
+      resourcequotas: {{ resource_quota_qty }}
+{% endif %}
+{% if service_quota %}
+      services: {{ service_quota_qty }}
+{% endif %}
+{% if lb_quota %}
+      services.loadbalancers: {{ lb_qty }}
+{% endif %}
+{% if nodeport_quota %}
+      services_nodeports: {{ nodeport_qty }}
+{% endif %}
+{% if secret_quota %}
+      secrets: {{ secret_qty }}
+{% endif %}
+{% if configmap_quota %}
+      configmaps: {{ configmap_qty }}
+{% endif %}
+{% if is_quota %}
+      openshift.io/imagestreams: {{ is_qty }}
+{% endif %}
+{% if deployment_quota %}
+      deployments.apps: {{ deployment_qty }}
+{% endif %}
+{% if replicaset_quota %}
+      replicasets.apps: {{ replicaset_qty }}
+{% endif %}
+{% if statefulset_quota %}
+      deployments.apps: {{ statefulset_qty }}
+{% endif %}
+{% if job_quota %}
+      jobs.batch: {{ job_qty }}
+{% endif %}
+{% if cronjob_quota %}
+      cronjobs.batch: {{ cronjob_qty }}
+{% endif %}
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: allow-from-openshift-ingress
+  spec:
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            network.openshift.io/policy-group: ingress
+    podSelector: {}
+    policyTypes:
+    - Ingress
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: allow-from-openshift-monitoring
+  spec:
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            network.openshift.io/policy-group: monitoring
+    podSelector: {}
+    policyTypes:
+    - Ingress
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: allow-same-namespace
+  spec:
+    podSelector:
+    ingress:
+    - from:
+      - podSelector: {}
+parameters:
+- name: PROJECT_NAME
+- name: PROJECT_DISPLAYNAME
+- name: PROJECT_DESCRIPTION
+- name: PROJECT_ADMIN_USER
+- name: PROJECT_REQUESTING_USER

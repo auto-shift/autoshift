@@ -1,0 +1,13 @@
+{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: codeready-workspaces
+  namespace: openshift-workspaces
+spec:
+  channel: latest
+  installPlanApproval: AutomaticW
+  name: codeready-workspaces
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+{{ end }}

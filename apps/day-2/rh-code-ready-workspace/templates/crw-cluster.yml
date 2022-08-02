@@ -1,0 +1,51 @@
+{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+apiVersion: org.eclipse.che/v1
+kind: CheCluster
+metadata:
+  name: codeready-workspaces
+  namespace: openshift-workspaces
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  auth:
+    externalIdentityProvider: false
+    identityProviderAdminUserName: ''
+    identityProviderClientId: ''
+    identityProviderPassword: ''
+    identityProviderRealm: ''
+    identityProviderURL: ''
+    initialOpenShiftOAuthUser: true
+    oAuthClientName: ''
+    oAuthSecret: ''
+    nativeUserMode: true
+  database:
+    chePostgresDb: ''
+    chePostgresHostName: ''
+    chePostgresPassword: ''
+    chePostgresPort: ''
+    chePostgresUser: ''
+    externalDb: false
+  metrics:
+    enable: true
+  server:
+    allowUserDefinedWorkspaceNamespaces: false
+    cheClusterRoles: ''
+    cheFlavor: codeready
+    cheWorkspaceClusterRole: ''
+    gitSelfSignedCert: false
+    nonProxyHosts: ''
+    proxyPassword: ''
+    proxyPort: ''
+    proxyURL: ''
+    proxyUser: ''
+    serverExposureStrategy: ''
+    serverTrustStoreConfigMapName: ''
+    tlsSupport: true
+    workspaceNamespaceDefault: <username>-codeready
+  storage:
+    postgresPVCStorageClassName: 'ocs-storagecluster-ceph-rbd'
+    preCreateSubPaths: true
+    pvcClaimSize: 10Gi
+    pvcStrategy: common
+    workspacePVCStorageClassName: 'ocs-storagecluster-ceph-rbd'
+{{ end }}

@@ -1,0 +1,28 @@
+{{- range $subnet :=.Values.subnets }} 
+{{- range $machinehealthchecks := $.Values.machinehealthchecks }}
+---
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: {{ $.Values.infra_id }}-{{ .node }}-{{ $subnet.availability_zone }}
+  namespace: openshift-machine-api
+  annotations:
+    argocd.argoproj.io/sync-options: PrunePropagationPolicy=orphan
+spec:
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-machine-role: {{ .role }}
+      machine.openshift.io/cluster-api-machine-type: worker
+      machine.openshift.io/cluster-api-machineset: {{ $.Values.infra_id }}-{{ .node }}-{{ $subnet.availability_zone }}
+  unhealthyConditions:
+  - type:    "Ready"
+    timeout: "300s" 
+    status: "False"
+  - type:    "Ready"
+    timeout: "300s" 
+    status: "Unknown"
+  maxUnhealthy: "40%" 
+  nodeStartupTimeout: "10m"
+{{- end }}
+{{- end }}
+

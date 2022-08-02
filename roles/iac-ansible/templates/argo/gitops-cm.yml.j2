@@ -1,0 +1,65 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: argocd-cm
+  namespace: openshift-gitops
+  labels:
+    app.kubernetes.io/managed-by: openshift-gitops
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+{% if (cluster_name == 'mgmt') or (cluster_name == 'infra') %}
+  accounts.admin_argo_user: 'apiKey,login'
+  accounts.example_argo_user: 'apiKey,login'
+{% endif %}
+  admin.enabled: 'true'
+  statusbadge.enabled: 'false'
+  resource.exclusions: |a
+    - apiGroups:
+      - tekton.dev
+      clusters:
+      - '*'
+      kinds:
+      - TaskRun
+      - PipelineRun
+  ga.trackingid: ''
+  repositories: >
+    - url: {{ gitops_repo_url }}
+      passwordSecret:
+        name: cms-github
+        key: password
+      usernameSecret:
+        name: cms-github
+        key: username
+    - url:
+    {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
+      passwordSecret:
+        name: cms-github
+        key: password
+      usernameSecret:
+        name: cms-github
+        key: username
+  ga.anonymizeusers: 'false'
+  help.chatUrl: ''
+  url: 'https://argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
+  help.chatText: ''
+  kustomize.buildOptions: ''
+  resource.inclusions: ''
+  repository.credentials: ''
+  dex.config: |
+    connectors:
+      # OpenShift
+      - type: openshift
+        id: openshift
+        name: OpenShift
+        config:
+          issuer: https://api.{{ cluster_name }}.{{ base_domain }}:6443
+          clientID: system:serviceaccount:openshift-gitops:openshift-gitops-argocd-dex-server
+          clientSecret: 
+          redirectURI: https://argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}/api/dex/callback
+          insecureCA: true
+          groups:
+            - MMT_IMP_RH
+  configManagementPlugins: ''
+  application.instanceLabelKey: ''
+  users.anonymous.enabled: 'false'

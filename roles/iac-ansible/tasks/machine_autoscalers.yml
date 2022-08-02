@@ -1,0 +1,20 @@
+---
+- name: Get OpenShift Infra Cluster Facts
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    kind: Infrastructure
+    name: cluster
+  register: infra_facts
+
+- name: Set Infra ID
+  set_fact:
+    infra_id: "{{ infra_facts.resources[0].status.infrastructureName }}"
+
+- name: Create MachineAutoscaler
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'machineautoscaler.yml.j2') }}"
+  loop: "{{ lookup('dict', machineset_types) }}"

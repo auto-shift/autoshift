@@ -1,0 +1,6 @@
+# Default values for infra-nodes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+gk_img_tag: v3.3.0-18
+allowed_git_repos:
+- repo: https://github.cms.gov

@@ -1,0 +1,104 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argo-apps-day-1
+  namespace: {{ gitops_namespace }}
+  labels:
+    velero.io/exclude-from-backup: "true"
+spec:
+  generators:
+  - git:
+      repoURL: {{ gitops_repo_url }}
+{% if branch_tag != '' %}
+      revision: {{ branch_tag }}
+{% else %}
+      revision: master
+{% endif %}
+      directories:
+      - path: 'apps/day-1/*'
+  template:
+    metadata:
+      name: '{{ metadata_name }}'
+      labels:
+        app: argo-apps-day-1
+        velero.io/exclude-from-backup: "true"
+    spec:
+      project: default
+      source:
+        path: '{{ source_path }}'
+        repoURL: '{{ gitops_repo_url }}'
+{% if branch_tag != '' %}
+        targetRevision: {{ branch_tag }}
+{% else %}
+        targetRevision: master
+{% endif %}
+        helm:
+          parameters:
+          - name: gitops_repo_url
+            value: '{{ gitops_repo_url }}'
+          - name: gitops_namespace
+            value: '{{ gitops_namespace }}'
+          - name: cluster_name
+            value: {{ cluster_name }}       
+          - name: infra_id
+            value: {{ infra_id }}
+          - name: region
+            value: {{ region }}
+          - name: ami_id
+            value: {{ ami_id }}
+          - name: instance_type
+            value: '{{ infra.ec2_type }}'
+          - name: vpc_cidr
+            value: {{ vpc_cidr }}
+          - name: vpn_cidr
+            value: {{ vpn_cidr }} 
+          - name: subnet_id_a
+            value: {{ subnet_id_a }}
+          - name: subnet_id_b
+            value: {{ subnet_id_b }}
+          - name: subnet_id_c
+            value: {{ subnet_id_c }}
+          - name: ldapurl
+            value: {{ ldapurl }}
+          - name: radiant_url
+            value: {{ radiant_url }}
+          - name: cluster_admin_group
+            value: {{ cluster_admin_group }}
+          - name: group_filter
+            value: {{ group_filter }}
+          - name: ldap_filter
+            value: "{{ ldap_filter }}"
+          - name: binddn_uid
+            value: "{{ binddn | regex_search('[^,]*') }}"
+          - name: okta_client_id
+            value: {{ okta_client_id }}
+          - name: okta_issuer
+            value: {{ okta_issuer }}
+          - name: pagerduty_prometheus_key
+            value: {{ pagerduty_prometheus_key }}
+          - name: pagerduty_events_key
+            value: {{ pagerduty_events_key }}
+          - name: base_domain
+            value: {{ base_domain }}
+{% if branch_tag != '' %}
+          - name: targetrevision
+            value: {{ branch_tag }}
+{% endif %}
+          valueFiles:
+          - values/values.yaml
+          values: |
+            subnets:
+{% for subnet in subnet_facts.subnets %}
+            - subnet_id: {{ subnet.subnet_id }}
+              availability_zone: {{ subnet.availability_zone }}
+{% endfor %}
+      syncPolicy:
+        preserveResourcesOnDeletion: true
+        automated:
+          prune: false
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: {{ gitops_namespace }}

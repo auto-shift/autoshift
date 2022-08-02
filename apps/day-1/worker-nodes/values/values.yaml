@@ -1,0 +1,9 @@
+# Default values for worker-nodes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+infra_id:
+region:
+ami_id:
+subnets:
+instance_type: m5.4xlarge

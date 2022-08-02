@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: file-integrity-operator
+  namespace: openshift-file-integrity
+spec:
+  installPlanApproval: Automatic
+  name: file-integrity-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace

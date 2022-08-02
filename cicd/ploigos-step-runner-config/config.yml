@@ -1,0 +1,34 @@
+---
+step-runner-config:
+  config-decryptors:
+  - implementer: SOPS
+
+  global-defaults:
+    organization: enba417
+    application-name: iac
+    service-name: rebaseline
+  generate-metadata:
+  - implementer: Git
+  - implementer: SemanticVersion
+    config:
+      is-pre-release: True
+      app-version: 0.0.1
+
+  tag-source:
+  - implementer: Git
+    config:
+      git-username: svc_acct
+  
+  static-code-analysis:
+  - implementer: SonarQube
+    config:
+      url: https://sonarqube.com
+      project-key: iac
+      sonar-analyze-branches: True
+
+  report:
+  - implementer: ResultArtifactsArchive
+    config:
+      results-archive-destination-url: https://github.com/enba417/tssc-report-archives/
+      results-archive-destination-username: svc-acct
+

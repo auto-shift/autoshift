@@ -1,0 +1,119 @@
+---
+- name: List custom objects created using CRD
+  kubernetes.core.k8s_info:
+    kind: Project
+    api_version: "project.openshift.io/v1"
+    name: "{{ cluster_name }}"
+  register: project_namespace
+
+- name: Remove ManagedCluster
+  kubernetes.core.k8s:
+    state: absent
+    api_version: cluster.open-cluster-management.io/v1
+    kind: ManagedCluster
+    name: "{{ cluster_name }}"
+  when: project_namespace.resources[0].status is defined
+
+- name: Remove ClusterDeployment
+  kubernetes.core.k8s:
+    state: absent
+    api_version: hive.openshift.io/v1
+    kind: ClusterDeployment
+    name: "{{ cluster_name }}"
+    namespace: "{{ cluster_name }}"
+  when: project_namespace.resources[0].status is defined
+
+- name: Wait for deprovision to complete
+  shell: |
+    oc wait -n {{ cluster_name }} --for=condition=complete jobs --selector hive.openshift.io/cluster-deployment-name={{ cluster_name }},hive.openshift.io/job-type=deprovision --timeout=15m
+  register: oc_get_pods
+  retries: 10
+  delay: 30
+  until: oc_get_pods.rc == 0
+  when: project_namespace.resources[0].status is defined
+
+- name: Gather Hosted Zones
+  route53_info:
+    query: hosted_zone
+  register: hz_facts
+
+- name: Define hosted_zone_id
+  set_fact:
+    hosted_zone_id: "{{ item.Id.split('/')[2] }}"
+  when: item.Name == cluster_name+'.'+base_domain+'.'
+  loop: "{{ hz_facts.list }}"
+
+- name: Retrieve api_int details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "api-int.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: api_int
+
+- name: Retrieve api details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "api.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: api
+
+- name: Retrieve app details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "*.apps.{{ cluster_name }}.{{ base_domain }}"
+    type: A
+  register: apps
+
+- name: Retrieve cname details for {{ hosted_zone_id }}
+  community.aws.route53:
+    state: get
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "openshift.{{ cluster_name }}.{{ base_domain }}"
+    type: CNAME
+  register: cname
+
+- name: Delete api_int record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ api_int.set.record }}"
+    type: "{{ api_int.set.type }}"
+    value: "{{ api_int.set.value }}"
+    alias: "{{ api_int.set.alias }}"
+    alias_hosted_zone_id: "{{ api_int.set.alias_hosted_zone_id }}"
+  when: api_int.set.record is defined
+
+- name: Delete api record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ api.set.record }}"
+    type: "{{ api.set.type }}"
+    value: "{{ api.set.value }}"
+    alias: "{{ api.set.alias }}"
+    alias_hosted_zone_id: "{{ api.set.alias_hosted_zone_id }}"
+  when: api.set.record is defined
+
+- name: Delete apps record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ apps.set.record }}"
+    type: "{{ apps.set.type }}"
+    value: "{{ apps.set.value }}"
+    alias: "{{ apps.set.alias }}"
+    alias_hosted_zone_id: "{{ apps.set.alias_hosted_zone_id }}"
+  when: apps.set.record is defined
+
+- name: Delete cname record 
+  community.aws.route53:
+    state: absent
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    record: "{{ cname.set.record }}"
+    type: "{{ cname.set.type }}"
+    value: "{{ cname.set.value }}"
+    ttl: "{{ cname.set.ttl }}"
+  when: cname.set.record is defined

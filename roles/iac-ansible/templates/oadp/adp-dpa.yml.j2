@@ -1,0 +1,48 @@
+apiVersion: oadp.openshift.io/v1alpha1
+kind: DataProtectionApplication
+metadata:
+  name: dpa-{{ cluster_name }}
+  namespace: open-cluster-management-backup
+spec:
+  backupLocations:
+    - velero:
+        config:
+          profile: default
+          region: "{{ region }}"
+        credential:
+          key: cloud
+          name: cloud-credentials
+        default: true
+        objectStorage:
+          bucket: "{{ organization }}-{{ cluster_name }}-backup"
+          prefix: "{{ organization }}-{{ cluster_name }}"
+        provider: aws
+  configuration:
+    restic:
+      enable: true
+      podConfig:
+        resourceAllocations:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+    velero:
+      defaultPlugins:
+        - openshift
+        - aws
+      podConfig:
+        resourceAllocations:
+          limits:
+            cpu: '1'
+            memory: 2Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+  snapshotLocations:
+    - velero:
+        config:
+          profile: default
+          region: "{{ region }}"
+        provider: aws

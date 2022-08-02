@@ -1,0 +1,33 @@
+---
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: gitops-repo-sops
+  namespace: {{ gitops_namespace }}
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/{{ gitops_namespace }}/gitops-repo-server-sops:latest
+  resources: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: 'registry.redhat.io/openshift-gitops-1/argocd-rhel8:{{ argocd_image_version }}'
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: '{{ gitops_repo_url }}'
+{% if branch_tag != '' %}
+      ref: {{ branch_tag }}
+{% else %}
+      ref: master
+{% endif %}
+    contextDir: argo-containers/argocd-repo-server-sops
+    sourceSecret:
+      name: cms-github
+  runPolicy: Serial

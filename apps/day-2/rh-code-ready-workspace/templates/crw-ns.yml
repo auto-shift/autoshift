@@ -1,0 +1,10 @@
+{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-workspaces
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+{{ end }}

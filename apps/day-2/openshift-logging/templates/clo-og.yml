@@ -1,0 +1,10 @@
+# operator group object yaml file for cluster logging operator
+
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cluster-logging
+  namespace: {{ .Values.logging_namespace }}
+spec:
+  targetNamespaces:
+  - {{ .Values.logging_namespace }}

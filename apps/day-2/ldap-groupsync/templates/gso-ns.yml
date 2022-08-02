@@ -1,0 +1,9 @@
+# yaml file to create namespace for Group Sync Operator
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: group-sync-operator
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"

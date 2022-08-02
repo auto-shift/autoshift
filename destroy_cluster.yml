@@ -1,0 +1,41 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Destroy Cluster
+  hosts: localhost
+  gather_facts: no 
+  environment:
+    K8S_AUTH_SSL_CA_CERT: '/etc/pki/tls/certs/ca-bundle.crt'
+    K8S_AUTH_VERIFY_SSL: 'no'
+  vars:
+    destroy_cluster: true
+    destroy_cluster_acm: false
+  vars_files:
+    - vars/all/main.yml
+  tasks:
+  - name: Confirm Cluster
+    pause:
+      prompt: "Confirm cluster (infra/dev/test/sbx/mgmt/prod/impl)"
+    register: cluster_response
+    delegate_to: localhost
+
+  - name: Store Env
+    set_fact:
+      env: "{{ cluster_response.user_input }}"
+
+  - name: Confirm Destroying Cluster
+    pause:
+      prompt: "Do you want to destroy the cluster (yes/no)?"
+    register: destroy_response
+    delegate_to: localhost
+
+  - name: Example using fail and when together
+    fail:
+      msg: Automation stopped, prompt response no for destroying cluster.
+    when: hostvars['localhost'].destroy_response.user_input != "yes"
+
+  - name: "Include vars for {{ env }}"
+    include_vars: "vars/{{ env }}/main.yml"
+
+  - name: Run Role
+    include_role: 
+      name: destroy-cluster

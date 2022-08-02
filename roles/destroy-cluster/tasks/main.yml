@@ -1,0 +1,8 @@
+---
+- name: Destroy OpenShift Cluster
+  include_tasks: destroy_cluster.yml
+  when: destroy_cluster
+
+- name: Destroy OpenShift Cluster
+  include_tasks: destroy_cluster_acm.yml
+  when: destroy_cluster_acm

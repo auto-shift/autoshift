@@ -1,0 +1,4 @@
+# Cluster Name to add to ACS in MGMT
+cluster_name:
+# ACS Init Bundle from AWS Secret Manager
+acs_init_bundle:

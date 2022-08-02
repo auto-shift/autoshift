@@ -1,0 +1,9 @@
+{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+apiVersion: cluster.open-cluster-management.io/v1alpha1
+kind: ManagedClusterSet
+metadata:
+  name: {{ .Values.cluster_set }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec: {}
+{{ end }}

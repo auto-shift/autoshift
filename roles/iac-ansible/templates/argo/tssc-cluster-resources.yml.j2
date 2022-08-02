@@ -1,0 +1,21 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: tssc-cluster-resources
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tssc-jenkins-cluster-resources
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: tssc-cluster-resources
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    chart: ploigos-workflow-jenkins-cluster-resources
+    repoURL: 'https://ploigos.github.io/ploigos-charts'
+    targetRevision: 0.22.0
+  syncPolicy: {}

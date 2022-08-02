@@ -1,0 +1,60 @@
+---
+- set_fact:
+    app_set_ready: False
+
+- name: Get ApplicationSet Status
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    name: "{{ app_set_name }}"
+    namespace: openshift-gitops
+  register: app_set_info
+  retries: 30
+  delay: 10
+  until:
+  - app_set_info.resources[0] is defined
+  - app_set_info.resources[0].status is defined
+  - app_set_info.resources[0].status.conditions is defined
+
+- set_fact:
+    conditions: "{{ app_set_info.resources[0].status.conditions }}"
+
+- set_fact:
+    app_set_ready: True
+  when: item.type == 'ResourcesUpToDate' and item.status == 'True'
+  loop: "{{ conditions }}"
+
+- name: Recheck ApplicationSet Status
+  include_tasks: check_apps.yml
+  when: app_set_ready == 'False' and (loop_count | int) <  60
+
+- name: Get Apps Status
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    namespace: openshift-gitops
+    label_selectors:
+      - app="{{ app_set_name }}" 
+  register: apps_info
+
+- name: Check Apps Status
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    namespace: openshift-gitops
+    name: "{{ item }}.metadata.name"
+  loop: "{{ apps_info.resources }}"
+  register: app_status
+  retries: 30
+  delay: 10
+  until:
+  - app_status.resources[0] is defined
+  - app_status.resources[0].status.sync.status == 'Synced'
+  - app_status.resources[0].status.health.status == 'Healthy'
+

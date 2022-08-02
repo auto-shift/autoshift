@@ -1,0 +1,26 @@
+vpc_name: ocp-east-dev
+cluster_name: dev
+openshift_version: 4.9.31
+base_domain: 
+region: us-east-1
+
+#LDAP vars
+ldap_filter: 
+
+#LDAP groupsync vars
+group_filter: 
+cluster_admin_group: 
+
+machineset_types:
+  infra:
+    replicas:
+      min: 1
+      max: 2
+  worker:
+    replicas:
+      min: 1
+      max: 2
+  storage:
+    replicas:
+      min: 1
+      max: 2

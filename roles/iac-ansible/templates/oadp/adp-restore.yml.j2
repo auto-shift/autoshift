@@ -1,0 +1,17 @@
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: {{ latest_backup }}
+  namespace: openshift-adp
+spec:
+  backupName: {{ latest_backup }}
+  excludedResources:
+    - nodes
+    - events
+    - events.events.k8s.io
+    - backups.velero.io
+    - restores.velero.io
+    - resticrepositories.velero.io
+  includeClusterResources: true
+  preserveNodePorts: true
+  restorePVs: true
