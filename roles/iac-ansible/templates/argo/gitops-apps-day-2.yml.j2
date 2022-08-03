@@ -92,13 +92,19 @@ spec:
             - subnet_id: {{ subnet.subnet_id }}
               availability_zone: {{ subnet.availability_zone }}
 {% endfor %}
+      ignoreDifferences:
+      - group: "apps"
+        kind: "Project"
+        jsonPointers:
+        - /metadata/annotations
+        - /metadata/labels
       syncPolicy:
         preserveResourcesOnDeletion: true
         automated:
           prune: false
           selfHeal: true
         syncOptions:
-          - CreateNamespace=true
+        - RespectIgnoreDifferences=true
       destination:
         server: https://kubernetes.default.svc
         namespace: {{ gitops_namespace }}
