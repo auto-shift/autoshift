@@ -49,6 +49,3 @@ spec:
       - profile
       issuer: {{ .Values.okta_issuer }}
     type: OpenID
-  templates:
-    providerSelection:
-      name: providers-template
