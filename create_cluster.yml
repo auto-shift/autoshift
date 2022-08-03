@@ -48,4 +48,4 @@
     - vars/all/main.yml
     - "vars/{{ hostvars['localhost']['env'] }}/main.yml"
   roles: 
-    - msf-iac-day-1
+    - iac-ansible

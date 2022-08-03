@@ -1,21 +1,21 @@
-#msf-iac-day-1 options
+#iac-ansible options
 # setup_dependencies: true
 # create_cluster: true
 # install_argo: true
 # install_argo_apps: true
 # remove_kubeadmin: true
 
-#msf-iac-day-1 variables
+#iac-ansible variables
 # Image version should match argo-containers/argocd-repo-server-sops/Dockerfile
 argocd_image_version: 'v1.4.4'
 
 region: us-east-1
 branch_tag: ''
-organization: enba417
-github_url: https://github.com/enba417
+organization: autoshift
+github_url: https://github.com/bcarr-rh
 
 # ArgoCD Variables
-gitops_repo_url: https://github.com/enba417/iac-automation.git
+gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
 
 #LDAP groupsync vars
 basedn: 

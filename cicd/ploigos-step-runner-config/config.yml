@@ -4,7 +4,7 @@ step-runner-config:
   - implementer: SOPS
 
   global-defaults:
-    organization: enba417
+    organization: autoshift
     application-name: iac
     service-name: rebaseline
   generate-metadata:
@@ -29,6 +29,6 @@ step-runner-config:
   report:
   - implementer: ResultArtifactsArchive
     config:
-      results-archive-destination-url: https://github.com/enba417/tssc-report-archives/
+      results-archive-destination-url: https://github.com/bcarr-rh/tssc-report-archives/
       results-archive-destination-username: svc-acct
 

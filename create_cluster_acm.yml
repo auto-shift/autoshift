@@ -20,4 +20,4 @@
     - vars/all/main.yml
     - "vars/{{ env }}/main.yml"
   roles: 
-    - msf-iac-day-1
+    - iac-ansible

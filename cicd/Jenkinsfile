@@ -2,12 +2,12 @@
 library identifier: 'jenkins-library@feature/cms-workflow',
 retriever: modernSCM([
     $class: 'GitSCMSource',
-    remote: 'https://github.com/enba417/jenkins-library.git',
+    remote: 'https://github.com/bcarr-rh/jenkins-library.git',
     credentialsId: 'svc_acct'
 ])
 
 // run the pipeline
-cmsWorkflowMsfIac(
+workflowAutoshift(
     stepRunnerConfigDir: 'cicd/ploigos-step-runner-config/',
     pgpKeysSecretName: 'pgp-keys-ploigos-workflow-ref-quarkus-mvn-fruit',
 
