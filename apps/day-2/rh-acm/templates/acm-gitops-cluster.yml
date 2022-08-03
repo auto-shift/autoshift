@@ -13,6 +13,6 @@ spec:
   placementRef:
     kind: Placement
     apiVersion: cluster.open-cluster-management.io/v1alpha1
-    name: {{ .Values.cluster_set }}
+    name: momot-clusters
     namespace: openshift-gitops
 {{ end }}

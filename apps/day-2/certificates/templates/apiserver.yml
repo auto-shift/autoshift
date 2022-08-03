@@ -3,6 +3,10 @@ kind: APIServer
 metadata:
   name: cluster
 spec:
+  encryption:
+    type: aescbc
+  audit:
+    profile: Default
   servingCerts:
     namedCertificates:
     - names: 

@@ -1,6 +1,6 @@
 {{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
-apiVersion: v1
-kind: Namespace
+apiVersion: project.openshift.io/v1
+kind: Project
 metadata:
   name: openshift-serverless
   annotations:

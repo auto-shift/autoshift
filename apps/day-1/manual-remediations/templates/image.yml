@@ -11,12 +11,12 @@ spec:
   allowedRegistriesForImport:
     - domainName: quay.io
       insecure: false
-    - domainName: registry.redhat.io
+    - domainName: registry.connect.redhat.com
       insecure: false
-    - domainName: artifactory.cloud.cms.gov
+    - domainName: registry.redhat.io
       insecure: false
   registrySources:
     allowedRegistries:
+      - registry.connect.redhat.com
       - quay.io
       - registry.redhat.io
-      - artifactory.cloud.cms.gov

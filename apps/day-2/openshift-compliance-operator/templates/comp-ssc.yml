@@ -1,0 +1,38 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: restricted-adjusted-compliance
+allowHostPorts: false
+priority: 30
+requiredDropCapabilities:
+  - KILL
+  - SETUID
+  - SETGID
+  - MKNOD
+allowPrivilegedContainer: false
+runAsUser:
+  type: MustRunAsRange
+users:
+  - 'system:serviceaccount:openshift-compliance:api-resource-collector'
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+seLinuxContext:
+  type: MustRunAs
+readOnlyRootFilesystem: false
+fsGroup:
+  type: MustRunAs
+groups: []
+defaultAddCapabilities: null
+supplementalGroups:
+  type: RunAsAny
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - persistentVolumeClaim
+  - projected
+  - secret
+allowHostPID: false
+allowHostNetwork: false
+allowPrivilegeEscalation: true
+allowedCapabilities: null

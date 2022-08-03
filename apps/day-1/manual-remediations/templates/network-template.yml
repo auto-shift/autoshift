@@ -52,6 +52,29 @@ objects:
     podSelector: {}
     policyTypes:
     - Ingress
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    name: default-quota
+  spec:
+    hard: {}
+# {{- range .Values.quotas }}
+#       {{ .name }}: {{ .qty }}
+# {{- end }}
+- apiVersion: networking.k8s.io/v1
+  kind: NetworkPolicy
+  metadata:
+    name: allow-from-openshift-monitoring
+    namespace: ${PROJECT_NAME}
+  spec:
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            network.openshift.io/policy-group: monitoring
+    podSelector: {}
+    policyTypes:
+    - Ingress
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:

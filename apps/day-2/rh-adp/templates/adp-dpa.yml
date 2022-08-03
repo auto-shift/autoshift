@@ -16,8 +16,8 @@ spec:
           name: cloud-credentials
         default: true
         objectStorage:
-          bucket: "{{ .Values.organization }}-{{ .Values.cluster_name }}-backup"
-          prefix: "{{ .Values.organization }}-{{ .Values.cluster_name }}"
+          bucket: "momot-{{ .Values.cluster_name }}-backup"
+          prefix: "momot-{{ .Values.cluster_name }}"
         provider: aws
   configuration:
     restic:

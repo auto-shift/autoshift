@@ -2,7 +2,7 @@
 apiVersion: cluster.open-cluster-management.io/v1alpha1
 kind: ManagedClusterSet
 metadata:
-  name: {{ .Values.cluster_set }}
+  name: momot-clusters
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec: {}

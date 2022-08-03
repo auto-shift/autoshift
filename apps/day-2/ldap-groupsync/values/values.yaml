@@ -8,6 +8,7 @@
 #ldap_groupsync vars
 group_membership_attr: uniquemember
 group_name_attr: cn
+basedn: ou=momot,dc=cms,dc=hhs,dc=gov
 user_name_attr: uid
 user_uid_attr: dn
 sync_schedule: 0,10,20,30,40,50 * * * *
@@ -16,4 +17,3 @@ sync_schedule: 0,10,20,30,40,50 * * * *
 group_filter:
 cluster_admin_group:
 radiant_url: 
-basedn:

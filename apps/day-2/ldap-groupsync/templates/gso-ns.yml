@@ -1,6 +1,6 @@
 # yaml file to create namespace for Group Sync Operator
-apiVersion: v1
-kind: Namespace
+apiVersion: project.openshift.io/v1
+kind: Project
 metadata:
   name: group-sync-operator
   annotations:

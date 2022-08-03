@@ -2,10 +2,10 @@
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: ManagedClusterSetBinding
 metadata:
-  name: {{ .Values.cluster_set }}
+  name: momot-clusters
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  clusterSet: {{ .Values.cluster_set }}
+  clusterSet: momot-clusters
 {{ end }}

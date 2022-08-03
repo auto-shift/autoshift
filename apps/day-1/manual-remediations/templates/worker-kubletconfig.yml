@@ -1,0 +1,39 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+  name: worker-kubeletconfig
+spec:
+  kubeletConfig:
+    tlsCipherSuites:
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+    eventRecordQPS: 5
+    evictionSoft:
+      imagefs.available: 15%
+      imagefs.inodesFree: 10%
+      memory.available: 500Mi
+      nodefs.available: 10%
+      nodefs.inodesFree: 5%
+    evictionHard:
+      imagefs.available: 10%
+      imagefs.inodesFree: 5%
+      memory.available: 200Mi
+      nodefs.available: 5%
+      nodefs.inodesFree: 4%
+    imageMinimumGCAge: 5m
+    evictionSoftGracePeriod:
+      imagefs.available: 1m30s
+      imagefs.inodesFree: 1m30s
+      memory.available: 1m30s
+      nodefs.available: 1m30s
+      nodefs.inodesFree: 1m30s
+    imageGCHighThresholdPercent: 80
+    imageGCLowThresholdPercent: 75
+    evictionPressureTransitionPeriod: 0s
+    streamingConnectionIdleTimeout: 5m0s
+    makeIPTablesUtilChains: true
+  machineConfigPoolSelector:
+    matchLabels:
+      pools.operator.machineconfiguration.openshift.io/worker: ''
