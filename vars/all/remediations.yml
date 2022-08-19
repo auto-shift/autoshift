@@ -1,28 +1,19 @@
 remediation_list:
-  - rhcos4-moderate-master-chronyd-client-only
-  - rhcos4-moderate-master-chronyd-no-chronyc-network
-  - rhcos4-moderate-worker-chronyd-client-only
-  - rhcos4-moderate-worker-chronyd-no-chronyc-network
-  - rhcos4-moderate-master-chronyd-or-ntpd-set-maxpoll
-  - rhcos4-moderate-master-chronyd-or-ntpd-specify-multiple-servers
-  - rhcos4-moderate-worker-chronyd-or-ntpd-set-maxpoll
-  - rhcos4-moderate-worker-chronyd-or-ntpd-specify-multiple-servers
-  - rhcos4-moderate-master-disable-ctrlaltdel-burstaction
-  - rhcos4-moderate-master-disable-ctrlaltdel-reboot
-  - rhcos4-moderate-worker-disable-ctrlaltdel-burstaction
-  - rhcos4-moderate-worker-disable-ctrlaltdel-reboot
-  - rhcos4-e8-master-sshd-disable-gssapi-auth
-  - rhcos4-e8-master-sshd-disable-user-known-hosts
-  - rhcos4-e8-worker-sshd-disable-gssapi-auth
-  - rhcos4-e8-worker-sshd-disable-user-known-hosts
-  - rhcos4-moderate-master-sshd-set-idle-timeout
-  - rhcos4-moderate-master-sshd-set-keepalive-0
-  - rhcos4-moderate-worker-sshd-set-idle-timeout
-  - rhcos4-moderate-worker-sshd-set-keepalive-0
-  - rhcos4-e8-master-no-empty-passwords
-  - rhcos4-e8-worker-no-empty-passwords
-  - rhcos4-moderate-master-no-empty-passwords
-  - rhcos4-moderate-worker-no-empty-passwords
+  - ocp4-cis-api-server-encryption-provider-cipher
+  - ocp4-cis-api-server-encryption-provider-config
+  - ocp4-cis-node-master-kubelet-configure-event-creation
+  - ocp4-cis-node-master-kubelet-configure-tls-cipher-suites
+  - ocp4-cis-node-master-kubelet-enable-iptables-util-chains
+  - ocp4-cis-node-master-kubelet-enable-protect-kernel-sysctl
+  - ocp4-cis-node-worker-kubelet-configure-event-creation
+  - ocp4-cis-node-worker-kubelet-configure-tls-cipher-suites
+  - ocp4-cis-node-worker-kubelet-enable-iptables-util-chains
+  - ocp4-cis-node-worker-kubelet-enable-protect-kernel-sysctl
+  - ocp4-e8-api-server-encryption-provider-cipher
+  - ocp4-moderate-api-server-encryption-provider-cipher
+  - ocp4-moderate-api-server-encryption-provider-config
+  - ocp4-moderate-audit-profile-set
+  - ocp4-moderate-oauth-or-oauthclient-inactivity-timeout
   - rhcos4-e8-master-audit-rules-dac-modification-chmod
   - rhcos4-e8-master-audit-rules-dac-modification-chown
   - rhcos4-e8-master-audit-rules-execution-chcon

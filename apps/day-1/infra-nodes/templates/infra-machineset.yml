@@ -67,8 +67,6 @@ spec:
             value: owned
           - name: autoOff
             value: "true"
-          - name: cms-cloud-exempt:scan-exempt
-            value: "CLDSPT-12416"
           userDataSecret:
             name: worker-user-data
 {{- end }}

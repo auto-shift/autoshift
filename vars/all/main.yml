@@ -21,7 +21,7 @@ gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
 basedn: 
 
 # ACM Vars
-cluster_set:
+cluster_set: autoshift-clusters
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets

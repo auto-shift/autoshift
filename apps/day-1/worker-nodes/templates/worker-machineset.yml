@@ -55,8 +55,6 @@ spec:
               value: owned
             - name: autoOff
               value: 'true'
-            - name: 'cms-cloud-exempt:scan-exempt'
-              value: CLDSPT-12416
           deviceIndex: 0
           ami:
             id: {{ $.Values.ami_id }}

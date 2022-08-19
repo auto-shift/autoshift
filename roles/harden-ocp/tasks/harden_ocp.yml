@@ -9,11 +9,13 @@
     name: "{{ item }}"
   register: compliancecheck_status_out
 
-- debug:
+- name: Check if Pass
+  debug:
     msg: "ComplianceCheck for {{ item }} passed. Skipping remediation."
   when: compliancecheck_status_out.resources[0] is defined and compliancecheck_status_out.resources[0].status == "PASS"
 
-- debug:
+- name: Check if Exists
+  debug:
     msg: "ComplianceCheck for {{ item }} does not exist. Please review remediation_list."
   when: compliancecheck_status_out.resources[0] is not defined
 

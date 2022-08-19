@@ -91,6 +91,9 @@ spec:
       - openshift-storage
       - openshift-user-workload-monitoring
       - openshift-vsphere-infra
+      - stackrox
+      - newrelic
+      - fluent-bit-logging
     includedResources:
       - pods
       - persistentvolumeclaims

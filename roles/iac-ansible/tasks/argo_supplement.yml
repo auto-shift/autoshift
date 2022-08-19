@@ -1,14 +1,47 @@
 ---
 - name: Set artifactory auth 
   set_fact: 
-    docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
+    docker_artifactory_auth: "{{ momot_infra_svc_acct_name }}:{{ momot_infra_svc_acct_password }}"
+
+- name: Create Secret for New Relic 
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    kind: Secret
+    name: kube-etcd-client-certs
+    namespace: openshift-monitoring
+  register: etcd_client_certs
+
+- name: Add New Relic App
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
 
 - name: Create Secret for New Relic 
   k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
-    definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
+    definition:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: kube-etcd-client-certs
+        namespace: newrelic
+      data:
+        cacert: "{{ etcd_client_certs.resources[0].data['etcd-client-ca.crt'] }}"
+        cert: "{{ etcd_client_certs.resources[0].data['etcd-client.crt'] }}"
+        key: "{{ etcd_client_certs.resources[0].data['etcd-client.key'] }}"
+      type: Opaque
+
+- name: Create Fluent Bit App
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: present
+    definition: "{{ lookup('template', 'fluent-bit.yml.j2') }}"
 
 - name: Link Docker Config
   shell: oc secrets link default docker-artifactory --for=pull -n newrelic
@@ -52,8 +85,8 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: 
-      apiVersion: v1
-      kind: Namespace
+      apiVersion: project.openshift.io/v1
+      kind: Project
       metadata:
         annotations:
           openshift.io/node-selector: ''
@@ -99,8 +132,8 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: 
-      apiVersion: v1
-      kind: Namespace
+      apiVersion: project.openshift.io/v1
+      kind: Project
       metadata:
         annotations:
           openshift.io/node-selector: ''
@@ -134,8 +167,8 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: 
-      apiVersion: v1
-      kind: Namespace
+      apiVersion: project.openshift.io/v1
+      kind: Project
       metadata:
         annotations:
           openshift.io/node-selector: ''
@@ -157,8 +190,8 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: 
-      apiVersion: v1
-      kind: Namespace
+      apiVersion: project.openshift.io/v1
+      kind: Project
       metadata:
         annotations:
           openshift.io/node-selector: ''
@@ -182,8 +215,8 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: 
-      apiVersion: v1
-      kind: Namespace
+      apiVersion: project.openshift.io/v1
+      kind: Project
       metadata:
         annotations:
           openshift.io/node-selector: ''

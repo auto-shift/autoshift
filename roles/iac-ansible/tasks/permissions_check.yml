@@ -1,0 +1,51 @@
+---
+- name: Get Project UIDs
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: project.openshift.io/v1
+    kind: Project
+    name: ansible-automation-platform
+  register: project_status
+
+- name: Store project uid 
+  set_fact:
+    project_start_uid: '{{ project_status.resources[0].metadata.annotations["openshift.io/sa.scc.uid-range"] | regex_search("(\d+)") }}'
+
+- name: Get ID of postgres pod
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: v1
+    kind: Pod
+    namespace: ansible-automation-platform
+    name: "{{ cluster_name }}-postgres-13-0"
+  register: pod_status
+  until: 
+  - pod_status is defined
+  - pod_status.resources is defined
+  - pod_status.resources[0] is defined
+  - pod_status.resources[0].spec is defined
+  - pod_status.resources[0].spec.securityContext is defined
+  - pod_status.resources[0].spec.securityContext.fsGroup is defined
+
+- name: Store Pod ID
+  set_fact:
+    pod_id: "{{ pod_status.resources[0].spec.securityContext.fsGroup }}"
+
+- name: Run chown 
+  shell: |
+    oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true
+    oc --insecure-skip-tls-verify=true -n ansible-automation-platform debug {{ cluster_name }}-postgres-13-0 -- chown -R {{ project_start_uid }}:{{ project_start_uid }} /var/lib/pgsql/data/userdata
+  when: pod_id != project_start_uid
+
+- name: Kill Postgres Pod to restart
+  k8s:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    state: absent
+    api_version: v1
+    kind: Pod
+    namespace: ansible-automation-platform
+    name: "{{ cluster_name }}-postgres-13-0"
+  when: pod_id != project_start_uid

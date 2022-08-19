@@ -5,7 +5,7 @@ install_argo_apps: true
 
 vpc_name: vpc-name
 cluster_name: cluster
-openshift_version: 4.9.11
+openshift_version: 4.9.43
 region: us-east-1
 availability_zones:
   - "{{ region }}a"
@@ -79,3 +79,33 @@ machineset_types:
 
 loop_count: 0
 app_set_ready: False
+
+#Fluent Bit logging Variables
+splunk_hec_token:
+splunk_channel_id:
+cloud_account:
+fluent_bit:
+  namespace: fluent-bit-logging
+  cm_name: fluent-bit
+  secret_name: fluent-bit-secrets
+  splunk_hec_url: hec.splunk.backends.cms.gov
+  image:
+    repository: registry.connect.redhat.com/calyptia/fluent-bit
+    tag: 1.9.6
+    pullPolicy: IfNotPresent
+  rbac:
+    nodeAccess: true
+  podSecurityPolicy:
+    create: true
+  openShift:
+    enabled: true
+    securityContextConstraints:
+      create: true
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    privileged: true

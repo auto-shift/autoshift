@@ -154,6 +154,6 @@
   - namespace_restore_status_gitops.resources[0] is defined
   - namespace_restore_status_gitops.resources[0].status is defined
   - namespace_restore_status_gitops.resources[0].status.phase is defined
-  - namespace_restore_status_gitops.resources[0].status.phase == "Completed" or namespace_restore_status_gitops.resources[0].status.phase == "PartiallyFailed"
+  - namespace_restore_status_gitops.resources[0].status.phase == "Completed" or namespace_restore_status_gitops.resources[0].status.phase == "PartiallyFailed" or namespace_restore_status_gitops.resources[0].status.phase == "FailedValidation"
   retries: 100 
   delay: 15

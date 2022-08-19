@@ -115,7 +115,7 @@
       - restor_acm_status.resources[0] is defined
       - restor_acm_status.resources[0].status is defined
       - restor_acm_status.resources[0].status.phase is defined
-      - restor_acm_status.resources[0].status.phase == "Completed" or restor_acm_status.resources[0].status.phase == "FinishedWithErrors"
+      - restor_acm_status.resources[0].status.phase == "Completed" or restor_acm_status.resources[0].status.phase == "FinishedWithErrors" or restor_acm_status.resources[0].status.phase == "FailedValidation"
       retries: 100 
       delay: 15
       when: restore_acm is true
@@ -144,9 +144,11 @@
       - restore_status_aap.resources[0] is defined
       - restore_status_aap.resources[0].status is defined
       - restore_status_aap.resources[0].status.phase is defined
-      - restore_status_aap.resources[0].status.phase == "Completed" or restore_status_aap.resources[0].status.phase == "PartiallyFailed"
+      - restore_status_aap.resources[0].status.phase == "Completed" or restore_status_aap.resources[0].status.phase == "PartiallyFailed" or restore_status_aap.resources[0].status.phase == "FailedValidation"
       retries: 100
       delay: 15
-    
+
+    - name: Include Restore Permissions Check
+      include_tasks: permissions_check.yml
   when: cluster_name == 'mgmt' or cluster_name == 'infra'
   # END BLOCK: Restore AAP and ACM 

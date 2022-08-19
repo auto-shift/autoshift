@@ -1,14 +1,14 @@
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ScanSetting
 metadata:
-  name: default-gp2
+  name: default-ocs-storagecluster-ceph-rbd
   namespace: openshift-compliance
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 autoUpdateRemediations: true 
 autoApplyRemediations: false 
 rawResultStorage:
-  storageClassName: gp2
+  storageClassName: ocs-storagecluster-ceph-rbd
   pvAccessModes:
     - ReadWriteOnce
   rotation: 3

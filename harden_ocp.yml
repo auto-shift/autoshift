@@ -1,0 +1,34 @@
+#!/usr/local/bin/ansible-playbook
+---
+- name: Harden OCP
+  hosts: localhost
+  gather_facts: no 
+  environment:
+    K8S_AUTH_SSL_CA_CERT: '/etc/pki/tls/certs/ca-bundle.crt'
+    K8S_AUTH_VERIFY_SSL: 'no'
+  vars_files:
+    - vars/all/main.yml
+    - vars/all/remediations.yml
+  tasks:
+  - name: Check if env is defined
+    set_fact: 
+      env: "{{ lookup('env', 'env') }}"
+
+  - name: Confirm Cluster
+    pause:
+      prompt: "Confirm cluster (infra/dev/test/sbx/mgmt/prod/impl)"
+    register: cluster_response
+    delegate_to: localhost
+    when: env == ""
+
+  - name: Store Env
+    set_fact:
+      env: "{{ cluster_response.user_input }}"
+    when: env == ""
+
+  - name: "Include vars for {{ env }}"
+    include_vars: "vars/{{ env }}/main.yml"
+
+  - name: Run Role
+    include_role: 
+      name: harden-ocp
