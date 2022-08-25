@@ -20,13 +20,13 @@
 - name: debug hosted zone
   debug:
     msg: "{{ item }}"
-  loop: "{{ hz_facts | dict2items }}"
+  loop: "{{ hz_facts.HostedZones | dict2items }}"
 
 - name: Define hosted_zone_id
   set_fact:
     hosted_zone_id: "{{ item.Id.split('/')[2] }}"
   when: item.Name == cluster_name+'.'+base_domain+'.'
-  loop: "{{ hz_facts | dict2items }}"
+  loop: "{{ hz_facts.HostedZones | dict2items }}"
 
 - name: DEBUG check the hosted zone
   debug:
