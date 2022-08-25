@@ -17,26 +17,12 @@
     query: hosted_zone
   register: hz_facts
 
-- name: debug hosted zone
-  debug:
-    msg: "{{ item }}"
-  loop: "{{ hz_facts.HostedZones }}"
-
 - name: Define hosted_zone_id
   set_fact:
     hosted_zone_id: "{{ item.Id.split('/')[2] }}"
   when: item.Name == cluster_name+'.'+base_domain+'.'
   loop: "{{ hz_facts.HostedZones }}"
-
-- name: DEBUG check the hosted zone
-  debug:
-    var: "{{ hosted_zone_id }}"
-
-- name: pause just in case
-  ansible.builtin.pause:
   
-  
-
 - name: Check if {{ home_dir }}/.ssh Directory Exists
   stat:
     path: "{{ home_dir }}/.ssh"
