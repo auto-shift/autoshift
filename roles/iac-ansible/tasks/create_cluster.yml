@@ -21,7 +21,7 @@
   set_fact:
     hosted_zone_id: "{{ item.Id.split('/')[2] }}"
   when: item.Name == cluster_name+'.'+base_domain+'.'
-  loop: "{{ hz_facts.list }}"
+  with_dict: "{{ hz_facts }}"
 
 - name: Check if {{ home_dir }}/.ssh Directory Exists
   stat:
