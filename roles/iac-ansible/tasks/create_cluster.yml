@@ -21,7 +21,7 @@
   set_fact:
     hosted_zone_id: "{{ item.Id.split('/')[2] }}"
   when: item.Name == cluster_name+'.'+base_domain+'.'
-  with_dict: "{{ hz_facts }}"
+  loop: "{{ hz_facts | dict2items }}"
 
 - name: DEBUG check the hosted zone
   debug:
