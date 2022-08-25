@@ -1,6 +1,6 @@
 vpc_name: ploigos-autoshift
 cluster_name: ploigos
-openshift_version: 4.11
+openshift_version: 4.11.2
 base_domain: 
 region: us-east-1
 
