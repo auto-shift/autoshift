@@ -1,7 +1,7 @@
 vpc_name: ploigos-autoshift
 cluster_name: ploigos
 openshift_version: 4.11
-base_domain: 
+base_domain: ploigos.io
 region: us-east-1
 
 #LDAP vars
