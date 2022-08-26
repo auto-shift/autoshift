@@ -34,7 +34,7 @@ ocp_install_secrets: "{{ ocp_secrets.install-user }}"
 
 # OCP Install Secrets
 #pull_secret: "{{ lookup('community.aws.aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
-pull_secret: "{{ ocp_secrets.ocp_pull_secret }}"
+pull_secret: "{{ ocp_secrets.ocp_pull_secret | string }}"
 #TODO add to SM - no user yet
 ocp_install_aws_access_key: "{{ ocp_secrets.access_key_id }}"
 ocp_install_aws_secret_key: "{{ ocp_isecrets.secret_access_key }}"
