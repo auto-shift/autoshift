@@ -4,6 +4,9 @@
     filters:
       "tag:Name": "{{ vpc_name }}"
   register: vpc_facts
+
+- debug:
+    var: vpc_facts
   
 - name: Gathering private subnet facts
   ec2_vpc_subnet_info:
@@ -11,6 +14,11 @@
       vpc-id: "{{ vpc_facts.vpcs[0].id }}"
       "tag:use": private
   register: subnet_facts
+
+- debug:
+    var: subnet_facts
+  
+- ansible.builtin.pause:
 
 - name: Gather Hosted Zones
   route53_info:
