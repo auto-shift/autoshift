@@ -25,11 +25,11 @@ cluster_set:
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
-ocp_secrets: "{{ lookup('community.aws.aws_secret', 'ploigos_autoshift', region=vars['region']) }}"
+ocp_secrets: "{{ lookup('aws_secret', 'ploigos_autoshift', region=vars['region']) }}"
 # aws user for cloudwatch log forwarding 
 # cw_secrets: "{{ lookup('community.aws.aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
 # aws user for install
-ocp_install_secrets: "{{ lookup('community.aws.aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
 
 # OCP Install Secrets
 #pull_secret: "{{ lookup('community.aws.aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
