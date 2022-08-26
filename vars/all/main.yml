@@ -29,14 +29,15 @@ ocp_secrets: "{{ lookup('aws_secret', 'ploigos_autoshift', region=vars['region']
 # aws user for cloudwatch log forwarding 
 # cw_secrets: "{{ lookup('community.aws.aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
 # aws user for install
-ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+#ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+ocp_install_secrets: "{{ ocp_secrets.install-user }}"
 
 # OCP Install Secrets
 #pull_secret: "{{ lookup('community.aws.aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
-pull_secret: "{{ ocp_install_secrets.ocp_pull_secret }}"
+pull_secret: "{{ ocp_secrets.ocp_pull_secret }}"
 #TODO add to SM - no user yet
-ocp_install_aws_access_key: "{{ ocp_install_secrets.aws_access_key_id }}"
-ocp_install_aws_secret_key: "{{ ocp_install_secrets.aws_secret_access_key }}"
+ocp_install_aws_access_key: "{{ ocp_secrets.access_key_id }}"
+ocp_install_aws_secret_key: "{{ ocp_isecrets.secret_access_key }}"
 
 # Certs
 custome_certs_enabled: false
