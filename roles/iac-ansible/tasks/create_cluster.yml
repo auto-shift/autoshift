@@ -12,7 +12,6 @@
   ec2_vpc_subnet_info:
     filters:
       vpc-id: "{{ vpc_facts.vpcs[0].id }}"
-      "tag:use": private
   register: subnet_facts
 
 - debug:
