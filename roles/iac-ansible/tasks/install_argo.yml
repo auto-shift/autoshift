@@ -26,9 +26,9 @@
     namespace: openshift-image-registry
     label_selectors:
       - docker-registry = default
-  wait: yes
-  wait_sleep: 5
-  wait_timeout: 150
+    wait: yes
+    wait_sleep: 5
+    wait_timeout: 150
 
 - name: Add Argo Repo Server Build
   k8s:
