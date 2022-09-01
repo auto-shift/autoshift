@@ -1,6 +1,6 @@
 ---
 - name: Create Namespace
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -9,7 +9,7 @@
   - gitops-ns.yml.j2
 
 - name: Install GitOps Operator 
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -18,7 +18,7 @@
   - gitops-sub.yml.j2
 
 - name: Wait for Internal Registry Ready
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: v1
@@ -31,7 +31,7 @@
     wait_timeout: 150
 
 - name: Add Argo Repo Server Build
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -45,7 +45,7 @@
 
 - block:
   - name: Create Build for Repo Server Image
-    k8s:
+    kubernetes.core.k8s:
       api_key: "{{ K8S_AUTH_API_KEY  }}"
       host: "{{ K8S_AUTH_HOST }}"
       state: present
@@ -53,14 +53,14 @@
     when: current_bc.changed
   rescue: 
   - name: Create Build for Repo Server Image
-    k8s:
+    kubernetes.core.k8s:
       api_key: "{{ K8S_AUTH_API_KEY  }}"
       host: "{{ K8S_AUTH_HOST }}"
       state: absent
       definition: "{{ lookup('template', 'argo/gitops-repo-server-build.yml.j2') }}"
     when: current_bc.changed
   - name: Create Build for Repo Server Image
-    k8s:
+    kubernetes.core.k8s:
       api_key: "{{ K8S_AUTH_API_KEY  }}"
       host: "{{ K8S_AUTH_HOST }}"
       state: present
@@ -68,7 +68,7 @@
     when: current_bc.changed
 
 - name: Create GitOps Argo Objects
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -77,7 +77,7 @@
   - gitops-secrets.yml.j2
 
 - name: Wait for GitopsService be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: pipelines.openshift.io/v1alpha1
@@ -94,7 +94,7 @@
 
 - block:
     - name: Wait for Cluster Argo Instance to be defined...
-      k8s_info:
+      kubernetes.core.k8s_info:
         api_key: "{{ K8S_AUTH_API_KEY  }}"
         host: "{{ K8S_AUTH_HOST }}"
         api_version: argoproj.io/v1alpha1
@@ -110,7 +110,7 @@
       delay: 10
   rescue:
     - name: Add ArgoCD SA  
-      k8s:
+      kubernetes.core.k8s:
         api_key: "{{ K8S_AUTH_API_KEY  }}"
         host: "{{ K8S_AUTH_HOST }}"
         state: present
@@ -120,7 +120,7 @@
       - gitops-sa.yml.j2
 
 - name: Wait for ArgoCD CustomResourceDefinition to be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: apiextensions.k8s.io/v1
@@ -153,7 +153,7 @@
     oc secrets link builder redhat-registries --for=pull -n {{ gitops_namespace }}  --insecure-skip-tls-verify=true
 
 - name: Waiting for Image to be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: image.openshift.io/v1
@@ -169,7 +169,7 @@
   delay: 10
 
 - name: Add ArgoCD Instance  
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -180,7 +180,7 @@
   - gitops-secrets.yml.j2
 
 - name: Waiting for Deployment to be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: apps/v1
@@ -196,7 +196,7 @@
   delay: 10
 
 - name: Update Argo Roles  
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
@@ -206,7 +206,7 @@
   - gitops-roles.yml.j2
 
 - name: Wait for Application CustomResourceDefinition to be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: apiextensions.k8s.io/v1
@@ -223,7 +223,7 @@
   delay: 10
 
 - name: Refresh CM with Users
-  k8s:
+  kubernetes.core.k8s:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
