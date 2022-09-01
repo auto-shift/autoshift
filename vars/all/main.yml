@@ -86,7 +86,7 @@ gitops_enabled: false
 # argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
 # git_user: "{{ ocp_secrets.git_user }}"
 # git_token: "{{ ocp_secrets.git_token }}"
-# gitops_namespace: "openshift-gitops"
+gitops_namespace: "openshift-gitops"
 # gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
 
 # Pager Duty Secrets
