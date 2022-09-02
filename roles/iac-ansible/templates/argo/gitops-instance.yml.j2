@@ -4,21 +4,6 @@ metadata:
   name: openshift-gitops
   namespace: {{ gitops_namespace }}
 spec:
-  initialRepositories: |
-    - url: {{ gitops_repo_url }}
-      passwordSecret:
-        name: cms-github
-        key: password
-      usernameSecret:
-        name: cms-github
-        key: username
-    - url: {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
-      passwordSecret:
-        name: cms-github
-        key: password
-      usernameSecret:
-        name: cms-github
-        key: username
   server:
     autoscale:
       enabled: false

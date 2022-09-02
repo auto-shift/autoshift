@@ -58,6 +58,7 @@ spec:
             value: {{ subnet_id_b }}
           - name: subnet_id_c
             value: {{ subnet_id_c }}
+{% if ldap_enabled == true %}
           - name: ldapurl
             value: {{ ldapurl }}
           - name: radiant_url
@@ -70,14 +71,19 @@ spec:
             value: "{{ ldap_filter }}"
           - name: binddn_uid
             value: "{{ binddn | regex_search('[^,]*') }}"
+{% endif %}
+{% if okta_enabled == true %}
           - name: okta_client_id
             value: {{ okta_client_id }}
           - name: okta_issuer
             value: {{ okta_issuer }}
+{% endif %}
+{% if pagerduty_enabled == true %}
           - name: pagerduty_prometheus_key
             value: {{ pagerduty_prometheus_key }}
           - name: pagerduty_events_key
             value: {{ pagerduty_events_key }}
+{% endif %}
           - name: base_domain
             value: {{ base_domain }}
 {% if branch_tag != '' %}
