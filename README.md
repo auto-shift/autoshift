@@ -7,3 +7,4 @@ tag the subnets as use: private
 pip3 install openshift
 freaking nat gateway T_T
 ansible-galaxy collection install kubernetes.core
+cat ../ploigos-gitops-private.key | base64 and also no spaces, thanks iterm
