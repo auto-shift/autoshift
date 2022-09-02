@@ -10,7 +10,7 @@
 argocd_image_version: 'v1.4.4'
 
 region: us-east-1
-branch_tag: ''
+branch_tag: 'feature/ploigos-autoshift'
 organization: autoshift
 github_url: https://github.com/bcarr-rh
 
