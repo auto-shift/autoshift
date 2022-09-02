@@ -146,6 +146,7 @@
   shell: |
     oc login --token={{ K8S_AUTH_API_KEY }} --server={{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true
     oc secrets link default docker-artifactory --for=pull -n {{ gitops_namespace }} --insecure-skip-tls-verify=true
+  when: artifactory_pull_secret is defined
 
 - name: Link Docker Config for Builds 
   shell: |
