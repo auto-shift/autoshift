@@ -36,7 +36,7 @@ ocp_install_secrets: "{{ ocp_secrets.install-user }}"
 #pull_secret: "{{ lookup('community.aws.aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
 pull_secret: "{{ ocp_secrets.ocp_pull_secret | string }}"
 ocp_install_aws_access_key: "{{ ocp_secrets.access_key_id }}"
-ocp_install_aws_secret_key: "{{ ocp_isecrets.secret_access_key }}"
+ocp_install_aws_secret_key: "{{ ocp_secrets.secret_access_key }}"
 
 # Certs
 custome_certs_enabled: false
