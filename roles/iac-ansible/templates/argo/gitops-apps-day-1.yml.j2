@@ -78,7 +78,7 @@ spec:
           - name: okta_issuer
             value: {{ okta_issuer }}
 {% endif %}
-{% if pagerduty_enabled == true %}
+{% if pager_duty_enabled == true %}
           - name: pagerduty_prometheus_key
             value: {{ pagerduty_prometheus_key }}
           - name: pagerduty_events_key
