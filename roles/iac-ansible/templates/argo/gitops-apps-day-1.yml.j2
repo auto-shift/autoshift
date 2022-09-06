@@ -72,7 +72,7 @@ spec:
           - name: binddn_uid
             value: "{{ binddn | regex_search('[^,]*') }}"
 {% endif %}
-{% if okta_enabled == true %}
+{% if okta_oauth_enabled == true %}
           - name: okta_client_id
             value: {{ okta_client_id }}
           - name: okta_issuer
