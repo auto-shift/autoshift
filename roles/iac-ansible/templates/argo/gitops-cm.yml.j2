@@ -24,21 +24,21 @@ data:
       - PipelineRun
   ga.trackingid: ''
   repositories: >
-  - url: {{ gitops_repo_url }}
-    passwordSecret:
-      name: autoshift-github
-      key: password
-    usernameSecret:
-      name: autoshift-github
-      key: username
-  - url:
-  {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
-    passwordSecret:
-      name: autoshift-github
-      key: password
-    usernameSecret:
-      name: autoshift-github
-      key: username
+    - url: {{ gitops_repo_url }}
+      passwordSecret:
+        name: autoshift-github
+        key: password
+      usernameSecret:
+        name: autoshift-github
+        key: username
+    - url:
+    {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
+      passwordSecret:
+        name: autoshift-github
+        key: password
+      usernameSecret:
+        name: autoshift-github
+        key: username
   ga.anonymizeusers: 'false'
   help.chatUrl: ''
   url: 'https://argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
