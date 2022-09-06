@@ -15,11 +15,6 @@
       "tag:use": private
   register: subnet_facts
 
-- debug:
-    var: subnet_facts
-  
-- ansible.builtin.pause:
-
 - name: Gather Hosted Zones
   route53_info:
     query: hosted_zone
@@ -61,8 +56,6 @@
   template:
     src: install-config.yaml.j2
     dest: "{{ install_dir }}/install-config.yaml"
-
-- ansible.builtin.pause:
 
 - name: Create Manifests
   shell: openshift-install create manifests --dir {{ install_dir }}
