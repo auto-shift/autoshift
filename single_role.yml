@@ -1,0 +1,23 @@
+- name: Run Role
+  hosts: localhost
+  gather_facts: no
+  environment:
+    K8S_AUTH_SSL_CA_CERT: '/etc/pki/tls/certs/ca-bundle.crt'
+    K8S_AUTH_VERIFY_SSL: 'no'
+    AWS_REGION: "{{ region }}"
+  vars:
+    setup_dependencies: true
+    create_cluster: false
+    create_cluster_acm: false
+    install_argo: true
+    restore: false
+    install_argo_apps: true
+    test_argo_apps: true
+    remove_kubeadmin: false
+    K8S_AUTH_API_KEY: INSERT RESULT OF oc whoami -t HERE
+    K8S_AUTH_HOST: INSERT oc login URL HERE
+  vars_files:
+    - vars/all/main.yml
+    - "vars/ploigos/main.yml"
+  roles: 
+    - iac-ansible
