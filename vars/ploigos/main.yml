@@ -4,6 +4,8 @@ openshift_version: 4.11.2
 base_domain: ploigos.io
 region: us-east-1
 
+fips_enabled: false
+
 #LDAP vars
 ldap_filter: 
 
