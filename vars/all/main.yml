@@ -63,7 +63,7 @@ radiant_ldab_enabled: false
 # radiant_binddn: "{{ ocp_secrets.radiant_binddn }}"
 # radiant_url: "{{ ocp_secrets.radiant_url }}"
 # radiant_password: "{{ ocp_secrets.radiant_password }}"
-okta_oath_enabled: false
+okta_oauth_enabled: false
 # okta_client_id: "{{ ocp_secrets.okta_client_id }}"
 # okta_client_secret: "{{ ocp_secrets.okta_client_secret }}"
 # okta_issuer: "{{ ocp_secrets.okta_issuer }}"
