@@ -1,3 +1,4 @@
+{{ if .Values.gatekeeper_operator }}
 apiVersion: config.gatekeeper.sh/v1alpha1
 kind: Config
 metadata:
@@ -9,3 +10,4 @@ spec:
   match:
     - excludedNamespaces: ["kube-system", "openshift-gatekeeper-system", "openshift-logging"]
       processes: ["*"]
+{{ end }}

@@ -1,4 +1,6 @@
+{{ if .Values.openshift_compliance_operator }}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:
   name: openshift-compliance 
+{{ end }}

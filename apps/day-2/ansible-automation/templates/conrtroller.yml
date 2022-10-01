@@ -1,4 +1,4 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ .Values.aap_enabled }}
 apiVersion: automationcontroller.ansible.com/v1beta1
 kind: AutomationController
 metadata:

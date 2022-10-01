@@ -9,6 +9,7 @@ spec:
     accessTokenMaxAgeSeconds: 28800
     accessTokenInactivityTimeout: 10m0s
   identityProviders:
+{{ if .Values.ldap_enabled }}
   - ldap:
       attributes:
         email:
@@ -29,6 +30,8 @@ spec:
     mappingMethod: claim
     name: ldapidp
     type: LDAP
+{{ end }}
+{{ if .Values.okta_oath_enabled }}
   - mappingMethod: claim
     name: okta
     openID:
@@ -49,3 +52,4 @@ spec:
       - profile
       issuer: {{ .Values.okta_issuer }}
     type: OpenID
+{{ end }}

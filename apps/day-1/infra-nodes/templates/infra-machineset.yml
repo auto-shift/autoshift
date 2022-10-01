@@ -1,5 +1,5 @@
-
-{{- range .Values.subnets }}
+{{ if .Values.infra_nodes_enabled }}
+{{ range .Values.subnets }}
 ---
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
@@ -41,16 +41,16 @@ spec:
           apiVersion: awsproviderconfig.openshift.io/v1beta1
           blockDevices:
             - ebs:
-                encrypted: true
-                iops: 0
-                volumeSize: 120
-                volumeType: gp2
+                encrypted: {{ $.Values.infra.ebs.encrypted | default('true') }}
+                iops: {{ $.Values.infra.ebs.iops | default('0') }}
+                volumeSize: {{ $.Values.infra.ebs.volumesize | default('120') }}
+                volumeType: {{ $.Values.infra.ebs.volumetype | default('gp2') }}
           credentialsSecret:
             name: aws-cloud-credentials
           deviceIndex: 0
           iamInstanceProfile:
             id: {{ $.Values.infra_id }}-worker-profile 
-          instanceType: {{ $.Values.instance_type }}
+          instanceType: {{ $.Values.infra.ec2_type }}
           kind: AWSMachineProviderConfig
           placement:
             availabilityZone: {{ .availability_zone }}
@@ -69,4 +69,5 @@ spec:
             value: "true"
           userDataSecret:
             name: worker-user-data
-{{- end }}
+{{ end }}
+{{ end }}

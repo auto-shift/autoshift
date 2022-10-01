@@ -1,3 +1,4 @@
+{{ if .Values.gatekeeper_operator }}
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
@@ -45,3 +46,4 @@ spec:
           not any(satisfied)
           msg := sprintf("uri has an invalid repo <%v>, allowed repos must begin with <%v>", [uri, input.parameters.repos])
         }        
+{{ end }}

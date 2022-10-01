@@ -1,4 +1,4 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ if .Values.mgmt_cluster }}
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: BackupSchedule
 metadata:

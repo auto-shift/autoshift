@@ -1,10 +1,11 @@
+{{ if .Values.openshift_logging.enabled }}
 # operator group object yaml file for cluster logging operator
-
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: cluster-logging
-  namespace: {{ .Values.logging_namespace }}
+  namespace: {{ .Values.openshift_logging.logging_namespace }}
 spec:
   targetNamespaces:
-  - {{ .Values.logging_namespace }}
+  - {{ .Values.openshift_logging.logging_namespace }}
+{{ end }}

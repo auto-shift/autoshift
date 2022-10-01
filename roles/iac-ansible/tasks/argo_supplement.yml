@@ -1,7 +1,7 @@
 ---
 - name: Set artifactory auth 
   set_fact: 
-    docker_artifactory_auth: "{{ momot_infra_svc_acct_name }}:{{ momot_infra_svc_acct_password }}"
+    docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
 
 - name: Create Secret for New Relic 
   k8s_info:

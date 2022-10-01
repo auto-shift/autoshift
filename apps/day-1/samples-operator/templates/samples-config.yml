@@ -1,3 +1,4 @@
+{{ if .Values.disable_sample_opearors }}
 apiVersion: samples.operator.openshift.io/v1
 kind: Config
 metadata:
@@ -6,3 +7,4 @@ spec:
   architectures:
     - x86_64
   managementState: Removed
+{{ end }}

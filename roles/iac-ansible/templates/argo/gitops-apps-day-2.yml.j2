@@ -69,7 +69,7 @@ spec:
           - name: ldap_filter
             value: "{{ ldap_filter }}"
           - name: binddn_uid
-            value: "{{ binddn | regex_search('[^,]*') }}"
+            value: "{{ oauth.binddn | regex_search('[^,]*') }}"
           - name: okta_client_id
             value: {{ okta_client_id }}
           - name: okta_issuer
@@ -78,6 +78,46 @@ spec:
             value: {{ pagerduty_prometheus_key }}
           - name: pagerduty_events_key
             value: {{ pagerduty_events_key }}
+          - name: base_domain
+            value: {{ base_domain }}
+          - name: amq_broker_enabled
+            value: {{ amq_broker_enabled }}
+          - name: aap_enabled
+            value: {{ aap_enabled }}
+          - name: custome_certs_enabled
+            value: {{ custome_certs_enabled }}
+          - name: cluster_autoscaling_enabled
+            value: {{ cluster_autoscaling_enabled }}
+          - name: pod_priority_threshold
+            value: {{ pod_priority_threshold }}
+          - name: resource_limits
+            value: {{ resource_limits }}
+          - name: scaledown
+            value: {{ scaledown }}
+          - name: container_security_operator
+            value: {{ container_security_operator }}
+          - name: custome_console
+            value: {{ custome_console }}
+          - name: disable_self_provisioner
+            value: {{ disable_self_provisioner }}
+          - name: file_integrity_operator
+            value: {{ file_integrity_operator }}
+          - name: gatekeeper_operator
+            value: {{ gatekeeper_operator }}
+          - name: gk_img_tag
+            value: {{ gk_img_tag }}
+          - name: allowed_git_repos
+            value: {{ allowed_git_repos }}
+          - name: cw_log_forwarding_enabled
+            value: {{ cw_log_forwarding_enabled }}
+          - name: oauth
+            value: {{ oauth }}
+          - name: openshift_compliance_operator
+            value: {{ openshift_compliance_operator }}
+          - name: openshift_logging
+            value: {{ openshift_logging }}
+          - name: openshift_monitoring_enabled
+            value: {{ openshift_monitoring_enabled }}
           - name: base_domain
             value: {{ base_domain }}
 {% if branch_tag != '' %}

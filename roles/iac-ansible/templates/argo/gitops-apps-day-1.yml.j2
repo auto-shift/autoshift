@@ -80,6 +80,38 @@ spec:
             value: {{ pagerduty_events_key }}
           - name: base_domain
             value: {{ base_domain }}
+          - name: organization
+            value: {{ organization }}
+          - name: gitops_enabled
+            value: {{ gitops_enabled }}
+          - name: infra_nodes_enabled
+            value: {{ infra_nodes_enabled }}
+          - name: infra
+            value: {{ infra }}
+          - name: master
+            value: {{ master }}
+          - name: storage
+            value: {{ storage }}
+          - name: worker_node_enabled
+            value: {{ worker_node_enabled }}
+          - name: worker
+            value: {{ worker }}
+          - name: machine_health_checks_enabled
+            value: {{ machine_health_checks_enabled }}
+          - name: machinehealthchecks
+            value: {{ machinehealthchecks }}
+          - name: manual_remediations_enabled
+            value: {{ manual_remediations_enabled }}
+          - name: allowedRegistriesForImport
+            value: {{ allowedRegistriesForImport }}
+          - name: allowedRegistriesForImport
+            value: {{ allowedRegistriesForImport }}
+          - name: allowedRegistries
+            value: {{ allowedRegistries }}
+          - name: odf_enabled
+            value: {{ odf_enabled }}
+          - name: disable_sample_opearors
+            value: {{ disable_sample_opearors }}
 {% if branch_tag != '' %}
           - name: targetrevision
             value: {{ branch_tag }}

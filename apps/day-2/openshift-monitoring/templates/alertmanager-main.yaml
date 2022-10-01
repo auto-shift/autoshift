@@ -1,3 +1,4 @@
+{{ if .Values.openshift_monitoring_enabled }}
 kind: Secret
 apiVersion: v1
 metadata:
@@ -51,3 +52,4 @@ stringData:
         - receiver: Critical
           match:
             severity: critical
+{{ end }}

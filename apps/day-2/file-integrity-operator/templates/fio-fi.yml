@@ -1,4 +1,5 @@
-{{ if .Capabilities.APIVersions.Has "fileintegrity.openshift.io/v1alpha1" -}}
+{{ if .Values.file_integrity_operator }}
+{{ if .Capabilities.APIVersions.Has "fileintegrity.openshift.io/v1alpha1" }}
 apiVersion: fileintegrity.openshift.io/v1alpha1
 kind: FileIntegrity
 metadata:
@@ -10,4 +11,5 @@ spec:
   nodeSelector:
       node-role.kubernetes.io/worker: ""
   config: {}
-{{- end }}
+{{ end }}
+{{ end }}

@@ -1,3 +1,4 @@
+{{ if .Values.openshift_logging.enabled }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -11,5 +12,5 @@ data:
     do 
     oc set env -c elasticsearch $i ES_JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true"; 
     oc scale $i --replicas=0; 
-    done
-    
+    done  
+{{ end }}

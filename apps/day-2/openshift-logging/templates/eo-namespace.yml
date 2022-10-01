@@ -1,5 +1,5 @@
+{{ if .Values.openshift_logging.enabled }}
 # yaml file to define the namespace for the elasticsearch operator
-
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -8,3 +8,4 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
+{{ end }}

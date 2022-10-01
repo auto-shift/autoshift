@@ -1,3 +1,4 @@
+{{ if .Values.cluster_autoscaling_enabled }}
 apiVersion: "autoscaling.openshift.io/v1"
 kind: "ClusterAutoscaler"
 metadata:
@@ -18,3 +19,4 @@ spec:
     delayAfterDelete: {{ .Values.scaledown.delay_after_delete }} 
     delayAfterFailure: {{ .Values.scaledown.delay_after_failure }} 
     unneededTime: {{ .Values.scaledown.unneeded_time }}
+{{ end }}

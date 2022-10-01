@@ -1,3 +1,4 @@
+{{ if .Values.odf_enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
@@ -6,3 +7,4 @@ metadata:
 spec:
   targetNamespaces:
   - openshift-storage
+{{ end }}

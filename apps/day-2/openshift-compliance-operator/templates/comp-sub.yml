@@ -1,3 +1,4 @@
+{{ if .Values.openshift_compliance_operator }}
 kind: Subscription
 metadata:
   name: compliance-operator-sub
@@ -8,4 +9,4 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
 apiVersion: operators.coreos.com/v1alpha1
-
+{{ end }}
