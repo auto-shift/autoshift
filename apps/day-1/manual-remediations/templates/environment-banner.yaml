@@ -1,13 +1,15 @@
+{{ if .Values.manual_remediations_enabled }}
 apiVersion: console.openshift.io/v1
 kind: ConsoleNotification
 metadata:
  name: console-banner
 spec:
  # Banner Text:
- text: "Autoshift Created OpenShift Container Platform"
+ text: "Autoshift Created OpenShift Container Platform {{ .Values.cluster_name }}"
  # Other options are BannerBottom, BannerTopBottom
  location: BannerTopBottom
  # Hexcode for white text color
  color: '#FFFFFF'
  # Hexcode for banner background color
  backgroundColor: '#0071BC'
+{{ end }}
