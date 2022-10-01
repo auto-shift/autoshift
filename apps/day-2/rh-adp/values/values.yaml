@@ -3,3 +3,5 @@
 # Declare variables to be passed into your templates.
 cluster_name:
 region:
+organization:
+oadp_enabled:

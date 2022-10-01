@@ -5,7 +5,7 @@ metadata:
   name: acm-operator-subscription
   namespace: open-cluster-management
 spec:
-  channel: {{ .Values.channel }}
+  channel: {{ .Values.acm_channel }}
   sourceNamespace: openshift-marketplace
   source: redhat-operators
   installPlanApproval: Automatic

@@ -14,6 +14,7 @@ branch_tag: ''
 organization: autoshift
 github_url: https://github.com/bcarr-rh
 
+
 # ArgoCD Variables
 gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
 
@@ -122,9 +123,12 @@ allowedRegistries:
 odf_enabled: true
 
 # Disable Sample Operators
-disable_sample_opearors: true
+disable_sample_operators: true
 
 # Day 2
+# Ploigos Trusted Software Supply Chain
+tssc_enabled: true
+
 # amq-broker-rhel8
 amq_broker_enabled: true
 
@@ -135,7 +139,7 @@ aap_username: "{{ ocp_secrets.aap_username }}"
 aap_password: "{{ ocp_secrets.aap_password }}"
 
 # Certs
-custome_certs_enabled: true
+custom_certs_enabled: true
 api_cert: "{{ lookup('aws_secret', 'ocp_api_cert', region=vars['region']) }}"
 api_cert_key: "{{ lookup('aws_secret', 'ocp_api_cert_key', region=vars['region']) }}"
 console_cert: "{{ lookup('aws_secret', 'ocp_console_cert', region=vars['region']) }}"
@@ -166,8 +170,8 @@ scaledown:
 # container-security-operator
 container_security_operator: true
 
-# custome-console
-custome_console: true
+# custom-console
+custom_console: true
 
 # disable-self-provisioner
 disable_self_provisioner: true
@@ -242,7 +246,7 @@ openshift_monitoring_enabled: true
 acm_enabled: true
 mgmt_cluster: false
 cluster_set: autoshift-clusters
-channel: release-2.5
+acm_channel: release-2.5
 
 # New Relic Secrets
 new_relic_enabled: true
@@ -263,6 +267,7 @@ pagerduty_prometheus_key: "{{ ocp_secrets.pagerduty_prometheus_key }}"
 
 # ACS Secrets
 acs_enabled: true
+acs_central_cluster: false
 acs_init_bundle: "{{ ocp_secrets.acs_init_bundle }}"
 
 # Fluentbit Splunk Log Forwarding
@@ -270,3 +275,38 @@ fluentbit_enabled: true
 splunk_hec_token: "{{ ocp_secrets.splunk_hec_token }}"
 splunk_channel_id: "{{ ocp_secrets.splunk_channel_id }}"
 cloud_account: "{{ ocp_secrets.cloud_account }}"
+fluent_bit:
+  namespace: fluent-bit-logging
+  cm_name: fluent-bit
+  secret_name: fluent-bit-secrets
+  splunk_hec_url: hec.splunk.backends.cms.gov
+  image:
+    repository: registry.connect.redhat.com/calyptia/fluent-bit
+    tag: 1.9.6
+    pullPolicy: IfNotPresent
+  rbac:
+    nodeAccess: true
+  podSecurityPolicy:
+    create: true
+  openShift:
+    enabled: true
+    securityContextConstraints:
+      create: true
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+    privileged: true
+
+# OADP
+# GLOBAL- region, organization, cluster_name
+oadp_enabled: true
+
+# Code Ready Workspace
+code_ready_workspace_enabled: false
+
+# Serverless
+serverless_enabled: false

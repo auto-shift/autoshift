@@ -1,4 +1,5 @@
-﻿apiVersion: platform.stackrox.io/v1alpha1
+﻿{{ if .Values.acs_enabled }}
+apiVersion: platform.stackrox.io/v1alpha1
 kind: SecuredCluster
 metadata:
   name: stackrox-secured-cluster-services
@@ -30,3 +31,4 @@ spec:
     taintToleration: TolerateTaints
   clusterName: {{ .Values.cluster_name }}
   centralEndpoint: "central-stackrox.apps.mgmt.{{ .Values.base_domain }}:443"
+{{ end }}

@@ -84,8 +84,8 @@ spec:
             value: {{ amq_broker_enabled }}
           - name: aap_enabled
             value: {{ aap_enabled }}
-          - name: custome_certs_enabled
-            value: {{ custome_certs_enabled }}
+          - name: custom_certs_enabled
+            value: {{ custom_certs_enabled }}
           - name: cluster_autoscaling_enabled
             value: {{ cluster_autoscaling_enabled }}
           - name: pod_priority_threshold
@@ -96,8 +96,8 @@ spec:
             value: {{ scaledown }}
           - name: container_security_operator
             value: {{ container_security_operator }}
-          - name: custome_console
-            value: {{ custome_console }}
+          - name: custom_console
+            value: {{ custom_console }}
           - name: disable_self_provisioner
             value: {{ disable_self_provisioner }}
           - name: file_integrity_operator
@@ -118,8 +118,28 @@ spec:
             value: {{ openshift_logging }}
           - name: openshift_monitoring_enabled
             value: {{ openshift_monitoring_enabled }}
-          - name: base_domain
-            value: {{ base_domain }}
+          - name: acm_enabled
+            value: {{ acm_enabled }}
+          - name: mgmt_cluster
+            value: {{ mgmt_cluster }}
+          - name: cluster_set
+            value: {{ cluster_set }}
+          - name: acm_channel
+            value: {{ acm_channel }}
+          - name: new_relic_enabled
+            value: {{ new_relic_enabled }}
+          - name: pager_duty_enabled
+            value: {{ pager_duty_enabled }}
+          - name: acs_enabled
+            value: {{ acs_enabled }}
+          - name: acs_central_cluster
+            value: {{ acs_central_cluster }}
+          - name: oadp_enabled
+            value: {{ oadp_enabled }}
+          - name: code_ready_workspace_enabled
+            value: {{ code_ready_workspace_enabled }}
+          - name: serverless_enabled
+            value: {{ serverless_enabled }}
 {% if branch_tag != '' %}
           - name: targetrevision
             value: {{ branch_tag }}

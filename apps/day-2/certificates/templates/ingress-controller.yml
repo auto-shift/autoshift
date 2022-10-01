@@ -1,4 +1,4 @@
-{{ if .Values.custome_certs_enabled }}
+{{ if .Values.custom_certs_enabled }}
 kind: IngressController
 apiVersion: operator.openshift.io/v1
 metadata:

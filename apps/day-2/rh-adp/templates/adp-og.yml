@@ -1,3 +1,4 @@
+{{ if .Values.oadp_enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
@@ -6,3 +7,4 @@ metadata:
 spec:
   targetNamespaces:
   - open-cluster-management-backup
+{{ end }}

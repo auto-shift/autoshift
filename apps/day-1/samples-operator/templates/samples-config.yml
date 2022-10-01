@@ -1,4 +1,4 @@
-{{ if .Values.disable_sample_opearors }}
+{{ if .Values.disable_sample_operators }}
 apiVersion: samples.operator.openshift.io/v1
 kind: Config
 metadata:

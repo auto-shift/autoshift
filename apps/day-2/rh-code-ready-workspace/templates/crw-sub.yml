@@ -1,4 +1,4 @@
-{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+{{ if .Values.code_ready_workspace_enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:

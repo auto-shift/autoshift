@@ -1,3 +1,4 @@
+{{ if .Values.oadp_enabled }}
 apiVersion: oadp.openshift.io/v1alpha1
 kind: DataProtectionApplication
 metadata:
@@ -48,3 +49,4 @@ spec:
           profile: default
           region: "{{ .Values.region }}"
         provider: aws
+{{ end }}

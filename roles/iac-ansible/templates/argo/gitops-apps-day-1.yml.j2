@@ -104,14 +104,12 @@ spec:
             value: {{ manual_remediations_enabled }}
           - name: allowedRegistriesForImport
             value: {{ allowedRegistriesForImport }}
-          - name: allowedRegistriesForImport
-            value: {{ allowedRegistriesForImport }}
           - name: allowedRegistries
             value: {{ allowedRegistries }}
           - name: odf_enabled
             value: {{ odf_enabled }}
-          - name: disable_sample_opearors
-            value: {{ disable_sample_opearors }}
+          - name: disable_sample_operators
+            value: {{ disable_sample_operators }}
 {% if branch_tag != '' %}
           - name: targetrevision
             value: {{ branch_tag }}
