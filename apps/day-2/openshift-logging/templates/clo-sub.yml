@@ -1,11 +1,12 @@
+{{ if .Values.openshift_logging.enabled }}
 # subscription object yaml file to subscribe namespace to cluster logging operator
-
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: cluster-logging
-  namespace: {{ .Values.logging_namespace }}
+  namespace: {{ .Values.openshift_logging.logging_namespace }}
 spec:
   name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+{{ end }}

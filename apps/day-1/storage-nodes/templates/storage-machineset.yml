@@ -1,4 +1,5 @@
-{{- range .Values.subnets }}
+{{ if .Values.storage_node_enabled }}
+{{ range .Values.subnets }}
 ---
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineSet
@@ -37,15 +38,15 @@ spec:
             region: {{ $.Values.region }}
           credentialsSecret:
             name: aws-cloud-credentials
-          instanceType: {{ $.Values.instance_type }}
+          instanceType: {{ $.Values.storage.ec2_type }}
           metadata:
             creationTimestamp: null
           blockDevices:
             - ebs:
-                encrypted: true
-                iops: 0
-                volumeSize: 120
-                volumeType: gp2
+                encrypted: {{ $.Values.storage.ebs.encrypted | default('true') }}
+                iops: {{ $.Values.storage.ebs.iops | default('0') }}
+                volumeSize: {{ $.Values.storage.ebs.volumesize | default('120') }}
+                volumeType: {{ $.Values.storage.ebs.volumetype | default('gp2') }}
           securityGroups:
             - filters:
                 - name: 'tag:Name'
@@ -69,4 +70,5 @@ spec:
         - effect: NoSchedule
           key: node.ocs.openshift.io/storage
           value: 'true'
-{{- end }}
+{{ end }}
+{{ end }}

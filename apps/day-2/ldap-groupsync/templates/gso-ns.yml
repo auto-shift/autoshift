@@ -1,4 +1,5 @@
 # yaml file to create namespace for Group Sync Operator
+{{ if .Values.oauth.groupsync_enabled }}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:
@@ -7,3 +8,4 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
+{{ end }}

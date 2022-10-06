@@ -1,3 +1,4 @@
+{{ if .Values.oadp_enabled }}
 apiVersion: oadp.openshift.io/v1alpha1
 kind: DataProtectionApplication
 metadata:
@@ -16,8 +17,8 @@ spec:
           name: cloud-credentials
         default: true
         objectStorage:
-          bucket: "momot-{{ .Values.cluster_name }}-backup"
-          prefix: "momot-{{ .Values.cluster_name }}"
+          bucket: "{{ .Values.organization }}-{{ .Values.cluster_name }}-backup"
+          prefix: "{{ .Values.organization }}-{{ .Values.cluster_name }}"
         provider: aws
   configuration:
     restic:
@@ -48,3 +49,4 @@ spec:
           profile: default
           region: "{{ .Values.region }}"
         provider: aws
+{{ end }}

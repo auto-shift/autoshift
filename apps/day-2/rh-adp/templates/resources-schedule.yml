@@ -1,3 +1,4 @@
+{{ if .Values.oadp_enabled }}
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
@@ -127,3 +128,4 @@ spec:
     ttl: 48h0m0s
     volumeSnapshotLocations:
       - dpa-{{ .Values.cluster_name }}-1
+{{ end }}

@@ -1,4 +1,4 @@
-﻿{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+﻿{{ if .Values.acs_central_cluster }}
 apiVersion: platform.stackrox.io/v1alpha1
 kind: Central
 metadata:

@@ -1,4 +1,4 @@
-{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+{{ if .Values.serverless_enabled }}
 apiVersion: operator.knative.dev/v1alpha1
 kind: KnativeEventing
 metadata:

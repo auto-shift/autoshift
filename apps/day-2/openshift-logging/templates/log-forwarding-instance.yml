@@ -1,8 +1,9 @@
+{{ if .Values.openshift_logging.enabled }}
 apiVersion: logging.openshift.io/v1
 kind: ClusterLogForwarder
 metadata:
   name: instance
-  namespace: {{ .Values.logging_namespace }}
+  namespace: {{ .Values.openshift_logging.logging_namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
@@ -31,3 +32,4 @@ spec:
     name: audit-logs
     outputRefs:
       - cw
+{{ end }}

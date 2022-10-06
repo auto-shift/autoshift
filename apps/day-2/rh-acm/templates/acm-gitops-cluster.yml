@@ -1,4 +1,4 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ if .Values.mgmt_cluster }}
 apiVersion: apps.open-cluster-management.io/v1beta1
 kind: GitOpsCluster
 metadata:
@@ -13,6 +13,6 @@ spec:
   placementRef:
     kind: Placement
     apiVersion: cluster.open-cluster-management.io/v1alpha1
-    name: momot-clusters
+    name: "{{ .Values.organization }}-clusters"
     namespace: openshift-gitops
 {{ end }}

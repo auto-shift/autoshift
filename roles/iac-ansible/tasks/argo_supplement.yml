@@ -1,7 +1,7 @@
 ---
 - name: Set artifactory auth 
   set_fact: 
-    docker_artifactory_auth: "{{ momot_infra_svc_acct_name }}:{{ momot_infra_svc_acct_password }}"
+    docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
 
 - name: Create Secret for New Relic 
   k8s_info:
@@ -18,6 +18,7 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
+  when: new_relic_enabled
 
 - name: Create Secret for New Relic 
   k8s:
@@ -35,6 +36,7 @@
         cert: "{{ etcd_client_certs.resources[0].data['etcd-client.crt'] }}"
         key: "{{ etcd_client_certs.resources[0].data['etcd-client.key'] }}"
       type: Opaque
+  when: new_relic_enabled
 
 - name: Create Fluent Bit App
   k8s:
@@ -42,6 +44,7 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: "{{ lookup('template', 'fluent-bit.yml.j2') }}"
+  when: fluentbit_enabled
 
 - name: Link Docker Config
   shell: oc secrets link default docker-artifactory --for=pull -n newrelic
@@ -54,6 +57,7 @@
     force: yes
     definition: "{{ lookup('template','secrets/' + 'web-console-cert-secret.yml.j2') }}"
   no_log: true
+  when: custom_certs_enabled
 
 - name: Get Ingress Facts
   k8s_info:
@@ -78,6 +82,7 @@
     value: "{{ ingress_hostname }}."
     private_zone: true
     overwrite: true
+  when: custom_console
 
 - name: Create Group Sync Operator Namespace 
   k8s:
@@ -94,6 +99,7 @@
           app.kubernetes.io/instance: ldap-groupsync
           openshift.io/cluster-monitoring: 'true'
         name: group-sync-operator
+  when: oauth.groupsync_enabled
 
 - name: Create Secret for Groupsync 
   k8s:
@@ -106,6 +112,7 @@
     - "{{ lookup('template','secrets/' + 'gso-creds.yml.j2') }}"
     - "{{ lookup('template','secrets/' + 'gso-ca.yml.j2') }}"
   no_log: true
+  when: oauth.groupsync_enabled
   
 - name: Create Secret for LDAP
   k8s:
@@ -117,6 +124,7 @@
     - "{{ lookup('template','secrets/' + 'ldap-secret.yml.j2') }}"
     - "{{ lookup('template','secrets/' + 'ldap-ca-config-map.yml.j2') }}"
   no_log: true
+  when: oauth.ldap_enabled
 
 - name: Create Secret for Okta 
   k8s:
@@ -125,6 +133,7 @@
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'openid-okta-secret.yml.j2') }}"
+  when: oauth.okta_oath_enabled
 
 - name: Create Logging Namespace 
   k8s:
@@ -140,6 +149,7 @@
         labels:
           openshift.io/cluster-monitoring: 'true'
         name: openshift-logging
+  when: openshift_logging.enabled
 
 - name: Create Secret for Cloudwatch 
   k8s:
@@ -148,6 +158,7 @@
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'cw-secret.yml.j2') }}"
+  when: cw_log_forwarding_enabled
 
 - name: Create Custom Ingress Certificate Workloads
   k8s:
@@ -160,6 +171,7 @@
   - "{{ lookup('template', 'secrets/ingress-certs.yml.j2') }}"
   - "{{ lookup('template', 'secrets/api-certs.yml.j2') }}"
   no_log: true
+  when: custom_certs_enabled
 
 - name: Create ACS Namespace 
   k8s:
@@ -175,6 +187,7 @@
         labels:
           openshift.io/cluster-monitoring: 'true'
         name: stackrox
+  when: acs_enabled
 
 - name: Create Secret for ACS 
   k8s:
@@ -183,31 +196,7 @@
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'acs-init-bundle.yml.j2') }}"
-
-- name: Create Hibernation Namespace 
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
-    state: present
-    definition: 
-      apiVersion: project.openshift.io/v1
-      kind: Project
-      metadata:
-        annotations:
-          openshift.io/node-selector: ''
-        labels:
-          openshift.io/cluster-monitoring: 'true'
-        name: cluster-hibernation-resource-ns-0
-  when: cluster_name == 'mgmt'
-
-- name: Create Secret for Hibernation 
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
-    state: present
-    force: yes
-    definition: "{{ lookup('template','secrets/' + 'git-secret.yml.j2') }}"
-  when: cluster_name == 'mgmt'
+  when: acs_enabled
 
 - name: Create ADP Namespace 
   k8s:
@@ -223,6 +212,7 @@
         labels:
           openshift.io/cluster-monitoring: 'true'
         name: open-cluster-management-backup
+  when: oadp_enabled
 
 - name: Set Ingress Hostname Fact
   set_fact:
@@ -230,6 +220,7 @@
       [default]
       aws_access_key_id = {{ ocp_install_aws_access_key }}
       aws_secret_access_key = {{ ocp_install_aws_secret_key }}
+  when: oadp_enabled
 
 - name: Create Secret for ADP 
   k8s:
@@ -238,6 +229,7 @@
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
+  when: oadp_enabled
 
 - name: Disable Server Version CR
   k8s: 
@@ -256,6 +248,7 @@
     kind: Secret
     namespace: ansible-automation-platform
   register: admin_password
+  when: aap_enabled
 
 - name: Apply TSSC App for MGMT
   k8s:
@@ -263,4 +256,4 @@
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: "{{ lookup('template', 'argo/tssc-cluster-resources.yml.j2') }}"
-  when: cluster_name == 'mgmt'
+  when: tssc_enabled

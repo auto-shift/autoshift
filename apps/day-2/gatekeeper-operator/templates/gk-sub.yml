@@ -1,3 +1,4 @@
+{{ if .Values.gatekeeper_operator }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -11,3 +12,4 @@ spec:
   name: gatekeeper-operator-product
   source: redhat-operators
   sourceNamespace: openshift-marketplace
+{{ end }}

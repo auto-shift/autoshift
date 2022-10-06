@@ -1,11 +1,11 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ if .Values.mgmt_cluster }}
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: ManagedClusterSetBinding
 metadata:
-  name: momot-clusters
+  name: "{{ .Values.organization }} -clusters"
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  clusterSet: momot-clusters
+  clusterSet: "{{ .Values.organization }}-clusters"
 {{ end }}

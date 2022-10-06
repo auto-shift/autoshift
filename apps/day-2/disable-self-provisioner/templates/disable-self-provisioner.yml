@@ -1,3 +1,4 @@
+{{ if .Values.disable_self_provisioner }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -9,3 +10,4 @@ roleRef:
   kind: ClusterRole
   name: self-provisioner
 subjects: null
+{{ end }}

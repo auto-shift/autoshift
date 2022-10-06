@@ -1,8 +1,8 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ if .Values.mgmt_cluster }}
 apiVersion: cluster.open-cluster-management.io/v1alpha1
 kind: Placement
 metadata:
-  name: momot-clusters
+  name: "{{ .Values.organization }}-clusters"
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

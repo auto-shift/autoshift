@@ -1,3 +1,4 @@
+{{ if .Values.gatekeeper_operator }}
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sBuilds
@@ -17,3 +18,4 @@ spec:
 {{- range $allowed_git_repos := $.Values.allowed_git_repos }}
       - {{ .repo }}
 {{- end }}
+{{ end }}

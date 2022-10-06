@@ -1,4 +1,5 @@
-﻿apiVersion: project.openshift.io/v1
+﻿{{ if .Values.acs_enabled }}
+apiVersion: project.openshift.io/v1
 kind: Project
 metadata:
   name: stackrox
@@ -6,3 +7,4 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
+{{ end }}

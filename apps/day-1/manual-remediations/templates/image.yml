@@ -1,3 +1,4 @@
+{{ if .Values.manual_remediations_enabled }}
 apiVersion: config.openshift.io/v1
 kind: Image
 metadata:
@@ -9,14 +10,8 @@ metadata:
   name: cluster
 spec: 
   allowedRegistriesForImport:
-    - domainName: quay.io
-      insecure: false
-    - domainName: registry.connect.redhat.com
-      insecure: false
-    - domainName: registry.redhat.io
-      insecure: false
+    {{ .Values.allowedRegistriesForImport }}
   registrySources:
     allowedRegistries:
-      - registry.connect.redhat.com
-      - quay.io
-      - registry.redhat.io
+      {{ .Values.allowedRegistries }}
+{{ end }}

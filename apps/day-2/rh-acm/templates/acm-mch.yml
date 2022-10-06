@@ -1,4 +1,4 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ if .Values.mgmt_cluster }}
 apiVersion: operator.open-cluster-management.io/v1
 kind: MultiClusterHub
 metadata:

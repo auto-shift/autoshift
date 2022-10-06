@@ -1,5 +1,6 @@
-{{- range $subnet :=.Values.subnets }} 
-{{- range $machinehealthchecks := $.Values.machinehealthchecks }}
+{{ if .Values.machine_health_checks_enabled }}
+{{ range $subnet :=.Values.subnets }} 
+{{ range $machinehealthchecks := $.Values.machinehealthchecks }}
 ---
 apiVersion: machine.openshift.io/v1beta1
 kind: MachineHealthCheck
@@ -23,6 +24,6 @@ spec:
     status: "Unknown"
   maxUnhealthy: "40%" 
   nodeStartupTimeout: "10m"
-{{- end }}
-{{- end }}
-
+{{ end }}
+{{ end }}
+{{ end }}

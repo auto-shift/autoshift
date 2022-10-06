@@ -1,3 +1,4 @@
+{{ if .Values.container_security_operator }}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:
@@ -6,3 +7,4 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     openshift.io/cluster-monitoring: "true"
+{{ end }}

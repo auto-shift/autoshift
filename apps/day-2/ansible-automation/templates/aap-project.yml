@@ -1,4 +1,4 @@
-{{ if or (eq .Values.cluster_name "mgmt") (eq .Values.cluster_name "infra") }}
+{{ .Values.aap_enabled }}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:

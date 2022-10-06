@@ -1,4 +1,4 @@
-{{- if or (eq .Values.cluster_name "sbx") (eq .Values.cluster_name "dev") -}}
+{{ if .Values.code_ready_workspace_enabled }}
 apiVersion: project.openshift.io/v1
 kind: Project
 metadata:

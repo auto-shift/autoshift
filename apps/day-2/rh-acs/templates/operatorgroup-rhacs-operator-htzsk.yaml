@@ -1,4 +1,5 @@
-﻿apiVersion: operators.coreos.com/v1
+﻿{{ if .Values.acs_enabled }}
+apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: rhacs-operator
@@ -6,3 +7,4 @@ metadata:
   annotations:
     olm.providedAPIs: >-
       Central.v1alpha1.platform.stackrox.io,SecuredCluster.v1alpha1.platform.stackrox.io
+{{ end }}
