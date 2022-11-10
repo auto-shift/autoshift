@@ -12,16 +12,16 @@
       "tag:use": private
   register: subnet_facts
 
-- name: Gather Hosted Zones
-  route53_info:
-    query: hosted_zone
-  register: hz_facts
+#- name: Gather Hosted Zones
+#  route53_info:
+#    query: hosted_zone
+#  register: hz_facts
 
-- name: Define hosted_zone_id
-  set_fact:
-    hosted_zone_id: "{{ item.Id.split('/')[2] }}"
-  when: item.Name == cluster_name+'.'+base_domain+'.'
-  loop: "{{ hz_facts.list }}"
+#- name: Define hosted_zone_id
+#  set_fact:
+#    hosted_zone_id: "{{ item.Id.split('/')[2] }}"
+#  when: item.Name == cluster_name+'.'+base_domain+'.'
+#  loop: "{{ hz_facts.list }}"
 
 - name: Check if {{ home_dir }}/.ssh Directory Exists
   stat:
