@@ -28,7 +28,7 @@ ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region
 credentials_mode: Passthrough
 
 # OCP Install Secrets
-pull_secret: "{{ lookup('aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
+pull_secret: "{{ ocp_secrets.pull_secret | string }}"
 ocp_install_aws_access_key: "{{ ocp_install_secrets.aws_access_key_id }}"
 ocp_install_aws_secret_key: "{{ ocp_install_secrets.aws_secret_access_key }}"
 
