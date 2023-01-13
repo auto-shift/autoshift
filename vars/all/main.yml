@@ -12,25 +12,21 @@ argocd_image_version: 'v1.4.4'
 region: us-east-1
 branch_tag: ''
 organization: autoshift
-github_url: https://github.com/bcarr-rh
+github_url: https://github.com/auto-shift
 
 
 # ArgoCD Variables
-gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
+gitops_repo_url: https://github.com/auto-shift/autoshift.git
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
-ocp_secrets: "{{ lookup('aws_secret', 'ocp_'vars['clustername']'_secrets', region=vars['region']) }}."
-# aws user for cloudwatch log forwarding 
-cw_secrets: "{{ lookup('aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
-# aws user for install
-ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+ocp_secrets: "{{ lookup('aws_secret', 'ocp_' + vars['clustername'] + '_secrets', region=vars['region']) }}."
 credentials_mode: Passthrough
 
 # OCP Install Secrets
-pull_secret: "{{ lookup('aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
-ocp_install_aws_access_key: "{{ ocp_install_secrets.aws_access_key_id }}"
-ocp_install_aws_secret_key: "{{ ocp_install_secrets.aws_secret_access_key }}"
+pull_secret: "{{ ocp_secrets.ocp_pull_secret | string }}"
+ocp_install_aws_access_key: "{{ ocp_secrets.aws_access_key_id }}"
+ocp_install_aws_secret_key: "{{ ocp_secrets.aws_secret_access_key }}"
 
 # Day 1
 # gitops-operator
@@ -140,14 +136,14 @@ aap_password: "{{ ocp_secrets.aap_password }}"
 
 # Certs
 custom_certs_enabled: true
-api_cert: "{{ lookup('aws_secret', 'ocp_api_cert', region=vars['region']) }}"
-api_cert_key: "{{ lookup('aws_secret', 'ocp_api_cert_key', region=vars['region']) }}"
-console_cert: "{{ lookup('aws_secret', 'ocp_console_cert', region=vars['region']) }}"
-console_cert_key: "{{ lookup('aws_secret', 'ocp_console_cert_key', region=vars['region']) }}"
-ingress_cert: "{{ lookup('aws_secret', 'ocp_ingress_cert', region=vars['region']) }}"
-ingress_cert_key: "{{ lookup('aws_secret', 'ocp_ingress_cert_key', region=vars['region']) }}"
-ingress_cert_ca: "{{ lookup('aws_secret', 'ocp_ingress_cert_ca', region=vars['region']) }}"
-ca_cert: "{{ lookup('aws_secret', 'ocp_ldap_ca', region=vars['region']) }}"
+api_cert: "{{ ocp_secrets.ocp_api_cert }}"
+api_cert_key: "{{ ocp_secrets.ocp_api_cert_key }}"
+console_cert: "{{ ocp_secrets.ocp_console_cert }}"
+console_cert_key: "{{ ocp_secrets.ocp_console_cert_key }}"
+ingress_cert: "{{ ocp_secrets.ocp_ingress_cert }}"
+ingress_cert_key: "{{ ocp_secrets.ocp_ingress_cert_key }}"
+ingress_cert_ca: "{{ ocp_secrets.ocp_ingress_cert_ca }}"
+ca_cert: "{{ ocp_secrets.ocp_ldap_ca }}"
 
 # cluster-autoscaling
 cluster_autoscaling_enabled: true
@@ -187,8 +183,8 @@ allowed_git_repos:
 
 # Cloud Watch Logging
 cw_log_forwarding_enabled: true
-cloudwatch_aws_access_key: "{{ cw_secrets.aws_access_key_id }}"
-cloudwatch_aws_secret_key: "{{ cw_secrets.aws_secret_access_key }}"
+cloudwatch_aws_access_key: "{{ocp_secrets.cw_aws_access_key_id }}"
+cloudwatch_aws_secret_key: "{{ ocp_secrets.cw_aws_secret_access_key }}"
 
 # Oauth Secrets
 oauth:
@@ -256,9 +252,8 @@ new_relic_pixie_api_key: "{{ ocp_secrets.new_relic_pixie_api_key }}"
 
 # Docker Registry Secrets
 artifactory_pull_secret: "{{ ocp_secrets.artifactory_pull_secret }}"
-svc_acct: "{{ lookup('aws_secret', 'svc-acct', region=vars['region']) }}"
-svc_acct_name: "{{ svc_acct.account_name }}"
-svc_acct_password: "{{ svc_acct.account_password }}"
+svc_acct_name: "{{ ocp_secrets.svc_acct_account_name }}"
+svc_acct_password: "{{ ocp_secrets.svc_acct_account_password }}"
 
 # Pager Duty Secrets
 pager_duty_enabled: true
