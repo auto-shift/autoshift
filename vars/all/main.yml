@@ -20,7 +20,7 @@ gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
-ocp_secrets: "{{ lookup('aws_secret', 'ocp_secrets', region=vars['region']) }}."
+ocp_secrets: "{{ lookup('aws_secret', 'ocp_'vars['clustername']'_secrets', region=vars['region']) }}."
 # aws user for cloudwatch log forwarding 
 cw_secrets: "{{ lookup('aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
 # aws user for install
