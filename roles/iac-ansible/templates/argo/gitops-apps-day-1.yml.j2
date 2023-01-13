@@ -83,9 +83,9 @@ spec:
           - name: organization
             value: {{ organization }}
           - name: gitops_enabled
-            value: {{ gitops_enabled }}
+            value: "{{ gitops_enabled | string }}"
           - name: infra_nodes_enabled
-            value: {{ infra_nodes_enabled }}
+            value: "{{ infra_nodes_enabled | string }}"
           - name: infra
             value: {{ infra }}
           - name: master
@@ -93,23 +93,23 @@ spec:
           - name: storage
             value: {{ storage }}
           - name: worker_node_enabled
-            value: {{ worker_node_enabled }}
+            value: "{{ worker_node_enabled | string }}"
           - name: worker
             value: {{ worker }}
           - name: machine_health_checks_enabled
-            value: {{ machine_health_checks_enabled }}
+            value: "{{ machine_health_checks_enabled | string }}"
           - name: machinehealthchecks
             value: {{ machinehealthchecks }}
           - name: manual_remediations_enabled
-            value: {{ manual_remediations_enabled }}
+            value: "{{ manual_remediations_enabled | string }}"
           - name: allowedRegistriesForImport
             value: {{ allowedRegistriesForImport }}
           - name: allowedRegistries
             value: {{ allowedRegistries }}
           - name: odf_enabled
-            value: {{ odf_enabled }}
+            value: "{{ odf_enabled | string }}"
           - name: disable_sample_operators
-            value: {{ disable_sample_operators }}
+            value: "{{ disable_sample_operators | string }}"
 {% if branch_tag != '' %}
           - name: targetrevision
             value: {{ branch_tag }}

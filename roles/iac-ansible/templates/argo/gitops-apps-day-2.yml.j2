@@ -81,13 +81,13 @@ spec:
           - name: base_domain
             value: {{ base_domain }}
           - name: amq_broker_enabled
-            value: {{ amq_broker_enabled }}
+            value: "{{ amq_broker_enabled | string }}"
           - name: aap_enabled
-            value: {{ aap_enabled }}
+            value: "{{ aap_enabled | string }}"
           - name: custom_certs_enabled
-            value: {{ custom_certs_enabled }}
+            value: "{{ custom_certs_enabled | string }}"
           - name: cluster_autoscaling_enabled
-            value: {{ cluster_autoscaling_enabled }}
+            value: "{{ cluster_autoscaling_enabled | string }}"
           - name: pod_priority_threshold
             value: {{ pod_priority_threshold }}
           - name: resource_limits
@@ -109,7 +109,7 @@ spec:
           - name: allowed_git_repos
             value: {{ allowed_git_repos }}
           - name: cw_log_forwarding_enabled
-            value: {{ cw_log_forwarding_enabled }}
+            value: "{{ cw_log_forwarding_enabled | string }}"
           - name: oauth
             value: {{ oauth }}
           - name: openshift_compliance_operator
@@ -117,9 +117,9 @@ spec:
           - name: openshift_logging
             value: {{ openshift_logging }}
           - name: openshift_monitoring_enabled
-            value: {{ openshift_monitoring_enabled }}
+            value: "{{ openshift_monitoring_enabled | string }}"
           - name: acm_enabled
-            value: {{ acm_enabled }}
+            value: "{{ acm_enabled | string }}"
           - name: mgmt_cluster
             value: {{ mgmt_cluster }}
           - name: cluster_set
@@ -127,19 +127,19 @@ spec:
           - name: acm_channel
             value: {{ acm_channel }}
           - name: new_relic_enabled
-            value: {{ new_relic_enabled }}
+            value: "{{ new_relic_enabled | string }}"
           - name: pager_duty_enabled
-            value: {{ pager_duty_enabled }}
+            value: "{{ pager_duty_enabled | string }}"
           - name: acs_enabled
-            value: {{ acs_enabled }}
+            value: "{{ acs_enabled | string }}"
           - name: acs_central_cluster
             value: {{ acs_central_cluster }}
           - name: oadp_enabled
-            value: {{ oadp_enabled }}
+            value: "{{ oadp_enabled | string }}"
           - name: code_ready_workspace_enabled
-            value: {{ code_ready_workspace_enabled }}
+            value: "{{ code_ready_workspace_enabled | string }}"
           - name: serverless_enabled
-            value: {{ serverless_enabled }}
+            value: "{{ serverless_enabled | string }}"
 {% if branch_tag != '' %}
           - name: targetrevision
             value: {{ branch_tag }}
