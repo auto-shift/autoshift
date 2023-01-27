@@ -1,3 +1,4 @@
+{{ if .Values.oauth.enabled }}
 apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
@@ -9,7 +10,7 @@ spec:
     accessTokenMaxAgeSeconds: 28800
     accessTokenInactivityTimeout: 10m0s
   identityProviders:
-{{ if .Values.ldap_enabled }}
+{{ if .Values.oauth.ldap_enabled }}
   - ldap:
       attributes:
         email:
@@ -26,12 +27,12 @@ spec:
       ca:
         name: ca-config-map
       insecure: false
-      url: {{ .Values.ldapurl }}{{ .Values.ldap_filter }}
+      url: {{ .Values.oauth.ldapurl }}{{ .Values.oauth.ldap_filter }}
     mappingMethod: claim
     name: ldapidp
     type: LDAP
 {{ end }}
-{{ if .Values.okta_oath_enabled }}
+{{ if .Values.oauth.okta_enabled }}
   - mappingMethod: claim
     name: okta
     openID:
@@ -44,12 +45,12 @@ spec:
         preferredUsername:
         - preferred_username
         - email
-      clientID: {{ .Values.okta_client_id }}
+      clientID: {{ .Values.oauth.okta_client_id }}
       clientSecret:
         name: openid-okta-secret
       extraScopes:
       - email
       - profile
-      issuer: {{ .Values.okta_issuer }}
+      issuer: {{ .Values.oauth.okta_issuer }}
     type: OpenID
 {{ end }}

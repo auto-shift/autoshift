@@ -1,4 +1,4 @@
-vpc_name: ocp-sbx-east-dev
+vpc_id: ocp-sbx-east-dev
 cluster_name: sbx
 openshift_version: 4.9.31
 base_domain: 

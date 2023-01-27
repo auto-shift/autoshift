@@ -1,15 +1,15 @@
 ---
-- name: "Gathering VPC facts from {{ vpc_name }}"
+- name: "Gathering VPC facts from {{ vpc_id }}"
   ec2_vpc_net_info:
     filters:
-      "tag:Name": "{{ vpc_name }}"
+      vpc-id: "{{ vpc_id }}"
   register: vpc_facts
   
 - name: Gathering private subnet facts
   ec2_vpc_subnet_info:
     filters:
-      vpc-id: "{{ vpc_facts.vpcs[0].id }}"
-      "tag:use": private
+      vpc-id: "{{ vpc_id }}"
+      "tag:type": private
   register: subnet_facts
 
 - name: Gather Hosted Zones

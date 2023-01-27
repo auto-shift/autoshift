@@ -1,9 +1,9 @@
-vpc_name: AutoShiftVPC
+vpc_id: autoshift-vpc
 
 cluster_name: mgmt
 openshift_version: 4.9.31
 base_domain: autoshift.io
-region: us-east-1
+region: us-gov-east-1
 
 acs_central_cluster: true
 mgmt_cluster: true

@@ -9,10 +9,11 @@
 # Image version should match argo-containers/argocd-repo-server-sops/Dockerfile
 argocd_image_version: 'v1.4.4'
 
-region: us-east-1
+region: us-gov-east-1
 branch_tag: ''
 organization: auto-shift
 github_url: https://github.com/auto-shift
+
 
 
 # ArgoCD Variables
@@ -20,7 +21,7 @@ gitops_repo_url: https://github.com/auto-shift/autoshift.git
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
-ocp_secrets: "{{ lookup('aws_secret', 'ocp_' + vars['clustername'] + '_secrets', region=vars['region']) }}."
+ocp_secrets: "{{ lookup('aws_secret', 'ocp_' + vars['cluster_name'] + '_secrets', region=vars['region']) }}"
 credentials_mode: Passthrough
 
 # OCP Install Secrets
@@ -54,6 +55,7 @@ infra:
 # master-nodes
 master:
   ec2_type: m5.2xlarge
+  ami_id: ami-01cf7af002e8874a4
   rootvolume:
     iops: 2000
     size: 120
@@ -79,6 +81,7 @@ storage:
 worker_node_enabled: true
 worker:
   ec2_type: m5.4xlarge
+  ami_id: ami-01cf7af002e8874a4
   ebs:
     encrypted: true
     iops: 0
@@ -188,6 +191,7 @@ cloudwatch_aws_secret_key: "{{ ocp_secrets.cw_aws_secret_access_key }}"
 
 # Oauth Secrets
 oauth:
+  enabled: false
   groupsync_enabled: false
   group_membership_attr: uniquemember
   group_name_attr: cn
@@ -203,7 +207,7 @@ oauth:
   radiant_binddn: "{{ ocp_secrets.radiant_binddn }}"
   radiant_url: "{{ ocp_secrets.radiant_url }}"
   radiant_password: "{{ ocp_secrets.radiant_password }}"
-  okta_oath_enabled: false
+  okta_enabled: false
   okta_client_id: "{{ ocp_secrets.okta_client_id }}"
   okta_client_secret: "{{ ocp_secrets.okta_client_secret }}"
   okta_issuer: "{{ ocp_secrets.okta_issuer }}"

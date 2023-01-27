@@ -23,7 +23,9 @@ Default output format [None]: json
 ### Install git and ansible packages
 
 ```
-sudo yum install -y git ansible tmux
+sudo yum install -y git ansible tmux python3-pip
+ansible-galaxy install -r collections/requirements.yml
+pip install boto3
 ```
 
 Add your git token to ~/.gitconfig
@@ -44,7 +46,7 @@ EOF
 | Variable Name | Description | Default |
 | -------- | ----------- | ------- |
 |pull_secret | OpenShift pull secret (cloud.redhat.com) | |
-|vpc_name | The value of the tag 'Name' of the desired target VPC | |
+|vpc_id | The value of the ID of the desired target VPC | |
 |cluster_name | The desired cluster name (e.g. cluster, dev, infra) | |
 |openshift_version | The desired OpenShift version to deploy | 4.7.8 |
 |base_domain | Base domain of the OpenShift cluster | cms.local |

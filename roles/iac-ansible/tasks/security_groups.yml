@@ -2,12 +2,8 @@
 - name: Gather VPC Facts
   ec2_vpc_net_info:
     filters:
-      "tag:Name": "{{ vpc_name }}"
+      vpc-id: "{{ vpc_id }}"
   register: vpc_facts
-
-- name: Set VPC ID fact
-  set_fact:
-    vpc_id: "{{ vpc_facts.vpcs[0].vpc_id }}"
 
 - name: Check for Existing Cloudbees Security Group
   ec2_group_info:

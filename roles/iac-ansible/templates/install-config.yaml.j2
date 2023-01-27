@@ -11,6 +11,9 @@ compute:
         size: {{ worker.rootvolume.size }}
         type: {{ worker.rootvolume.type }}
       type: {{ worker.ec2_type }}
+{% if worker.ami_id is defined %}
+      amiID: {{ worker.ami_id }}
+{% endif %}
       zones:
       - {{ region | default('us-east-1') }}a
       - {{ region | default('us-east-1') }}b
@@ -26,6 +29,9 @@ controlPlane:
         size: {{ master.rootvolume.size }}
         type: {{ master.rootvolume.type }}
       type: {{ master.ec2_type }}
+{% if master.ami_id is defined %}
+      amiID: {{ master.ami_id }}
+{% endif %}
       zones:
       - {{ region | default('us-east-1') }}a
       - {{ region | default('us-east-1') }}b
@@ -38,8 +44,10 @@ networking:
   clusterNetwork:
   - cidr: {{ cluster_network_cidr | default('100.64.0.0/14') }}
     hostPrefix: {{ cluster_network_host_prefix | default('23') }}
+{% if vpc_facts is defined %}
   machineNetwork:
   - cidr: {{ vpc_facts.vpcs[0].cidr_block}}
+{% endfor %}
   networkType: {{ ocp_network_type | default('OpenShiftSDN') }}
   serviceNetwork:
   -  {{ service_network_cidr | default('172.30.0.0/16') }}

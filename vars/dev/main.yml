@@ -1,4 +1,4 @@
-vpc_name: ocp-east-dev
+vpc_id: ocp-east-dev
 cluster_name: dev
 openshift_version: 4.9.31
 base_domain: 

@@ -1,15 +1,15 @@
-vpc_name: ocp-east-impl
+vpc_id: ocp-east-impl
 cluster_name: impl
 openshift_version: 4.9.31
-base_domain: 
-region: us-east-1
+base_domain: autoshift.io
+region: us-gov-east-1
 
 #LDAP vars
-ldap_filter: 
+ldap_filter: na
 
 #LDAP groupsync vars
-group_filter: 
-cluster_admin_group: 
+group_filter: na
+cluster_admin_group: na
 
 machineset_types:
   infra:

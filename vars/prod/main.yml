@@ -1,4 +1,4 @@
-vpc_name: ocp-east-prod
+vpc_id: ocp-east-prod
 cluster_name: prod
 openshift_version: 4.9.31
 base_domain: 

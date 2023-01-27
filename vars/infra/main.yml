@@ -1,5 +1,5 @@
 openshift_version: 4.9.31
-vpc_name: ocp-infra-east-dev
+vpc_id: ocp-infra-east-dev
 cluster_name: infra
 base_domain: 
 region: us-east-1

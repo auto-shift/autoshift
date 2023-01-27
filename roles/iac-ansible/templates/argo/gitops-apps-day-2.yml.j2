@@ -58,22 +58,6 @@ spec:
             value: {{ subnet_id_b }}
           - name: subnet_id_c
             value: {{ subnet_id_c }}
-          - name: ldapurl
-            value: {{ ldapurl }}
-          - name: radiant_url
-            value: {{ radiant_url }}
-          - name: cluster_admin_group
-            value: {{ cluster_admin_group }}
-          - name: group_filter
-            value: {{ group_filter }}
-          - name: ldap_filter
-            value: "{{ ldap_filter }}"
-          - name: binddn_uid
-            value: "{{ oauth.binddn | regex_search('[^,]*') }}"
-          - name: okta_client_id
-            value: {{ okta_client_id }}
-          - name: okta_issuer
-            value: {{ okta_issuer }}
           - name: pagerduty_prometheus_key
             value: {{ pagerduty_prometheus_key }}
           - name: pagerduty_events_key

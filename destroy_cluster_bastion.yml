@@ -28,7 +28,7 @@
     register: destroy_response
     delegate_to: localhost
 
-  - name: Example using fail and when together
+  - name: Wiat for Prompt
     fail:
       msg: Automation stopped, prompt response no for destroying cluster.
     when: hostvars['localhost'].destroy_response.user_input != "yes"

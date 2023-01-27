@@ -3,7 +3,7 @@ setup_dependencies: true
 create_cluster: true
 install_argo_apps: true
 
-vpc_name: vpc-name
+vpc_id: vpc-name
 cluster_name: cluster
 openshift_version: 4.9.43
 region: us-east-1
