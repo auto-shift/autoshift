@@ -2,18 +2,18 @@ vpc_name: ocp-mgmt-east-prod
 
 cluster_name: mgmt
 openshift_version: 4.9.31
-base_domain: 
+base_domain: autoshift.io
 region: us-east-1
 
 acs_central_cluster: true
 mgmt_cluster: true
 
 #LDAP vars
-ldap_filter: 
+ldap_filter: na
 
 #LDAP groupsync vars
-group_filter: 
-cluster_admin_group: 
+group_filter: na
+cluster_admin_group: na
 
 machineset_types:
   infra:
@@ -29,10 +29,10 @@ machineset_types:
       min: 1
       max: 2
 
-ado_groups:
+ado_groups: na
 
 #AWS Secrets Manager Secret
-impl_argo_sa_token: 
+impl_argo_sa_token: na
 dev_argo_sa_token: 
 test_argo_sa_token: 
 prod_argo_sa_token: 
