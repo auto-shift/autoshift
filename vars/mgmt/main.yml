@@ -1,4 +1,4 @@
-vpc_name: autoshift-vpc
+vpc_name: AutoShiftVPC
 
 cluster_name: mgmt
 openshift_version: 4.9.31
@@ -33,6 +33,6 @@ ado_groups: na
 
 #AWS Secrets Manager Secret
 impl_argo_sa_token: na
-dev_argo_sa_token: 
-test_argo_sa_token: 
-prod_argo_sa_token: 
+dev_argo_sa_token: na
+test_argo_sa_token: na
+prod_argo_sa_token: na
