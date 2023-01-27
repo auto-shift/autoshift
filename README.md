@@ -23,7 +23,7 @@ Default output format [None]: json
 ### Install git and ansible packages
 
 ```
-sudo yum -y git ansible tmux
+sudo yum install -y git ansible tmux
 ```
 
 Add your git token to ~/.gitconfig
