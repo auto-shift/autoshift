@@ -6,6 +6,8 @@
 # remove_kubeadmin: true
 
 #iac-ansible variables
+# Default is set to aws, vsphere is also available
+platform_type: aws
 # Image version should match argo-containers/argocd-repo-server-sops/Dockerfile
 argocd_image_version: 'v1.4.4'
 
@@ -310,3 +312,17 @@ code_ready_workspace_enabled: false
 
 # Serverless
 serverless_enabled: false
+
+# VSphere Vars
+vcenter_server: 
+vcenter_username: 
+vcenter_password: 
+vcenter_datacenter: 
+vcenter_datastore: 
+vcenter_folder: 
+rvcenter_esource_pool: 
+vcenter_disktype: 
+vcenter_VM_Network: 
+vsphere_cluster_name: 
+vcenter_api_vip: 
+ivcenter_ngress_vip: 

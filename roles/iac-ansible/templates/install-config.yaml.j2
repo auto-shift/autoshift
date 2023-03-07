@@ -5,6 +5,7 @@ compute:
 - hyperthreading: Enabled
   name: worker
   platform:
+{% if platform_type is "aws" %}
     aws:
       rootVolume:
         iops: {{ worker.rootvolume.iops }}
@@ -15,11 +16,20 @@ compute:
       - {{ region | default('us-east-1') }}a
       - {{ region | default('us-east-1') }}b
       - {{ region | default('us-east-1') }}c
+{% elif platform_type is "vsphere" %}
+    vsphere: 
+      cpus: 2
+      coresPerSocket: 2
+      memoryMB: 8192
+      osDisk:
+        diskSizeGB: 120
+{% endif %}
   replicas: {{ worker.replicas }}
 controlPlane:
   hyperthreading: Enabled
   name: master
   platform:
+{% if platform_type is "aws" %}
     aws:
       rootVolume:
         iops: {{ master.rootvolume.iops }}
@@ -30,6 +40,14 @@ controlPlane:
       - {{ region | default('us-east-1') }}a
       - {{ region | default('us-east-1') }}b
       - {{ region | default('us-east-1') }}c
+{% elif platform_type is "vsphere" %}
+    vsphere: 
+      cpus: 4
+      coresPerSocket: 2
+      memoryMB: 16384
+      osDisk:
+        diskSizeGB: 120
+{% endif %}
   replicas: {{ master.replicas }}
 fips: {{ fips_enabled | default('true') }}
 metadata:
@@ -44,16 +62,33 @@ networking:
   serviceNetwork:
   -  {{ service_network_cidr | default('172.30.0.0/16') }}
 platform:
+{% if platform_type is "aws" %}
   aws:
     region: {{ region | default('us-east-1') }}
     userTags:
       autoOff: True
     subnets:
-{% for subnet in subnet_facts.subnets %}
+  {% for subnet in subnet_facts.subnets %}
     - {{ subnet.id }}
-{% endfor %}
-{% if hosted_zone_id is defined %}
+  {% endfor %}
+  {% if hosted_zone_id is defined %}
     hostedZone: {{ hosted_zone_id }}
+  {% endif %}
+{% elif platform_type is "vsphere" %}
+platform:
+  vsphere:
+    vcenter: {{ vcenter_server }}
+    username: {{ vcenter_username }}
+    password: {{ vcenter_password }}
+    datacenter: {{ vcenter_datacenter }}
+    defaultDatastore: {{ vcenter_datastore }}
+    folder: {{ vcenter_folder }}
+    resourcePool: {{ rvcenter_esource_pool }}
+    diskType: {{ vcenter_disktype }}
+    network: {{ vcenter_VM_Network }}
+    cluster: {{ vsphere_cluster_name }} 
+    apiVIPs: {{ vcenter_api_vip }}
+    ingressVIPs: {{ ivcenter_ngress_vip }}
 {% endif %}
 publish: {{ publish_type | default('Internal') }}
 pullSecret: '{{ pull_secret }}'
