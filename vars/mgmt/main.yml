@@ -1,7 +1,7 @@
 vpc_id:
 
 cluster_name: mgmt
-openshift_version: 4.9.31
+openshift_version: 4.12.20
 base_domain: 
 region: us-east-1
 
