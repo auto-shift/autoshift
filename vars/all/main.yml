@@ -12,11 +12,11 @@ argocd_image_version: 'v1.4.4'
 region: us-east-1
 branch_tag: ''
 organization: autoshift
-github_url: https://github.com/bcarr-rh
+github_url: https://github.com/auto-shift
 
 
 # ArgoCD Variables
-gitops_repo_url: https://github.com/bcarr-rh/autoshift.git
+gitops_repo_url: https://github.com/auto-shift/autoshift.git
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
