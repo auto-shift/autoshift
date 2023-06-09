@@ -1,7 +1,7 @@
 vpc_id:
 cluster_name: test
 openshift_version: 4.12.20
-base_domain: 
+base_domain: autoshift.dev
 region: us-east-1
 
 #LDAP vars
