@@ -20,26 +20,26 @@ gitops_repo_url: https://github.com/auto-shift/autoshift.git
 
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
-ocp_secrets: "{{ lookup('aws_secret', 'ocp_secrets', region=vars['region']) }}."
+autoshift_secrets: "{{ lookup('aws_secret', 'autoshift_secrets', region=vars['region']) }}."
 # aws user for cloudwatch log forwarding 
-cw_secrets: "{{ lookup('aws_secret', 'ocp-cloudwatch-svc-user', region=vars['region']) }}"
+cw_secrets: "{{ lookup('aws_secret', 'ocp_cloudwatch_svc_user', region=vars['region']) }}"
 # aws user for install
-ocp_install_secrets: "{{ lookup('aws_secret', 'ocp-install-service-user', region=vars['region']) }}"
+ocp_install_secrets: "{{ lookup('aws_secret', 'autoshift_install_service_user', region=vars['region']) }}"
 credentials_mode: Passthrough
 
 # OCP Install Secrets
-pull_secret: "{{ lookup('aws_secret', 'ocp_pull_secret', region=vars['region']) | string }}"
-ocp_install_aws_access_key: "{{ ocp_install_secrets.aws_access_key_id }}"
-ocp_install_aws_secret_key: "{{ ocp_install_secrets.aws_secret_access_key }}"
+pull_secret: "{{ lookup('aws_secret', 'autoshift_pull_secret', region=vars['region']) | string }}"
+ocp_install_aws_access_key: "{{ autoshift_install_secrets.aws_access_key_id }}"
+ocp_install_aws_secret_key: "{{ autoshift_install_secrets.aws_secret_access_key }}"
 
 # Day 1
 # gitops-operator
 gitops_enabled: true
-argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
-git_user: "{{ ocp_secrets.git_user }}"
-git_token: "{{ ocp_secrets.git_token }}"
+argocd_pgp_private_key: "{{ autoshift_secrets.argocd_pgp_private_key }}"
+git_user: "{{ autoshift_secrets.git_user }}"
+git_token: "{{ autoshift_secrets.git_token }}"
 gitops_namespace: "openshift-gitops"
-gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
+gitops_admin_passphrase: "{{ autoshift_secrets.gitops_admin_pass }}"
 
 # infra-nodes
 infra_nodes_enabled: true
@@ -134,9 +134,9 @@ amq_broker_enabled: true
 
 # AAP Secrets
 aap_enabled: true
-aap_host: "{{ ocp_secrets.aap_host }}"
-aap_username: "{{ ocp_secrets.aap_username }}"
-aap_password: "{{ ocp_secrets.aap_password }}"
+aap_host: "{{ autoshift_secrets.aap_host }}"
+aap_username: "{{ autoshift_secrets.aap_username }}"
+aap_password: "{{ autoshift_secrets.aap_password }}"
 
 # Certs
 custom_certs_enabled: true
@@ -200,17 +200,17 @@ oauth:
   user_uid_attr: dn
   sync_schedule: 0,10,20,30,40,50 * * * *
   ldap_enabled: false
-  binddn: "{{ ocp_secrets.binddn }}"
-  ldapurl: "{{ ocp_secrets.ldapurl }}"
-  ldap_password: "{{ ocp_secrets.ldap_password }}"
+  binddn: "{{ autoshift_secrets.binddn }}"
+  ldapurl: "{{ autoshift_secrets.ldapurl }}"
+  ldap_password: "{{ autoshift_secrets.ldap_password }}"
   radiant_ldab_enabled: false
-  radiant_binddn: "{{ ocp_secrets.radiant_binddn }}"
-  radiant_url: "{{ ocp_secrets.radiant_url }}"
-  radiant_password: "{{ ocp_secrets.radiant_password }}"
+  radiant_binddn: "{{ autoshift_secrets.radiant_binddn }}"
+  radiant_url: "{{ autoshift_secrets.radiant_url }}"
+  radiant_password: "{{ autoshift_secrets.radiant_password }}"
   okta_oath_enabled: false
-  okta_client_id: "{{ ocp_secrets.okta_client_id }}"
-  okta_client_secret: "{{ ocp_secrets.okta_client_secret }}"
-  okta_issuer: "{{ ocp_secrets.okta_issuer }}"
+  okta_client_id: "{{ autoshift_secrets.okta_client_id }}"
+  okta_client_secret: "{{ autoshift_secrets.okta_client_secret }}"
+  okta_issuer: "{{ autoshift_secrets.okta_issuer }}"
 
 # openshift-compliance-operator
 openshift_compliance_operator: true
@@ -250,31 +250,31 @@ acm_channel: release-2.5
 
 # New Relic Secrets
 new_relic_enabled: true
-new_relic_license_key: "{{ ocp_secrets.new_relic_license_key }}"
-new_relic_pixie_deploy_key: "{{ ocp_secrets.new_relic_pixie_deploy_key }}"
-new_relic_pixie_api_key: "{{ ocp_secrets.new_relic_pixie_api_key }}"
+new_relic_license_key: "{{ autoshift_secrets.new_relic_license_key }}"
+new_relic_pixie_deploy_key: "{{ autoshift_secrets.new_relic_pixie_deploy_key }}"
+new_relic_pixie_api_key: "{{ autoshift_secrets.new_relic_pixie_api_key }}"
 
 # Docker Registry Secrets
-artifactory_pull_secret: "{{ ocp_secrets.artifactory_pull_secret }}"
-svc_acct: "{{ lookup('aws_secret', 'svc-acct', region=vars['region']) }}"
+artifactory_pull_secret: "{{ autoshift_secrets.artifactory_pull_secret }}"
+svc_acct: "{{ lookup('aws_secret', 'svc_acct', region=vars['region']) }}"
 svc_acct_name: "{{ svc_acct.account_name }}"
 svc_acct_password: "{{ svc_acct.account_password }}"
 
 # Pager Duty Secrets
 pager_duty_enabled: true
-pagerduty_events_key: "{{ ocp_secrets.pagerduty_events_key }}"
-pagerduty_prometheus_key: "{{ ocp_secrets.pagerduty_prometheus_key }}"
+pagerduty_events_key: "{{ autoshift_secrets.pagerduty_events_key }}"
+pagerduty_prometheus_key: "{{ autoshift_secrets.pagerduty_prometheus_key }}"
 
 # ACS Secrets
 acs_enabled: true
 acs_central_cluster: false
-acs_init_bundle: "{{ ocp_secrets.acs_init_bundle }}"
+acs_init_bundle: "{{ autoshift_secrets.acs_init_bundle }}"
 
 # Fluentbit Splunk Log Forwarding
 fluentbit_enabled: true
-splunk_hec_token: "{{ ocp_secrets.splunk_hec_token }}"
-splunk_channel_id: "{{ ocp_secrets.splunk_channel_id }}"
-cloud_account: "{{ ocp_secrets.cloud_account }}"
+splunk_hec_token: "{{ autoshift_secrets.splunk_hec_token }}"
+splunk_channel_id: "{{ autoshift_secrets.splunk_channel_id }}"
+cloud_account: "{{ autoshift_secrets.cloud_account }}"
 fluent_bit:
   namespace: fluent-bit-logging
   cm_name: fluent-bit
