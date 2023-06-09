@@ -1,4 +1,4 @@
-vpc_name: ocp-east-test
+vpc_id:
 cluster_name: test
 openshift_version: 4.9.31
 base_domain: 

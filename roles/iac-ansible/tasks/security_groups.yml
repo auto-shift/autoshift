@@ -2,7 +2,7 @@
 - name: Gather VPC Facts
   ec2_vpc_net_info:
     filters:
-      "tag:Name": "{{ vpc_name }}"
+      vpc-id: "{{ vpc_id }}"
   register: vpc_facts
 
 - name: Set VPC ID fact
