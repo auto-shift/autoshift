@@ -51,7 +51,7 @@
   
 - name: Creating install-config.yaml
   template:
-    src: templates/install-config.yaml.j2
+    src: install-config.yaml.j2
     dest: "{{ install_dir }}/install-config.yaml"
 
 - name: Create OCP Cluster
