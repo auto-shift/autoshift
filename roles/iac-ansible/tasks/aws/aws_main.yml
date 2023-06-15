@@ -1,7 +1,4 @@
 ---
-- name: Gather Infra Facts
-  include_tasks: gather_infra_facts.yml
-
 - name: Create OpenShift Cluster
   include_tasks: create_cluster.yml
   when: create_cluster
@@ -9,6 +6,9 @@
 - name: Create OpenShift Cluster
   include_tasks: create_cluster_acm.yml
   when: create_cluster_acm
+
+- name: Gather Infra Facts
+  include_tasks: gather_infra_facts.yml
 
 - name: Create S3 bucket
   aws_s3:
