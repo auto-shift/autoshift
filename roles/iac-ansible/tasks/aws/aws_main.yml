@@ -10,14 +10,14 @@
 - name: Gather Infra Facts
   include_tasks: gather_infra_facts.yml
 
-- name: Create S3 bucket
-  aws_s3:
-    bucket: "{{ organization }}-{{ cluster_name }}-backup"
-    mode: create
-    permission: bucket-owner-read
-    encrypt: yes
-  register: bucket_changed
-  when: restore
+# - name: Create S3 bucket
+#   aws_s3:
+#     bucket: "{{ organization }}-{{ cluster_name }}-backup"
+#     mode: create
+#     permission: bucket-owner-read
+#     encrypt: yes
+#   register: bucket_changed
+#   when: restore
 
 # - name: Restore Gitops
 #   include_tasks: restore_gitops.yml
