@@ -4,7 +4,7 @@
   when: setup_dependencies
 
 - name: AWS Deploy
-  include_tasks: aws_main.yml
+  include_tasks: aws/aws_main.yml
   when: platform == 'aws'
 
 # - name: Install Gitops
