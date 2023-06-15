@@ -70,31 +70,6 @@
     src: "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}"
     dest: "{{ install_dir }}/auth/id_rsa_{{ cluster_name }}"
 
-- name: Create S3 bucket
-  amazon.aws.s3_bucket:
-    name: "{{ cluster_name }}-openshift-install"
-    state: present
-    encryption: AES256
-
-- name: Compress install directory
-  archive:
-    path: "{{ install_dir }}"
-    dest: "{{ install_dir }}.tgz"
-
-- name: Push install directory to S3 bucket
-  amazon.aws.s3_object:
-    bucket: "{{ cluster_name }}-openshift-install"
-    object: openshift_install.tgz
-    src: "{{ install_dir }}.tgz"
-    mode: put
-    encrypt: true
-    encryption_mode: AES256
-
-- name: "Remove {{ install_dir }}.tgz"
-  file:
-    path: "{{ install_dir }}.tgz"
-    state: absent
-
 - name: Create .kube Directory
   file:
     path: "{{ home_dir }}/.kube"
@@ -127,3 +102,40 @@
   set_fact: 
     K8S_AUTH_API_KEY: "{{ kube_token.stdout_lines[kube_token.stdout_lines|length-1] }}"
   no_log: true
+
+- name: Get OpenShift Infra Cluster Facts
+  k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    kind: Infrastructure
+    name: cluster
+  register: infra_facts
+
+- name: Set Infra ID
+  set_fact:
+    infra_id: "{{ infra_facts.resources[0].status.infrastructureName }}"
+
+- name: Create S3 bucket
+  amazon.aws.s3_bucket:
+    name: "{{ cluster_name }}-openshift-install-{{ infra_id }}"
+    state: present
+    encryption: AES256
+
+- name: Compress install directory
+  archive:
+    path: "{{ install_dir }}"
+    dest: "{{ install_dir }}.tgz"
+
+- name: Push install directory to S3 bucket
+  amazon.aws.s3_object:
+    bucket: "{{ cluster_name }}-openshift-install-{{ infra_id }}"
+    object: openshift_install.tgz
+    src: "{{ install_dir }}.tgz"
+    mode: put
+    encrypt: true
+    encryption_mode: AES256
+
+- name: "Remove {{ install_dir }}.tgz"
+  file:
+    path: "{{ install_dir }}.tgz"
+    state: absent
