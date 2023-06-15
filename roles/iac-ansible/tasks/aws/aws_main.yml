@@ -19,6 +19,6 @@
   register: bucket_changed
   when: restore
 
-- name: Restore Gitops
-  include_tasks: restore_gitops.yml
-  when: restore and not bucket_changed.changed and ( cluster_name == 'mgmt' or cluster_name == 'infra' )
+# - name: Restore Gitops
+#   include_tasks: restore_gitops.yml
+#   when: restore and not bucket_changed.changed and ( cluster_name == 'mgmt' or cluster_name == 'infra' )
