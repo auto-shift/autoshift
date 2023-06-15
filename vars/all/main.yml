@@ -1,3 +1,4 @@
+platform: aws
 # iac-ansible options
 # setup_dependencies: true
 # create_cluster: true
