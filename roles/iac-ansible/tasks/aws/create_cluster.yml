@@ -51,16 +51,8 @@
   
 - name: Creating install-config.yaml
   template:
-    src: install-config.yaml.j2
+    src: templates/install-config.yaml.j2
     dest: "{{ install_dir }}/install-config.yaml"
-
-- name: Create Manifests
-  shell: openshift-install create manifests --dir {{ install_dir }}
-
-- name: Copy IngressController
-  copy:
-    src: cluster-ingress-default-ingresscontroller.yaml
-    dest: "{{ install_dir }}/manifests/cluster-ingress-default-ingresscontroller.yaml"
 
 - name: Create OCP Cluster
   script: openshift-install.sh {{ install_dir }} create
