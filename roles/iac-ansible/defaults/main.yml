@@ -2,6 +2,7 @@
 setup_dependencies: true
 create_cluster: true
 install_argo_apps: true
+platform: aws
 
 vpc_id:
 cluster_name: cluster

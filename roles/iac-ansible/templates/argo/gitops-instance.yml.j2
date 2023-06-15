@@ -7,17 +7,17 @@ spec:
   initialRepositories: |
     - url: {{ gitops_repo_url }}
       passwordSecret:
-        name: cms-github
+        name: github-creds
         key: password
       usernameSecret:
-        name: cms-github
+        name: github-creds
         key: username
     - url: {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
       passwordSecret:
-        name: cms-github
+        name: github-creds
         key: password
       usernameSecret:
-        name: cms-github
+        name: github-creds
         key: username
   server:
     autoscale:
@@ -78,25 +78,7 @@ spec:
       p, role:view-{{ organization }}, projects, get, {{ organization }}*, allow
       p, role:view-{{ organization }}, clusters, get, {{ organization }}*, allow
       p, role:view-{{ organization }}, applications, get, {{ organization }}*, allow
-      p, role:edit-hub, projects, *, hub*, allow
-      p, role:edit-hub, repositories, *, hub/https://github.cms.gov/HUB*, allow
-      p, role:edit-hub, repositories, *, https://github.cms.gov/HUB*, allow
-      p, role:edit-hub, clusters, *, hub*, allow
-      p, role:edit-hub, applications, *, hub*, allow
-      p, role:view-hub, projects, get, hub*, allow
-      p, role:view-hub, clusters, get, hub*, allow
-      p, role:view-hub, applications, get, hub*, allow
-      p, role:edit-msisf, projects, *, msi*, allow
-      p, role:edit-msisf, repositories, *, msi/https://github.cms.gov/MSI*, allow
-      p, role:edit-msisf, repositories, *, https://github.cms.gov/MSI*, allow
-      p, role:edit-msisf, clusters, *, msi*, allow
-      p, role:edit-msisf, applications, *, msi*, allow
-      p, role:view-msisf, projects, get, msi*, allow
-      p, role:view-msisf, clusters, get, msi*, allow
-      p, role:view-msisf, applications, get, msi*, allow
       g, {{ organization }}_argo_user, role:edit-{{ organization }}
-      g, hub_argo_user, role:edit-hub
-      g, msisf_argo_user, role:edit-msisf
       g, {{ cluster_admin_group }}, role:admin
     defaultPolicy: ''
 {% else %}

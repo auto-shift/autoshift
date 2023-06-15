@@ -26,18 +26,18 @@ data:
   repositories: >
     - url: {{ gitops_repo_url }}
       passwordSecret:
-        name: cms-github
+        name: github-creds
         key: password
       usernameSecret:
-        name: cms-github
+        name: github-creds
         key: username
     - url:
     {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
       passwordSecret:
-        name: cms-github
+        name: github-creds
         key: password
       usernameSecret:
-        name: cms-github
+        name: github-creds
         key: username
   ga.anonymizeusers: 'false'
   help.chatUrl: ''

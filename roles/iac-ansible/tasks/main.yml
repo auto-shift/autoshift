@@ -3,120 +3,100 @@
   include_tasks: dependencies.yml
   when: setup_dependencies
 
-- name: Create OpenShift Cluster
-  include_tasks: create_cluster.yml
-  when: create_cluster
+- name: AWS Deploy
+  include_tasks: aws_main.yml
+  when: platform == 'aws'
 
-- name: Create OpenShift Cluster
-  include_tasks: create_cluster_acm.yml
-  when: create_cluster_acm
+# - name: Install Gitops
+#   include_tasks: install_argo.yml
+#   when: install_argo
 
-- name: Gather Infra Facts
-  include_tasks: gather_infra_facts.yml
+# - name: Set argo apps name
+#   set_fact: 
+#     metadata_name: !unsafe '{{path.basename}}'
+#   no_log: true
 
-- name: Create S3 bucket
-  aws_s3:
-    bucket: "{{ organization }}-{{ cluster_name }}-backup"
-    mode: create
-    permission: bucket-owner-read
-    encrypt: yes
-  register: bucket_changed
-  when: restore
+# - name: Set source Path
+#   set_fact: 
+#     source_path: !unsafe '{{path}}'
+#   no_log: true
 
-- name: Restore Gitops
-  include_tasks: restore_gitops.yml
-  when: restore and not bucket_changed.changed and ( cluster_name == 'mgmt' or cluster_name == 'infra' )
+# - name: Create Day 1 gitops-apps App Set
+#   k8s:
+#     api_key: "{{ K8S_AUTH_API_KEY  }}"
+#     host: "{{ K8S_AUTH_HOST }}"
+#     state: present
+#     definition: "{{ lookup('template', 'argo/gitops-apps-day-1.yml.j2') }}"
+#     apply: yes
+#   when: install_argo_apps
 
-- name: Install Gitops
-  include_tasks: install_argo.yml
-  when: install_argo
+# - name: Test Argo Apps
+#   include_tasks: check_apps.yml
+#   when: test_argo_apps
+#   vars:
+#     app_set_name: argo-apps-day-1
+#     loop_count: 0
 
-- name: Set argo apps name
-  set_fact: 
-    metadata_name: !unsafe '{{path.basename}}'
-  no_log: true
+# - name: Wait for Storage Cluster
+#   k8s_info:
+#     api_key: "{{ K8S_AUTH_API_KEY  }}"
+#     host: "{{ K8S_AUTH_HOST }}"
+#     kind: StorageCluster
+#     name: ocs-storagecluster
+#     namespace: openshift-storage
+#   register: storage_set
+#   until: 
+#   - storage_set.resources is defined 
+#   - storage_set.resources[0] is defined
+#   - storage_set.resources[0].status is defined 
+#   - storage_set.resources[0].status.phase == 'Ready'
+#   retries: 20
+#   delay: 60
 
-- name: Set source Path
-  set_fact: 
-    source_path: !unsafe '{{path}}'
-  no_log: true
-
-- name: Create Day 1 gitops-apps App Set
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
-    state: present
-    definition: "{{ lookup('template', 'argo/gitops-apps-day-1.yml.j2') }}"
-    apply: yes
-  when: install_argo_apps
-
-- name: Test Argo Apps
-  include_tasks: check_apps.yml
-  when: test_argo_apps
-  vars:
-    app_set_name: argo-apps-day-1
-    loop_count: 0
-
-- name: Wait for Storage Cluster
-  k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
-    kind: StorageCluster
-    name: ocs-storagecluster
-    namespace: openshift-storage
-  register: storage_set
-  until: 
-  - storage_set.resources is defined 
-  - storage_set.resources[0] is defined
-  - storage_set.resources[0].status is defined 
-  - storage_set.resources[0].status.phase == 'Ready'
-  retries: 20
-  delay: 60
-
-- name: Restore
-  include_tasks: restore.yml
-  when: restore and not bucket_changed.changed
+# - name: Restore
+#   include_tasks: restore.yml
+#   when: restore and not bucket_changed.changed
   
-- name: Create Day 2 gitops-apps App Set
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
-    state: present
-    definition: "{{ lookup('template', 'argo/gitops-apps-day-2.yml.j2') }}"
-    apply: yes
-  when: install_argo_apps
+# - name: Create Day 2 gitops-apps App Set
+#   k8s:
+#     api_key: "{{ K8S_AUTH_API_KEY  }}"
+#     host: "{{ K8S_AUTH_HOST }}"
+#     state: present
+#     definition: "{{ lookup('template', 'argo/gitops-apps-day-2.yml.j2') }}"
+#     apply: yes
+#   when: install_argo_apps
 
-- name: Test Argo Apps
-  include_tasks: check_apps.yml
-  when: test_argo_apps
-  vars:
-    app_set_name: argo-apps-day-2
-    loop_count: 0
+# - name: Test Argo Apps
+#   include_tasks: check_apps.yml
+#   when: test_argo_apps
+#   vars:
+#     app_set_name: argo-apps-day-2
+#     loop_count: 0
 
-- name: Supplemental Argo Tasks
-  include_tasks: argo_supplement.yml
-  when: install_argo_apps
+# - name: Supplemental Argo Tasks
+#   include_tasks: argo_supplement.yml
+#   when: install_argo_apps
 
-- name: Remove Classic Load Balancers
-  include_tasks: remove_classic.yml
+# - name: Remove Classic Load Balancers
+#   include_tasks: remove_classic.yml
 
-- name: Migrate OpenShift Infra
-  include_tasks: migrate_infra.yml
+# - name: Migrate OpenShift Infra
+#   include_tasks: migrate_infra.yml
 
-- name: Security Groups
-  include_tasks: security_groups.yml
+# - name: Security Groups
+#   include_tasks: security_groups.yml
 
-- name: Add Machine Autoscalers 
-  include_tasks: machine_autoscalers.yml
+# - name: Add Machine Autoscalers 
+#   include_tasks: machine_autoscalers.yml
 
-- name: Update ACM creds
-  include_tasks: update_acm_creds.yml
-  when: not create_cluster
+# - name: Update ACM creds
+#   include_tasks: update_acm_creds.yml
+#   when: not create_cluster
 
-- name: Restore ADO Data
-  include_tasks: restore_ado.yml
-  when: restore and not bucket_changed.changed
+# - name: Restore ADO Data
+#   include_tasks: restore_ado.yml
+#   when: restore and not bucket_changed.changed
 
-- name: Remove kubeadmin
-  include_tasks: kubeadmin.yml
-  when: remove_kubeadmin
+# - name: Remove kubeadmin
+#   include_tasks: kubeadmin.yml
+#   when: remove_kubeadmin
