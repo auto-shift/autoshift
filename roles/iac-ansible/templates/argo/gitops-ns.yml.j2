@@ -1,9 +1,10 @@
-apiVersion: v1
-kind: Namespace
+---
+apiVersion: project.openshift.io/v1
+kind: Project
 metadata:
-  name: {{ gitops_namespace }}
-  annotations:
-    openshift.io/node-selector: ""
-    managed-admin/subject.name: system:serviceaccounts:{{ gitops_namespace }}
+  name: openshift-gitops
   labels:
-    openshift.io/cluster-monitoring: "true"
+    kubernetes.io/metadata.name: openshift-gitops
+spec:
+  finalizers:
+    - kubernetes

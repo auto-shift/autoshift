@@ -71,11 +71,10 @@
     dest: "{{ install_dir }}/auth/id_rsa_{{ cluster_name }}"
 
 - name: Create S3 bucket
-  aws_s3:
-    bucket: "{{ cluster_name }}-openshift-install"
-    mode: create
-    permission: bucket-owner-read
-    encrypt: yes
+  amazon.aws.s3_bucket:
+    name: "{{ cluster_name }}-openshift-install"
+    state: present
+    encryption: AES256
 
 - name: Compress install directory
   archive:
@@ -83,12 +82,13 @@
     dest: "{{ install_dir }}.tgz"
 
 - name: Push install directory to S3 bucket
-  aws_s3:
+  amazon.aws.s3_object:
     bucket: "{{ cluster_name }}-openshift-install"
     object: openshift_install.tgz
     src: "{{ install_dir }}.tgz"
     mode: put
-    encrypt: yes
+    encrypt: true
+    encryption_mode: AES256
 
 - name: "Remove {{ install_dir }}.tgz"
   file:

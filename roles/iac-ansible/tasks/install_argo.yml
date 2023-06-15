@@ -9,8 +9,40 @@
   - gitops-ns.yml.j2
   - gitops-sub.yml.j2
 
+- name: Wait for GitopsService be defined...
+  kubernetes.core.k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: pipelines.openshift.io/v1alpha1
+    kind: GitopsService
+    name: cluster
+  register: gitops_service_status_out
+  until:
+  - gitops_service_status_out is defined
+  - gitops_service_status_out.resources is defined
+  - gitops_service_status_out.resources[0] is defined
+  retries: 6
+  delay: 10
+  ignore_errors: True
+
+- name: Wait for Cluster Argo Instance to be defined...
+  kubernetes.core.k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    host: "{{ K8S_AUTH_HOST }}"
+    api_version: argoproj.io/v1alpha1
+    kind: ArgoCD
+    name: openshift-gitops
+    namespace: "{{ gitops_namespace }}"
+  register: argocd_status_out
+  until:
+  - argocd_status_out is defined
+  - argocd_status_out.resources is defined
+  - argocd_status_out.resources[0] is defined
+  retries: 6
+  delay: 10
+
 - name: Wait for ArgoCD CustomResourceDefinition to be defined...
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_key: "{{ K8S_AUTH_API_KEY  }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: apiextensions.k8s.io/v1
@@ -35,7 +67,6 @@
     apply: yes
   loop:
   - gitops-instance.yml.j2
-  - gitops-secrets.yml.j2
 
 # - name: Wait for Internal Registry Ready
 #   k8s_info:

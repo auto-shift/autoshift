@@ -2,23 +2,9 @@ apiVersion: argoproj.io/v1alpha1
 kind: ArgoCD
 metadata:
   name: openshift-gitops
-  namespace: {{ gitops_namespace }}
 spec:
   initialRepositories: |
     - url: {{ gitops_repo_url }}
-      passwordSecret:
-        name: github-creds
-        key: password
-      usernameSecret:
-        name: github-creds
-        key: username
-    - url: {{ github_url }}/reference-quarkus-mvn-cloud-resources_jenkins_workflow-minimal.git
-      passwordSecret:
-        name: github-creds
-        key: password
-      usernameSecret:
-        name: github-creds
-        key: username
   server:
     autoscale:
       enabled: false
@@ -36,7 +22,9 @@ spec:
         memory: 128Mi
     route:
       enabled: true
-    host: 'argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: reencrypt
     service:
       type: ''
   grafana:
@@ -59,6 +47,8 @@ spec:
     route:
       enabled: false
   initialSSHKnownHosts: {}
+  sso:
+    provider: dex
   applicationSet:
     resources:
       limits:
@@ -68,72 +58,18 @@ spec:
         cpu: 250m
         memory: 512Mi
   rbac:
-{% if (cluster_name == 'mgmt') or (cluster_name == 'infra') %}
     policy: |
-      p, role:edit-{{ organization }}, projects, *, {{ organization }}*, allow
-      p, role:edit-{{ organization }}, repositories, *, {{ organization }}/{{ github_url }}*, allow
-      p, role:edit-{{ organization }}, repositories, *, {{ github_url }}*, allow
-      p, role:edit-{{ organization }}, clusters, *, {{ organization }}*, allow
-      p, role:edit-{{ organization }}, applications, *, {{ organization }}*, allow
-      p, role:view-{{ organization }}, projects, get, {{ organization }}*, allow
-      p, role:view-{{ organization }}, clusters, get, {{ organization }}*, allow
-      p, role:view-{{ organization }}, applications, get, {{ organization }}*, allow
-      g, {{ organization }}_argo_user, role:edit-{{ organization }}
-      g, {{ cluster_admin_group }}, role:admin
-    defaultPolicy: ''
-{% else %}
-    defaultPolicy: |
       g, system:cluster-admins, role:admin
       g, cluster-admins, role:admin
-    policy: |
-      p, role:repo, repositories, get, *, allow
-      p, role:repo, repositories, create, *, allow
-      g, {{ cluster_admin_group }}, role:admin
-{% endif %}
-    scopes: '[email,groups]'
+    scopes: '[groups]'
   repo:
-    image: >-
-      image-registry.openshift-image-registry.svc:5000/openshift-gitops/gitops-repo-server-sops
-    version: latest
-    initContainers:
-      - command:
-          - /bin/sh
-          - '-c'
-          - >-
-            export HOME=/home/argocd && gpg --import /app/config/gpg/private/*
-            && gpg --export-secret-keys > /home/argocd/.gnupg/secring.gpg
-        image: >-
-          image-registry.openshift-image-registry.svc:5000/openshift-gitops/gitops-repo-server-sops
-        version: latest
-        name: gpg-import-keys
-        resources: {}
-        securityContext:
-          runAsUser: 999
-        volumeMounts:
-          - mountPath: /app/config/gpg/private
-            name: gpg-private-keys
-          - mountPath: /home/argocd
-            name: home
-    serviceaccount: openshift-gitops-argocd-server
     resources:
       limits:
         cpu: '1'
-        memory: 512Mi
+        memory: 1Gi
       requests:
         cpu: 250m
         memory: 256Mi
-    volumeMounts:
-      - mountPath: /app/config/gpg/private
-        name: gpg-private-keys
-      - mountPath: /home/argocd
-        name: home
-    volumes:
-      - emptyDir: {}
-        name: home
-      - name: gpg-private-keys
-        secret:
-          defaultMode: 420
-          secretName: openshift-gitops-gpg-private-keys
   resourceExclusions: |
     - apiGroups:
       - tekton.dev
@@ -143,7 +79,6 @@ spec:
       - TaskRun
       - PipelineRun
   dex:
-    openShiftOAuth: true
     resources:
       limits:
         cpu: 500m
@@ -151,25 +86,6 @@ spec:
       requests:
         cpu: 250m
         memory: 128Mi
-    config: |
-      connectors:
-        # OpenShift
-        - type: openshift
-          id: openshift
-          name: OpenShift
-          config:
-            issuer: https://api.{{ cluster_name }}.{{ base_domain }}:6443
-            clientID: system:serviceaccount:{{ gitops_namespace }}:openshift-gitops-argocd-dex-server
-            clientSecret: {{ dextoken.stdout_lines[dextoken.stdout_lines|length-1] }}
-            redirectURI: https://argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}/api/dex/callback
-            insecureCA: true
-            groups:
-              - {{ cluster_admin_group }}
-{% if ado_groups is defined %}
-{% for group in ado_groups %}
-              - {{ group }}
-{% endfor %}
-{% endif %}
   ha:
     enabled: false
     resources:
@@ -189,15 +105,13 @@ spec:
       requests:
         cpu: 250m
         memory: 128Mi
-  image: registry.redhat.io/openshift-gitops-1/argocd-rhel8
-  version: {{ argocd_image_version }}
   controller:
     processors: {}
     resources:
       limits:
-        cpu: '4'
-        memory: 8Gi
-      requests:
         cpu: '2'
         memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 1Gi
     sharding: {}
