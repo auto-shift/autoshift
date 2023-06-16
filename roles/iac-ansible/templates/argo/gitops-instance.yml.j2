@@ -4,8 +4,7 @@ metadata:
   name: openshift-gitops
   namespace: {{ gitops_namespace }}
 spec:
-  initialRepositories: |
-    - url: {{ gitops_repo_url }}
+  initialRepositories: '{{ gitops_repo_url }}'
   server:
     autoscale:
       enabled: false
