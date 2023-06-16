@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ArgoCD
 metadata:
   name: openshift-gitops
+  namespace: {{ gitops_namespace }}
 spec:
   initialRepositories: |
     - url: {{ gitops_repo_url }}
