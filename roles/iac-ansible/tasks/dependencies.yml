@@ -1,28 +1,28 @@
 ---
-- name: "Downloading and Unarchiving the OCP binaries in {{ home_dir }}, verison: {{ openshift.release }}"
-  unarchive:
+- name: Downloading and Unarchiving the OCP binaries
+  ansible.builtin.unarchive:
     src: "{{ openshift.release_url }}/{{ openshift.release }}/{{ item }}-linux.tar.gz"
     dest: "{{ home_dir }}"
-    remote_src: yes
-    mode: 0775
+    remote_src: true
+    mode: '0775'
   loop:
     - openshift-client
     - openshift-install
 
 - name: Copy Binaries to /usr/local/bin/
-  copy:
+  ansible.builtin.copy:
     src: "{{ home_dir }}/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
     mode: '0755'
-  become: yes
-  become_method: sudo
+  become: true
+  become_method: ansible.builtin.sudo
   loop:
     - oc
     - openshift-install
     - kubectl
 
 - name: Remove Artifacts
-  file:
+  ansible.builtin.file:
     path: "{{ home_dir }}/{{ item }}"
     state: absent
   loop:
