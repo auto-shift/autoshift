@@ -1,14 +1,14 @@
 ---
 - name: Setup Dependencies
-  include_tasks: dependencies.yml
+  ansible.builtin.include_tasks: dependencies.yml
   when: setup_dependencies
 
 - name: AWS Deploy
-  include_tasks: aws/aws_main.yml
+  ansible.builtin.include_tasks: aws/aws_main.yml
   when: platform == 'aws'
 
-- name: Install Gitops
-  include_tasks: install_argo.yml
+- name: Install OpenShift GitOps
+  ansible.builtin.include_tasks: install_argo.yml
   when: install_argo
 
 # - name: Set argo apps name
