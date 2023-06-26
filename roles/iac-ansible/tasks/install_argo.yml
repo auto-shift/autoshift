@@ -1,33 +1,33 @@
 ---
-- name: Install GitOps Operator 
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+- name: Install GitOps Operator
+  kubernetes.core.k8s:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
-    definition: "{{ lookup('template', 'argo/'+item) }}"
+    definition: "{{ lookup('template', 'argo/' + item) }}"
   loop:
-  - gitops-ns.yml.j2
-  - gitops-sub.yml.j2
+    - gitops-ns.yml.j2
+    - gitops-sub.yml.j2
 
 - name: Wait for GitopsService be defined...
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: pipelines.openshift.io/v1alpha1
     kind: GitopsService
     name: cluster
   register: gitops_service_status_out
   until:
-  - gitops_service_status_out is defined
-  - gitops_service_status_out.resources is defined
-  - gitops_service_status_out.resources[0] is defined
+    - gitops_service_status_out is defined
+    - gitops_service_status_out.resources is defined
+    - gitops_service_status_out.resources[0] is defined
   retries: 6
   delay: 10
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Wait for Cluster Argo Instance to be defined...
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: argoproj.io/v1alpha1
     kind: ArgoCD
@@ -35,38 +35,38 @@
     namespace: "{{ gitops_namespace }}"
   register: argocd_status_out
   until:
-  - argocd_status_out is defined
-  - argocd_status_out.resources is defined
-  - argocd_status_out.resources[0] is defined
+    - argocd_status_out is defined
+    - argocd_status_out.resources is defined
+    - argocd_status_out.resources[0] is defined
   retries: 6
   delay: 10
 
 - name: Wait for ArgoCD CustomResourceDefinition to be defined...
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: argocds.argoproj.io
   register: argocd_crd_status_out
   until:
-  - argocd_crd_status_out is defined
-  - argocd_crd_status_out.resources is defined
-  - argocd_crd_status_out.resources[0] is defined
-  - argocd_crd_status_out.resources[0].status is defined
-  - argocd_crd_status_out.resources[0].status.conditions is defined
+    - argocd_crd_status_out is defined
+    - argocd_crd_status_out.resources is defined
+    - argocd_crd_status_out.resources[0] is defined
+    - argocd_crd_status_out.resources[0].status is defined
+    - argocd_crd_status_out.resources[0].status.conditions is defined
   retries: 30
   delay: 10
 
-- name: Add ArgoCD Instance  
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+- name: Add ArgoCD Instance
+  kubernetes.core.k8s:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
-    definition: "{{ lookup('template', 'argo/'+item) }}"
-    apply: yes
+    definition: "{{ lookup('template', 'argo/' + item) }}"
+    apply: true
   loop:
-  - gitops-instance.yml.j2
+    - gitops-instance.yml.j2
 
 # - name: Wait for Internal Registry Ready
 #   k8s_info:
