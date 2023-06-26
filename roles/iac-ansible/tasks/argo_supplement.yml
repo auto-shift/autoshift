@@ -1,11 +1,11 @@
 ---
-- name: Set artifactory auth 
-  set_fact: 
+- name: Set artifactory auth
+  ansible.builtin.set_fact:
     docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
 
-- name: Create Secret for New Relic 
-  k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+- name: Create Secret for New Relic
+  kubernetes.core.k8s_info:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     kind: Secret
     name: kube-etcd-client-certs
@@ -13,16 +13,16 @@
   register: etcd_client_certs
 
 - name: Add New Relic App
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+  kubernetes.core.k8s:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
   when: new_relic_enabled
 
 - name: Create Secret for New Relic 
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+  kubernetes.core.k8s:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: present
     definition:

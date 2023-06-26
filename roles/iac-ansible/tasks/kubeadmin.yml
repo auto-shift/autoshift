@@ -1,7 +1,7 @@
 ---
 - name: Remove kubeadmin
-  k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
+  kubernetes.core.k8s:
+    api_key: "{{ K8S_AUTH_API_KEY }}"
     host: "{{ K8S_AUTH_HOST }}"
     state: absent
     kind: Secret

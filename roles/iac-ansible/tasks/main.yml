@@ -7,9 +7,9 @@
   include_tasks: aws/aws_main.yml
   when: platform == 'aws'
 
-# - name: Install Gitops
-#   include_tasks: install_argo.yml
-#   when: install_argo
+- name: Install Gitops
+  include_tasks: install_argo.yml
+  when: install_argo
 
 # - name: Set argo apps name
 #   set_fact: 
