@@ -1,10 +1,12 @@
----
-apiVersion: project.openshift.io/v1
-kind: Project
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: openshift-gitops
+  name: {{ gitops_namespace }}
+  annotations:
+    openshift.io/node-selector: ""
+    managed-admin/subject.name: system:serviceaccounts:{{ gitops_namespace }}
+    scheduler.alpha.kubernetes.io/defaultTolerations: >-
+      [{"operator": "Exists", "effect": "NoSchedule", "key": "infra"},
+      {"operator": "Exists", "effect": "NoExecute", "key": "infra"} ]
   labels:
-    kubernetes.io/metadata.name: openshift-gitops
-spec:
-  finalizers:
-    - kubernetes
+    openshift.io/cluster-monitoring: "true"

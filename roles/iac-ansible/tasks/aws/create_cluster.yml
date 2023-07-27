@@ -46,12 +46,12 @@
     ssh_key: "{{ lookup('file', '{{ ssh_facts.filename }}.pub') }}"
 
 - name: Creating installation directory
-  anisble_builtin.file:
+  anisble.builtin.file:
     path: "{{ install_dir }}"
     state: directory
 
 - name: Creating install-config.yaml
-  anisble_builtin.template:
+  anisble.builtin.template:
     src: install-config.yaml.j2
     dest: "{{ install_dir }}/install-config.yaml"
 

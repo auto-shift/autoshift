@@ -63,7 +63,7 @@ vpn_cidr: 10.232.32.0/19
 console_cert: "{{ lookup('env', 'CONSOLE_CERT') }}"
 console_cert_key: "{{ lookup('env', 'CONSOLE_CERT_KEY') }}"
 
-#machineautoscaler vars
+# machineautoscaler vars
 machineset_types:
   infra:
     replicas:
@@ -81,7 +81,31 @@ machineset_types:
 loop_count: 0
 app_set_ready: False
 
-#Fluent Bit logging Variables
+# GitOps vars
+gitops_namespace: "openshift-gitops"
+
+redhat_operators_catalog: redhat/redhat-operator-index:v4.12
+redhat_operators:
+  # Day 1 Apps
+  odf:
+    name: odf-operator
+    namespace: openshift-storage
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    installPlanApproval: Automatic
+    operatorGroup: openshift-storage-operatorgroup
+    channel: stable-4.12
+    ose_cli_image: registry.redhat.io/openshift4/ose-cli:v4.12.0
+
+  # Day 2 Apps
+  gitops:
+    name: openshift-gitops-operator
+    channel: gitops-{{ gitops_version }}
+    installPlanApproval: Automatic
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+# Fluent Bit logging Variables
 splunk_hec_token:
 splunk_channel_id:
 cloud_account:
