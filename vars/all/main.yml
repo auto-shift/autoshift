@@ -19,6 +19,14 @@ github_url: https://github.com/auto-shift
 # ArgoCD Variables
 gitops_repo_url: https://github.com/auto-shift/autoshift.git
 
+# Gitops Values
+gitops_version: 1.7
+gitops_helm_secrets_version: 3.15.0
+gitops_vals_version: 0.18.0
+gitops_sops_version: 3.7.3
+gitops_helm_version: 3.10.3
+gitops_namespace: "openshift-gitops"
+
 # AWS SecretsManager vars
 # Secret Locations for nested secrets
 autoshift_secrets: "{{ lookup('aws_secret', 'autoshift_secrets', region=vars['region']) }}."

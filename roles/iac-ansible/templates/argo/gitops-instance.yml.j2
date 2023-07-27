@@ -4,10 +4,9 @@ metadata:
   name: openshift-gitops
   namespace: {{ gitops_namespace }}
 spec:
-  initialRepositories: '{{ gitops_repo_url }}'
   server:
     autoscale:
-      enabled: false
+      enabled: true
     grpc:
       ingress:
         enabled: false
@@ -16,28 +15,17 @@ spec:
     resources:
       limits:
         cpu: 500m
-        memory: 256Mi
+        memory: 512Mi
       requests:
-        cpu: 125m
-        memory: 128Mi
+        cpu: 250m
+        memory: 256Mi
     route:
       enabled: true
-      tls:
-        insecureEdgeTerminationPolicy: Redirect
-        termination: reencrypt
+    host: 'argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
     service:
       type: ''
   grafana:
     enabled: false
-    ingress:
-      enabled: false
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 250m
-        memory: 128Mi
     route:
       enabled: false
   prometheus:
@@ -47,22 +35,22 @@ spec:
     route:
       enabled: false
   initialSSHKnownHosts: {}
-  sso:
-    provider: dex
   applicationSet:
     resources:
       limits:
         cpu: '2'
         memory: 1Gi
       requests:
-        cpu: 250m
+        cpu: 500m
         memory: 512Mi
   rbac:
     policy: |
       g, system:cluster-admins, role:admin
       g, cluster-admins, role:admin
     scopes: '[groups]'
+    scopes: '[email,groups]'
   repo:
+    replicas: 2
     resources:
       limits:
         cpu: '1'
@@ -70,24 +58,19 @@ spec:
       requests:
         cpu: 250m
         memory: 256Mi
-  resourceExclusions: |
-    - apiGroups:
-      - tekton.dev
-      clusters:
-      - '*'
-      kinds:
-      - TaskRun
-      - PipelineRun
-  dex:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 250m
-        memory: 128Mi
+  sso:
+    dex:
+      openShiftOAuth: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 250m
+          memory: 128Mi
+    provider: dex
   ha:
-    enabled: false
+    enabled: true
     resources:
       limits:
         cpu: 500m
@@ -109,9 +92,11 @@ spec:
     processors: {}
     resources:
       limits:
-        cpu: '2'
-        memory: 2Gi
+        cpu: '3'
+        memory: 6Gi
       requests:
-        cpu: 250m
+        cpu: '1'
         memory: 1Gi
-    sharding: {}
+    sharding:
+      enabled: true
+      replicas: 3
