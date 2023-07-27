@@ -46,61 +46,61 @@
     ssh_key: "{{ lookup('file', '{{ ssh_facts.filename }}.pub') }}"
 
 - name: Creating installation directory
-  anisble.builtin.file:
+  ansible.builtin.file:
     path: "{{ install_dir }}"
     state: directory
 
 - name: Creating install-config.yaml
-  anisble.builtin.template:
+  ansible.builtin.template:
     src: install-config.yaml.j2
     dest: "{{ install_dir }}/install-config.yaml"
 
 - name: Create Manifests
-  anisble_builtin.shell: openshift-install create manifests --dir {{ install_dir }}
+  ansible_builtin.shell: openshift-install create manifests --dir {{ install_dir }}
 
 - name: Copy IngressController
-  anisble_builtin.copy:
+  ansible_builtin.copy:
     src: cluster-ingress-default-ingresscontroller.yaml
     dest: "{{ install_dir }}/manifests/cluster-ingress-default-ingresscontroller.yaml"
 
 - name: Create OCP Cluster
-  anisble_builtin.script: openshift-install.sh {{ install_dir }} create
+  ansible_builtin.script: openshift-install.sh {{ install_dir }} create
 
 - name: Copy SSH key to install dir
-  anisble_builtin.copy:
+  ansible_builtin.copy:
     src: "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}"
     dest: "{{ install_dir }}/auth/id_rsa_{{ cluster_name }}"
 
 - name: Create .kube Directory
-  anisble_builtin.file:
+  ansible_builtin.file:
     path: "{{ home_dir }}/.kube"
     state: directory
     mode: '0700'
 
 - name: Copy kubeconfig to .kube Directory
-  anisble_builtin.copy:
+  ansible_builtin.copy:
     src: "{{ install_dir }}/auth/kubeconfig"
     dest: "{{ home_dir }}/.kube/config"
     mode: '0600'
 
 - name: Store Kubeadmin
-  anisble_builtin.set_fact:
+  ansible_builtin.set_fact:
     kubeadmin_password: "{{ lookup('file', vars['install_dir'] + '/auth/kubeadmin-password') }}"
   no_log: true
 
 - name: Set Host for k8
-  anisble_builtin.set_fact:
+  ansible_builtin.set_fact:
     K8S_AUTH_HOST: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
 
 - name: Get token
-  anisble_builtin.shell: |
+  ansible_builtin.shell: |
     oc login {{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true -u kubeadmin -p {{ kubeadmin_password }}
     oc whoami --show-token
   register: kube_token
   no_log: true
 
 - name: Set Key for k8
-  anisble_builtin.set_fact:
+  ansible_builtin.set_fact:
     K8S_AUTH_API_KEY: "{{ kube_token.stdout_lines[kube_token.stdout_lines | length - 1] }}"
   no_log: true
 
@@ -113,7 +113,7 @@
   register: infra_facts
 
 - name: Set Infra ID
-  anisble_builtin.set_fact:
+  ansible_builtin.set_fact:
     infra_id: "{{ infra_facts.resources[0].status.infrastructureName }}"
 
 - name: Create S3 bucket
