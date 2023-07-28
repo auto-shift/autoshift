@@ -18,6 +18,15 @@
     - gitops-ns.yml.j2
   when: gitops_project.resources is not defined or gitops_project.resources | length == 0
 
+- name: Create GitOps Argo Objects
+  kubernetes.core.k8s:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    state: present
+    definition: "{{ lookup('template', 'argo/' + item) }}"
+  loop:
+    - gitops-secrets.yml.j2
+
 - name: Install GitOps Operator
   kubernetes.core.k8s:
     api_key: "{{ k8s_auth_api_key }}"
