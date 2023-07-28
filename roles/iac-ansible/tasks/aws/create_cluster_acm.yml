@@ -118,18 +118,18 @@
 
 - name: Set Host for k8
   set_fact: 
-    K8S_AUTH_HOST: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+    k8s_auth_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
 
 - name: Get token
   shell: |
-    oc login {{ K8S_AUTH_HOST }} -u {{ kube_user.stdout }} -p {{ kube_pass.stdout }} --insecure-skip-tls-verify=true
+    oc login {{ k8s_auth_host }} -u {{ kube_user.stdout }} -p {{ kube_pass.stdout }} --insecure-skip-tls-verify=true
     oc whoami --show-token
   register: kube_token
   no_log: true
 
 - name: Set Key for k8
   set_fact: 
-    K8S_AUTH_API_KEY: "{{ kube_token.stdout_lines[kube_token.stdout_lines|length-1] }}"
+    k8s_auth_api_key: "{{ kube_token.stdout_lines[kube_token.stdout_lines|length-1] }}"
   no_log: true
 
 - name: Create .kube Directory
@@ -146,9 +146,9 @@
 
 - name: Test Cluster Connection
   kubernetes.core.k8s_cluster_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
   register: api_status
   retries: 10
   delay: 60
-  until: api_status.connection is defined and api_status.connection.host == K8S_AUTH_HOST
+  until: api_status.connection is defined and api_status.connection.host == k8s_auth_host

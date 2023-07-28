@@ -90,24 +90,24 @@
 
 - name: Set Host for k8
   ansible.builtin.set_fact:
-    K8S_AUTH_HOST: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+    k8s_auth_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
 
 - name: Get token
   ansible.builtin.shell: |
-    oc login {{ K8S_AUTH_HOST }} --insecure-skip-tls-verify=true -u kubeadmin -p {{ kubeadmin_password }}
+    oc login {{ k8s_auth_host }} --insecure-skip-tls-verify=true -u kubeadmin -p {{ kubeadmin_password }}
     oc whoami --show-token
   register: kube_token
   no_log: true
 
 - name: Set Key for k8
   ansible.builtin.set_fact:
-    K8S_AUTH_API_KEY: "{{ kube_token.stdout_lines[kube_token.stdout_lines | length - 1] }}"
+    k8s_auth_api_key: "{{ kube_token.stdout_lines[kube_token.stdout_lines | length - 1] }}"
   no_log: true
 
 - name: Get OpenShift Infra Cluster Facts
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     kind: Infrastructure
     name: cluster
   register: infra_facts
