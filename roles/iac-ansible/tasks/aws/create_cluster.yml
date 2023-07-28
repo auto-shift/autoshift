@@ -97,10 +97,10 @@
         dest: "{{ home_dir }}/.kube/config"
         mode: '0600'
 
-    - name: Store Kubeadmin
-      ansible.builtin.set_fact:
-        kubeadmin_password: "{{ lookup('file', vars['install_dir'] + '/auth/kubeadmin-password') }}"
-      no_log: true
+- name: Store Kubeadmin
+  ansible.builtin.set_fact:
+    kubeadmin_password: "{{ lookup('file', vars['install_dir'] + '/auth/kubeadmin-password') }}"
+  no_log: true
 
 - name: Get token
   ansible.builtin.shell: |
