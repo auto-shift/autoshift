@@ -1,12 +1,15 @@
-{{ if .Values.file_integrity_operator }}
+{{ if .Values.fio.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: file-integrity-operator
-  namespace: openshift-file-integrity
+  name: {{ .Values.fio.name }}
+  namespace: {{ .Values.fio.namespace }}
 spec:
-  installPlanApproval: Automatic
-  name: file-integrity-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  installPlanApproval: {{ .Values.fio.installPlanApproval }}
+  name: {{ .Values.fio.name }}
+  source: {{ .Values.fio.source }}
+  sourceNamespace: {{ .Values.fio.sourceNamespace }}
+{{ if .Values.fio.channel }}
+  channel: {{ .Values.fio.channel }}
+{{ end }}
 {{ end }}

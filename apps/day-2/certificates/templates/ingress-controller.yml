@@ -1,4 +1,3 @@
-{{ if .Values.custom_certs_enabled }}
 kind: IngressController
 apiVersion: operator.openshift.io/v1
 metadata:
@@ -8,8 +7,32 @@ metadata:
     argocd.argoproj.io/sync-options: Replace=false
     argocd.argoproj.io/sync-options: Prune=false
 spec:
+{{ if .Values.custom_certs_enabled }}
   defaultCertificate:
     name: ingress-cert-secret
+{{ end }}
+  endpointPublishingStrategy:
+    loadBalancer:
+{{ if semverCompare "~4.12.0" .Values.openshift_version }}
+      allowedSourceRanges:
+      - "0.0.0.0/0"
+{{ end }}
+      dnsManagementPolicy: Managed
+      providerParameters:
+        aws:
+          type: NLB
+        type: AWS
+      scope: Internal
+    type: LoadBalancerService
+{{ if .Values.enable_external_load_balancer }}
+  routeSelector:
+    matchExpressions:
+      - key: momot.router
+        operator: NotIn
+        values:
+          - external
+{{ end }}
+  domain: apps.{{ .Values.cluster_name }}.{{ .Values.base_domain }}
   nodePlacement:
     nodeSelector:
       matchLabels:
@@ -21,4 +44,3 @@ spec:
     - effect: NoExecute
       key: infra
       value: reserved
-{{ end }}

@@ -2,26 +2,24 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-#ldap_groupsync vars
-oauth:
-  groupsync_enabled: false
+
+gso:
+  #ldap_groupsync vars
   group_membership_attr: uniquemember
   group_name_attr: cn
   basedn:
   user_name_attr: uid
   user_uid_attr: dn
   sync_schedule: 0,10,20,30,40,50 * * * *
-  ldap_enabled: false
-  binddn: "{{ ocp_secrets.binddn }}"
-  ldapurl: "{{ ocp_secrets.ldapurl }}"
-  ldap_password: "{{ ocp_secrets.ldap_password }}"
-  radiant_ldab_enabled: false
-  radiant_binddn: "{{ ocp_secrets.radiant_binddn }}"
-  radiant_url: "{{ ocp_secrets.radiant_url }}"
-  radiant_password: "{{ ocp_secrets.radiant_password }}"
-  okta_oath_enabled: false
-  okta_client_id: "{{ ocp_secrets.okta_client_id }}"
-  okta_client_secret: "{{ ocp_secrets.okta_client_secret }}"
-  okta_issuer: "{{ ocp_secrets.okta_issuer }}"
+  # sub
+  name: group-sync-operator
+  namespace: group-sync-operator
+  installPlanApproval: Manual
+  source: community-operators
+  sourceNamespace: openshift-marketplace
 
-cluster_admin_group:
+  # ldap values passed in
+  group_filter:
+  cluster_admin_group:
+  cluster_view_group:
+  radiant_url: 

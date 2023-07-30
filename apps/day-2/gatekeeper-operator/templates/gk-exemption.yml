@@ -1,4 +1,4 @@
-{{ if .Values.gatekeeper_operator }}
+{{ if .Values.gatekeeper.enabled }}
 apiVersion: config.gatekeeper.sh/v1alpha1
 kind: Config
 metadata:
@@ -6,8 +6,19 @@ metadata:
   namespace: openshift-gatekeeper-system
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   match:
-    - excludedNamespaces: ["kube-system", "openshift-gatekeeper-system", "openshift-logging"]
+    - excludedNamespaces:
+        - ansible-automation-platform
+        - hive
+        - kube-*
+        - local-quay
+        - multicluster-engine
+        - open-cluster-management
+        - open-cluster-management-*
+        - openshift-*
+        - rhacs-operator
+        - stackrox
       processes: ["*"]
 {{ end }}

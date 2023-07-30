@@ -1,13 +1,22 @@
-{{ if .Values.disable_self_provisioner }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "false"
-  name: self-provisioners
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: self-provisioner
+{{ if .Values.disable_self_provisioner }}
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "false"
+  name: self-provisioners
 subjects: null
+{{ else }}
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: self-provisioners
+subjects:
+  - kind: Group
+    apiGroup: rbac.authorization.k8s.io
+    name: 'system:authenticated:oauth'
 {{ end }}

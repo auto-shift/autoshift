@@ -1,10 +1,11 @@
-{{ if .Values.gatekeeper_operator }}
+{{ if .Values.gatekeeper.enabled }}
 apiVersion: operator.gatekeeper.sh/v1alpha1
 kind: Gatekeeper
 metadata:
   name: gatekeeper
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   validatingWebhook: Enabled
   webhook:
@@ -12,7 +13,7 @@ spec:
     replicas: 2
   image:
     image: >-
-      registry.redhat.io/rhacm2/gatekeeper-rhel8:{{ .Values.gk_img_tag }}
+      registry.redhat.io/rhacm2/gatekeeper-rhel8:{{ .Values.gatekeeper.gk_img_tag }}
   audit:
     logLevel: INFO
     replicas: 1

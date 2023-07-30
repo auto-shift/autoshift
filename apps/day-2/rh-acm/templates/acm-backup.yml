@@ -6,7 +6,7 @@ metadata:
   namespace: open-cluster-management-backup
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   veleroSchedule: 0 */1 * * *
   veleroTtl: 120h

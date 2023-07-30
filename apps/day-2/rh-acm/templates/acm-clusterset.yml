@@ -1,9 +1,10 @@
 {{ if .Values.mgmt_cluster }}
-apiVersion: cluster.open-cluster-management.io/v1alpha1
+apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: ManagedClusterSet
 metadata:
   name: "{{ .Values.organization }}-clusters"
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "4"
 spec: {}
 {{ end }}

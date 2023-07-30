@@ -1,4 +1,4 @@
-{{ if .Values.openshift_compliance_operator }}
+{{ if .Values.compliance.enabled }}
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
@@ -14,7 +14,7 @@ allowPrivilegedContainer: false
 runAsUser:
   type: MustRunAsRange
 users:
-  - 'system:serviceaccount:openshift-compliance:api-resource-collector'
+  - "system:serviceaccount:{{ .Values.compliance.namespace }}:api-resource-collector"
 allowHostDirVolumePlugin: false
 allowHostIPC: false
 seLinuxContext:

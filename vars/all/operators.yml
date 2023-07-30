@@ -1,0 +1,220 @@
+# Gitops Values
+community_operators_catalog: redhat/community-operator-index:v4.12
+community_operators:
+  # Day 2 Apps
+  gso:
+    # ldap_groupsync vars
+    enabled: false
+    group_membership_attr: uniquemember
+    group_name_attr: cn
+    basedn: ou=momot,dc=cms,dc=hhs,dc=gov
+    user_name_attr: uid
+    user_uid_attr: dn
+    sync_schedule: 0,10,20,30,40,50 * * * *
+    # sub
+    name: group-sync-operator
+    namespace: group-sync-operator
+    installPlanApproval: Manual
+    source: community-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: alpha
+
+redhat_operators_catalog: redhat/redhat-operator-index:v4.12
+redhat_operators:
+  # Day 1 Apps
+  odf:
+    enabled: false
+    name: odf-operator
+    namespace: openshift-storage
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    installPlanApproval: Manual
+    operatorGroup: openshift-storage-operatorgroup
+    channel: stable-4.12
+    ose_cli_image: registry.redhat.io/openshift4/ose-cli:v4.12.0
+
+  # Day 2 Apps
+  gitops:
+    enabled: false
+    name: openshift-gitops-operator
+    channel: gitops-{{ gitops_version }}
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    gitops_version: 1.7
+    gitops_helm_secrets_version: 3.15.0
+    gitops_vals_version: 0.18.0
+    gitops_sops_version: 3.7.3
+    gitops_helm_version: 3.10.3
+    gitops_namespace: "openshift-gitops"
+    argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
+    git_user: "{{ ocp_secrets.git_user }}"
+    git_token: "{{ ocp_secrets.git_token }}"
+    gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
+
+  amq_broker:
+    enabled: false
+    name: amq-broker-rhel8
+    namespace: openshift-operators
+    channel: 7.11.x
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+  # ansible-automation-platform
+  aap:
+    enabled: false
+    name: ansible-automation-platform-operator
+    namespace: ansible-automation-platform
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: stable-2.3
+    create_preload_data: false
+    route_tls_termination_mechanism: Edge
+    garbage_collect_secrets: false
+    ingress_type: Route
+    loadbalancer_port: 80
+    projects_use_existing_claim: _Yes_
+    image_pull_policy: IfNotPresent
+    projects_storage_size: 8Gi
+    task_privileged: false
+    projects_storage_access_mode: ReadWriteMany
+    projects_persistence: false
+    replicas: 3
+    admin_user: admin
+    loadbalancer_protocol: http
+    nodeport_port: 30080
+
+  # container-security-operator
+  container_security_operator:
+    enabled: false
+    name: container-security-operator
+    namespace: openshift-operators
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: stable-3.8
+
+  # file-integrity-operator
+  fio:
+    enabled: false
+    name: file-integrity-operator
+    namespace: openshift-file-integrity
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: stable
+
+  gatekeeper:
+    enabled: false
+    name: gatekeeper-operator-product
+    namespace: openshift-operators
+    channel: stable
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    gk_img_tag: v3.3.0-18
+    allowed_git_repos:
+      - repo: https://github.cms.gov
+
+  compliance:
+    enabled: false
+    name: compliance-operator
+    namespace: openshift-compliance
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    nameSub: compliance-operator-sub
+    channel: stable
+
+  acm:
+    enabled: false
+    subName: acm-operator-subscription
+    namespace: open-cluster-management
+    channel: release-2.7
+    sourceNamespace: openshift-marketplace
+    source: redhat-operator-index
+    installPlanApproval: Manual
+    name: advanced-cluster-management
+
+  acs:
+    enabled: false
+    channel: rhacs-3.74
+    installPlanApproval: Manual
+    name: rhacs-operator
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    namespace: stackrox
+
+  adp:
+    enabled: false
+    channel: stable-1.1
+    nameSub: redhat-oadp-operator-subscription
+    namespace: open-cluster-management-backup
+    installPlanApproval: Manual
+    name: redhat-oadp-operator
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+  serviceMesh:
+    enabled: false
+    name: servicemeshoperator
+    namespace: openshift-operators-redhat
+    channel: stable
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    proxy:
+      requests:
+        cpu: 100m
+        memory: 50Mi
+    controlPlane:
+      namespace: istio-system
+      version: v2.3
+      sampling: 100
+
+  kiali:
+    enabled: false
+    name: kiali-ossm
+    namespace: openshift-operators-redhat
+    channel: stable
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+  elasticSearch:
+    enabled: false
+    name: elasticsearch-operator
+    namespace: openshift-operators-redhat
+    channel: stable
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+  jeager:
+    enabled: false
+    name: jaeger-product
+    namespace: openshift-distributed-tracing
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: stable
+
+  wt:
+    name: web-terminal
+    namespace: openshift-operators
+    enabled: false
+    channel: fast
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+
+  cost:
+    enabled: false
+    name: costmanagement-metrics-operator
+    namespace: costmanagement-metrics-operator
+    installPlanApproval: Manual
+    source: redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    channel: stable

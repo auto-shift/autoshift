@@ -1,0 +1,68 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: basic
+  namespace: {{ .Values.serviceMesh.controlPlane.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  version: {{ .Values.serviceMesh.controlPlane.version }}
+  security:
+    dataPlane:
+      mtls: true
+  tracing:
+    sampling: {{ .Values.serviceMesh.controlPlane.sampling }}
+    type: Jaeger
+  runtime:
+    components:
+      pilot:
+        container:
+          resources:
+            requests:
+              cpu: '1'
+              memory: 1.6Gi
+            limits: {}
+  proxy:
+    runtime:
+      container:
+        resources:
+          requests:
+            cpu: {{ .Values.serviceMesh.proxy.requests.cpu }}
+            memory: {{ .Values.serviceMesh.proxy.requests.memory }}
+          limits: {}
+    injection:
+      autoInject: true
+  gateways:
+      egress:
+        runtime:
+          deployment:
+            autoScaling:
+              enabled: true
+      ingress:
+        runtime:
+          deployment:
+            autoScaling:
+              enabled: true
+  addons:
+    jaeger:
+      name: jaeger-prod
+    kiali:
+      enabled: true
+      name: kiali
+      install:
+        deployment:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: infra
+            value: reserved
+          - effect: NoExecute
+            key: infra
+            value: reserved
+        dashboard:
+          viewOnly: true
+          enableGrafana: false
+          enableTracing: true
+          enablePrometheus: true

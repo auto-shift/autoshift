@@ -1,0 +1,9 @@
+{{ if .Values.cost.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.cost.namespace }}
+  annotations:
+    openshift.io/node-selector: ""
+    argocd.argoproj.io/sync-wave: "-1"
+{{ end }}

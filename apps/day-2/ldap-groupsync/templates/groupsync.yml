@@ -1,4 +1,4 @@
-{{ if .Values.oauth.groupsync_enabled }}
+{{ if .Values.gso.enabled }}
 apiVersion: redhatcop.redhat.io/v1alpha1
 kind: GroupSync
 metadata:
@@ -17,25 +17,25 @@ spec:
         namespace: group-sync-operator
       rfc2307:
         groupMembershipAttributes:
-        - {{ .Values.oauth.group_membership_attr }}
+        - {{ .Values.gso.group_membership_attr }}
         groupNameAttributes:
-        - {{ .Values.oauth.group_name_attr }}
+        - {{ .Values.gso.group_name_attr }}
         groupUIDAttribute: dn
         groupsQuery:
-          baseDN: {{ .Values.basedn }}
+          baseDN: {{ .Values.gso.basedn }}
           derefAliases: never
           filter: {{ .Values.group_filter }}
           scope: sub
         tolerateMemberNotFoundErrors: true
         tolerateMemberOutOfScopeErrors: true
         userNameAttributes:
-        - {{ .Values.oauth.user_name_attr }}
-        userUIDAttribute: {{ .Values.oauth.user_uid_attr }}
+        - {{ .Values.gso.user_name_attr }}
+        userUIDAttribute: {{ .Values.gso.user_uid_attr }}
         usersQuery:
-          baseDN: {{ .Values.basedn }}
+          baseDN: {{ .Values.gso.basedn }}
           derefAliases: never
           scope: sub
-      url: {{ .Values.oauth.radiant_url }}
+      url: {{ .Values.radiant_url }}
     name: ldap
-  schedule: {{ .Values.oauth.sync_schedule }}
+  schedule: {{ .Values.gso.sync_schedule }}
   {{ end }}

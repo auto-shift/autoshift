@@ -1,10 +1,10 @@
-{{ if .Values.openshift_compliance_operator }}
+{{ if .Values.compliance.enabled }}
 ---
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ScanSettingBinding
 metadata:
   name: ocp4
-  namespace: openshift-compliance
+  namespace: {{ .Values.compliance.namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 profiles:
@@ -29,7 +29,7 @@ apiVersion: compliance.openshift.io/v1alpha1
 kind: ScanSettingBinding
 metadata:
   name: rhcos4
-  namespace: openshift-compliance
+  namespace: {{ .Values.compliance.namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 profiles:

@@ -1,0 +1,36 @@
+{{ if .Values.odf.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rook-ceph-operator-config
+  namespace: {{ .Values.odf.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+data:
+  CSI_ENABLE_CSIADDONS: 'true'
+  CSI_LOG_LEVEL: '5'
+  CSI_PLUGIN_TOLERATIONS: |-
+
+    - key: node.ocs.openshift.io/storage
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+    - effect: NoSchedule
+      key: infra
+      value: reserved
+    - effect: NoExecute
+      key: infra
+      value: reserved
+  CSI_PROVISIONER_TOLERATIONS: |-
+
+    - key: node.ocs.openshift.io/storage
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+    - effect: NoSchedule
+      key: infra
+      value: reserved
+    - effect: NoExecute
+      key: infra
+      value: reserved
+{{ end }}

@@ -11,4 +11,9 @@ spec:
       servingCertKeyPairSecret:
         name: console-tls
   domain: apps.{{ .Values.cluster_name }}.{{ .Values.base_domain }}
+  loadBalancer:
+    platform:
+      aws:
+        type: NLB
+      type: AWS
 {{ end }}

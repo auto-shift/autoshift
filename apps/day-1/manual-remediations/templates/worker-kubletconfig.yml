@@ -33,7 +33,7 @@ spec:
     imageGCHighThresholdPercent: 80
     imageGCLowThresholdPercent: 75
     evictionPressureTransitionPeriod: 0s
-    streamingConnectionIdleTimeout: 5m0s
+    streamingConnectionIdleTimeout: 4h0m0s
     makeIPTablesUtilChains: true
   machineConfigPoolSelector:
     matchLabels:

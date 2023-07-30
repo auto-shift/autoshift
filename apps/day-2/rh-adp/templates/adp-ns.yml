@@ -1,8 +1,8 @@
-{{ if .Values.oadp_enabled }}
+{{ if .Values.adp.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: open-cluster-management-backup
+  name: {{ .Values.adp.namespace }}
   annotations:
     openshift.io/node-selector: ""
   labels:

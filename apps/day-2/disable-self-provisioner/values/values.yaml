@@ -1,3 +1,4 @@
-# Default values for container-security-operator.
+# Default values for disable self provisioner.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+disable_self_provisioner: "true"

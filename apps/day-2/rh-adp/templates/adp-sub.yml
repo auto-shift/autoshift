@@ -1,12 +1,13 @@
-{{ if .Values.oadp_enabled }}
+{{ if .Values.adp.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: redhat-oadp-operator-subscription
-  namespace: open-cluster-management-backup
+  name: {{ .Values.adp.nameSub }}
+  namespace: {{ .Values.adp.namespace }}
 spec:
-  installPlanApproval: Automatic
-  name: redhat-oadp-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  channel: {{ .Values.adp.channel }}
+  installPlanApproval: {{ .Values.adp.installPlanApproval }}
+  name: {{ .Values.adp.name }}
+  source: {{ .Values.adp.source }}
+  sourceNamespace: {{ .Values.adp.sourceNamespace }}
 {{ end }}

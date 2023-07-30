@@ -1,0 +1,15 @@
+{{ if .Values.container_security_operator.enabled }}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.container_security_operator.name }}
+  namespace: {{ .Values.container_security_operator.namespace }}
+spec:
+  installPlanApproval: {{ .Values.container_security_operator.installPlanApproval }}
+  name: {{ .Values.container_security_operator.name }}
+  source: {{ .Values.container_security_operator.source }}
+  sourceNamespace: {{ .Values.container_security_operator.sourceNamespace }}
+ {{ if .Values.container_security_operator.channel }}
+  channel: {{ .Values.container_security_operator.channel }}
+{{ end }}
+{{ end }}

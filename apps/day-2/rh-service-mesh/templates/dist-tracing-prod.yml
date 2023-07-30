@@ -1,0 +1,49 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: jaeger-prod
+  namespace: {{ .Values.serviceMesh.controlPlane.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  strategy: production
+  ingress:
+    enabled: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-role.kubernetes.io/infra
+            operator: Exists
+  tolerations:
+  - effect: NoSchedule
+    key: infra
+    value: reserved
+  - effect: NoExecute
+    key: infra
+    value: reserved
+  storage:
+    type: elasticsearch
+    elasticsearch:
+      nodeCount: 3
+      storage: 
+        storageClassName: ocs-storagecluster-ceph-rbd
+        size: 5Gi
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: infra
+        value: reserved
+      - effect: NoExecute
+        key: infra
+        value: reserved
+      resources:
+        requests:
+          cpu: '1'
+          memory: 16Gi
+        limits:
+          memory: 16Gi
+      redundancyPolicy: FullRedundancy

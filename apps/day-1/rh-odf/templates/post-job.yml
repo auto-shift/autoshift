@@ -1,4 +1,4 @@
-{{ if .Values.odf_enabled }}
+{{ if .Values.odf.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -12,21 +12,24 @@ spec:
       restartPolicy: "OnFailure"
       containers:
       - name: update-loadbalancer
-        image: registry.redhat.io/openshift4/ose-cli:v4.9.0
+        image: "{{ .Values.odf.ose_cli_image }}"
         command:
             - "/bin/bash"
             - "-c"
             - >- 
-              echo "Annotating nooba-mgmt service Loadbalancer type" &&
-              oc annotate service noobaa-mgmt -n openshift-storage service.beta.kubernetes.io/aws-load-balancer-type=nlb --overwrite=true &&
+              echo "Annotating sts service Loadbalancer type" &&
+              oc annotate service sts -n {{ .Values.odf.namespace }} service.beta.kubernetes.io/aws-load-balancer-type=nlb --overwrite=true &&
               echo "Annotating s3 service Loadbalancer type" &&
-              oc annotate service s3 -n openshift-storage service.beta.kubernetes.io/aws-load-balancer-type=nlb --overwrite=true &&
+              oc annotate service s3 -n {{ .Values.odf.namespace }} service.beta.kubernetes.io/aws-load-balancer-type=nlb --overwrite=true &&
               echo "Patch nooba-mgmt Source Range" &&
-              oc patch service noobaa-mgmt -n openshift-storage -p '{"spec":{"loadBalancerSourceRanges":["{{ .Values.vpc_cidr }}","{{ .Values.vpn_cidr }}"]}}' &&
+              oc patch service sts -n {{ .Values.odf.namespace }} -p '{"spec":{"loadBalancerSourceRanges":["{{ .Values.vpc_cidr }}","{{ .Values.vpn_cidr }}"]}}' &&
               echo "Patch s3 Source Range" &&
-              oc patch service s3 -n openshift-storage -p '{"spec":{"loadBalancerSourceRanges":["{{ .Values.vpc_cidr }}","{{ .Values.vpn_cidr }}"]}}' &&
+              oc patch service s3 -n {{ .Values.odf.namespace }} -p '{"spec":{"loadBalancerSourceRanges":["{{ .Values.vpc_cidr }}","{{ .Values.vpn_cidr }}"]}}' &&
               echo "Annotating ocs-storagecluster-ceph-rbd to set as default" &&
-              oc annotate storageclass ocs-storagecluster-ceph-rbd storageclass.kubernetes.io/is-default-class='true' &&
-              oc annotate storageclass gp2 storageclass.kubernetes.io/is-default-class-
+              oc annotate storageclass ocs-storagecluster-ceph-rbd storageclass.kubernetes.io/is-default-class='true' --overwrite=true &&
+              oc label volumesnapshotclass ocs-storagecluster-rbdplugin-snapclass velero.io/csi-volumesnapshot-class='true' --overwrite=true &&
+              oc annotate storageclass gp3-csi storageclass.kubernetes.io/is-default-class- &&
+              oc annotate volumesnapshotclass ocs-storagecluster-rbdplugin-snapclass snapshot.storage.kubernetes.io/is-default-class='true' --overwrite=true &&
+              oc annotate volumesnapshotclass csi-aws-vsc snapshot.storage.kubernetes.io/is-default-class-
       serviceAccountName: openshift-gitops-argocd-application-controller
 {{ end }}

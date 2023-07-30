@@ -1,0 +1,10 @@
+{{ if .Values.container_security_operator.enabled }}
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: {{ .Values.container_security_operator.namespace }}
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    openshift.io/cluster-monitoring: "true"
+{{ end }}

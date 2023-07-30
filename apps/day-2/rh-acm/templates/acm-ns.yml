@@ -1,10 +1,11 @@
-{{ if .Values.acm_enabled }}
-apiVersion: project.openshift.io/v1
-kind: Project
+{{ if .Values.acm.enabled }}
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: open-cluster-management
+  name: {{ .Values.acm.namespace }}
   annotations:
     openshift.io/node-selector: ""
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     openshift.io/cluster-monitoring: "true"
 {{ end }}

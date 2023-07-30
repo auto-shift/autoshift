@@ -1,10 +1,10 @@
-{{ .Values.aap_enabled }}
-apiVersion: v1
+{{ .Values.aap.enabled  }}
 kind: Namespace
+apiVersion: v1
 metadata:
-  name: ansible-automation-platform
+  name: {{ .Values.aap.namespace }}
   annotations:
-    openshift.io/node-selector: ""
+    openshift.io/node-selector: ''
   labels:
-    openshift.io/cluster-monitoring: "true"
+    openshift.io/cluster-monitoring: 'true'
 {{ end }}

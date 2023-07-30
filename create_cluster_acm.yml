@@ -18,6 +18,7 @@
     restore: false
   vars_files:
     - vars/all/main.yml
+    - vars/all/operators.yml
     - "vars/{{ env }}/main.yml"
   roles: 
     - iac-ansible

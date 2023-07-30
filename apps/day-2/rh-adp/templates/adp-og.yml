@@ -1,10 +1,10 @@
-{{ if .Values.oadp_enabled }}
+{{ if .Values.adp.enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: redhat-oadp-operator-group
-  namespace: open-cluster-management-backup
+  namespace: {{ .Values.adp.namespace }}
 spec:
   targetNamespaces:
-  - open-cluster-management-backup
+  - {{ .Values.adp.namespace }}
 {{ end }}

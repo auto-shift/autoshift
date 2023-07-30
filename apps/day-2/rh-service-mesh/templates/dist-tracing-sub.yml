@@ -1,0 +1,16 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.jeager.name }}
+  namespace: {{ .Values.jeager.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  channel: {{ .Values.jeager.channel }}
+  installPlanApproval: {{ .Values.jeager.installPlanApproval }}
+  name: {{ .Values.jeager.name }}
+  source: {{ .Values.jeager.source }}
+  sourceNamespace: {{ .Values.jeager.sourceNamespace }}
+{{ if .Values.jeager.channel }}
+  channel: {{ .Values.jeager.channel }}
+{{ end }}

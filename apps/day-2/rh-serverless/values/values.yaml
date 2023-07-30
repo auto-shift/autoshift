@@ -1,5 +1,0 @@
-# Default values for rh-odf.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-cluster_name:
-serverless_enabled:

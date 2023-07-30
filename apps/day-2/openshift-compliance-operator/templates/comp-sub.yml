@@ -1,12 +1,14 @@
-{{ if .Values.openshift_compliance_operator }}
+{{ if .Values.compliance.enabled }}
 kind: Subscription
-metadata:
-  name: compliance-operator-sub
-  namespace: openshift-compliance
-spec:
-  installPlanApproval: Automatic
-  name: compliance-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
 apiVersion: operators.coreos.com/v1alpha1
+metadata:
+  name: {{ .Values.compliance.nameSub }}
+  namespace: {{ .Values.compliance.namespace }}
+spec:
+  installPlanApproval: {{ .Values.compliance.installPlanApproval }}
+  name: {{ .Values.compliance.name }}
+  source: {{ .Values.compliance.source }}
+  sourceNamespace: {{ .Values.compliance.sourceNamespace }}
+{{ if .Values.compliance.channel }}
+  channel: {{ .Values.compliance.channel }}
 {{ end }}

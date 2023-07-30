@@ -1,8 +1,8 @@
-﻿{{ if .Values.acs_enabled }}
-apiVersion: project.openshift.io/v1
-kind: Project
+﻿{{ if .Values.acs.enabled }}
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: stackrox
+  name: {{ .Values.acs.namespace }}
   annotations:
     openshift.io/node-selector: ""
   labels:

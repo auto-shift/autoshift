@@ -1,3 +1,9 @@
 # Default values for container-security-operator.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+container_security_operator:
+  name: container-security-operator
+  namespace: openshift-operators
+  installPlanApproval: Manual
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace

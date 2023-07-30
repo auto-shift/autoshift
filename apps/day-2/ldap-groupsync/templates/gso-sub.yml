@@ -1,12 +1,14 @@
-{{ if .Values.oauth.groupsync_enabled }}
+{{ if .Values.gso.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: group-sync-operator
-  namespace: group-sync-operator
+  name: {{ .Values.gso.name }}
+  namespace: {{ .Values.gso.namespace }}
 spec:
-  installPlanApproval: Automatic
-  name: group-sync-operator
-  source: community-operators
-  sourceNamespace: openshift-marketplace
+  installPlanApproval: {{ .Values.gso.installPlanApproval }}
+  name: {{ .Values.gso.name }}
+  source: {{ .Values.gso.source }}
+  sourceNamespace: {{ .Values.gso.sourceNamespace }}
+{{ if .Values.gso.channel }}
+  channel: {{ .Values.gso.channel }}
 {{ end }}
