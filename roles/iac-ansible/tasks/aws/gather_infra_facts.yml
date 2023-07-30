@@ -1,8 +1,8 @@
 ---
 - name: Get OpenShift Infra Cluster Facts
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     kind: Infrastructure
     name: cluster
   register: infra_facts
@@ -13,8 +13,8 @@
 
 - name: Get Master Machine Facts
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     api: machine.openshift.io/v1beta1
     kind: Machine
     name: "{{ infra_id }}-master-0"

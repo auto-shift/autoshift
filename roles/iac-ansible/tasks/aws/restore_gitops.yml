@@ -1,8 +1,8 @@
 ---
 - name: Create Namespace
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'argo/'+item) }}"
   loop:
@@ -10,16 +10,16 @@
 
 - name: Install GitOps Operator 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'argo/'+item) }}"
   loop:
   - gitops-sub.yml.j2
 - name: Install ACM Operators
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'restore-additional-blank-templates/'+item) }}"
   loop: 
@@ -29,8 +29,8 @@
 
 - name: Check if MCH CRD exists...
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: "multiclusterhubs.operator.open-cluster-management.io"
@@ -46,8 +46,8 @@
 
 - name: Install MCH
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'restore-additional-blank-templates/'+item) }}"
   loop:
@@ -55,8 +55,8 @@
 
 - name: Waiting for DataApp CustomResourceDefinition to be defined...
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api_version: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     name: dataprotectionapplications.oadp.openshift.io
@@ -79,15 +79,15 @@
 
 - name: Add ADP Secret
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
 
 - name: Install DataProtectionApp
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'oadp/'+item) }}"
   loop: 
@@ -100,8 +100,8 @@
 
 - name: Check if Namespaces Backup exists...
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api_version: velero.io/v1
     kind: Backup
     name: "{{ resources_backup_name }}"
@@ -116,8 +116,8 @@
 
 - name: Check if Cluster Resources Backup exists...
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api_version: velero.io/v1
     kind: Backup
     name: "{{ resources_backup_name }}"
@@ -132,8 +132,8 @@
 
 - name: Apply Namespaces Resources Restore AAP
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'oadp/'+item) }}"
   loop:
@@ -141,8 +141,8 @@
 
 - name: Waiting for Namespaces Resources Restore for Gitops to finish...
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api_version: velero.io/v1
     kind: Restore
     namespace: "open-cluster-management-backup"

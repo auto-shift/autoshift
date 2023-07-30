@@ -5,8 +5,8 @@
 
 - name: Create Secret for New Relic
   kubernetes.core.k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     kind: Secret
     name: kube-etcd-client-certs
     namespace: openshift-monitoring
@@ -14,16 +14,16 @@
 
 - name: Add New Relic App
   kubernetes.core.k8s:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
   when: new_relic_enabled
 
 - name: Create Secret for New Relic 
   kubernetes.core.k8s:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition:
       kind: Secret
@@ -40,8 +40,8 @@
 
 - name: Create Fluent Bit App
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'fluent-bit.yml.j2') }}"
   when: fluentbit_enabled
@@ -51,8 +51,8 @@
 
 - name: Create OpenShift Custom Web Console URL Certificate Secret
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'web-console-cert-secret.yml.j2') }}"
@@ -61,8 +61,8 @@
 
 - name: Get Ingress Facts
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     kind: Service
     name: router-default
     namespace: openshift-ingress
@@ -86,8 +86,8 @@
 
 - name: Create Group Sync Operator Namespace 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: 
       apiVersion: project.openshift.io/v1
@@ -103,8 +103,8 @@
 
 - name: Create Secret for Groupsync 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ item }}"
@@ -116,8 +116,8 @@
   
 - name: Create Secret for LDAP
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ item }}"
   loop:
@@ -128,8 +128,8 @@
 
 - name: Create Secret for Okta 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'openid-okta-secret.yml.j2') }}"
@@ -137,8 +137,8 @@
 
 - name: Create Logging Namespace 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: 
       apiVersion: project.openshift.io/v1
@@ -153,8 +153,8 @@
 
 - name: Create Secret for Cloudwatch 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'cw-secret.yml.j2') }}"
@@ -162,8 +162,8 @@
 
 - name: Create Custom Ingress Certificate Workloads
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ item }}"
@@ -175,8 +175,8 @@
 
 - name: Create ACS Namespace 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: 
       apiVersion: project.openshift.io/v1
@@ -191,8 +191,8 @@
 
 - name: Create Secret for ACS 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'acs-init-bundle.yml.j2') }}"
@@ -200,8 +200,8 @@
 
 - name: Create ADP Namespace 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: 
       apiVersion: project.openshift.io/v1
@@ -224,8 +224,8 @@
 
 - name: Create Secret for ADP 
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
@@ -233,16 +233,16 @@
 
 - name: Disable Server Version CR
   k8s: 
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     force: yes
     definition: "{{ lookup('template','public-info-cluster-role.yml.j2') }}"
 
 - name: Get AAP Password
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     name: "{{ cluster_name }}-admin-password"
     api_version: v1
     kind: Secret
@@ -252,8 +252,8 @@
 
 - name: Apply TSSC App for MGMT
   k8s:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     state: present
     definition: "{{ lookup('template', 'argo/tssc-cluster-resources.yml.j2') }}"
   when: tssc_enabled

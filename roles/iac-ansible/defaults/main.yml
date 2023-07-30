@@ -107,7 +107,7 @@ redhat_operators:
     name: openshift-gitops-operator
     channel: gitops-{{ gitops_version }}
     installPlanApproval: Automatic
-    source: redhat-operator-index
+    source: redhat-operators
     sourceNamespace: openshift-marketplace
 
 # Fluent Bit logging Variables

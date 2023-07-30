@@ -79,7 +79,8 @@ spec:
         cpu: 250m
         memory: 128Mi
   tls:
-    ca: {}
+    ca:
+      secretName: openshift-gitops-tls
   redis:
     resources:
       limits:

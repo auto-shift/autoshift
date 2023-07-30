@@ -4,8 +4,8 @@
 
 - name: Get ApplicationSet Status
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     api_version: argoproj.io/v1alpha1
     kind: ApplicationSet
     name: "{{ app_set_name }}"
@@ -32,8 +32,8 @@
 
 - name: Get Apps Status
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     api_version: argoproj.io/v1alpha1
     kind: Application
     namespace: openshift-gitops
@@ -43,8 +43,8 @@
 
 - name: Check Apps Status
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     api_version: argoproj.io/v1alpha1
     kind: Application
     namespace: openshift-gitops

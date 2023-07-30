@@ -23,8 +23,8 @@
 
 # - name: Create Day 1 gitops-apps App Set
 #   k8s:
-#     api_key: "{{ K8S_AUTH_API_KEY  }}"
-#     host: "{{ K8S_AUTH_HOST }}"
+#     api_key: "{{ k8s_auth_api_key  }}"
+#     host: "{{ k8s_auth_host }}"
 #     state: present
 #     definition: "{{ lookup('template', 'argo/gitops-apps-day-1.yml.j2') }}"
 #     apply: yes
@@ -39,8 +39,8 @@
 
 # - name: Wait for Storage Cluster
 #   k8s_info:
-#     api_key: "{{ K8S_AUTH_API_KEY  }}"
-#     host: "{{ K8S_AUTH_HOST }}"
+#     api_key: "{{ k8s_auth_api_key  }}"
+#     host: "{{ k8s_auth_host }}"
 #     kind: StorageCluster
 #     name: ocs-storagecluster
 #     namespace: openshift-storage
@@ -59,8 +59,8 @@
   
 # - name: Create Day 2 gitops-apps App Set
 #   k8s:
-#     api_key: "{{ K8S_AUTH_API_KEY  }}"
-#     host: "{{ K8S_AUTH_HOST }}"
+#     api_key: "{{ k8s_auth_api_key  }}"
+#     host: "{{ k8s_auth_host }}"
 #     state: present
 #     definition: "{{ lookup('template', 'argo/gitops-apps-day-2.yml.j2') }}"
 #     apply: yes
