@@ -23,6 +23,51 @@ spec:
       enabled: true
     service:
       type: ''
+    extraConfig:
+{% if helm_secrets.enabled %}
+      helm.valuesFileSchemes: >-
+        secrets+gpg-import, secrets+gpg-import-kubernetes, secrets+age-import,
+        secrets+age-import-kubernetes, secrets,secrets+literal, https
+{% endif %}
+      resource.customizations: |
+        operators.coreos.com/Subscription:
+          health.lua: |
+            health_status = {}
+            if obj.status ~= nil then
+              if obj.status.conditions ~= nil then
+                numDegraded = 0
+                numPending = 0
+                msg = ""
+                for i, condition in pairs(obj.status.conditions) do
+                    msg = msg .. i .. ": " .. condition.type .. " | " .. condition.status .. "\n"
+                    if condition.type == "InstallPlanPending" and condition.status == "True" then
+                        numPending = numPending + 1
+                    elseif (condition.type == "InstallPlanMissing" and condition.reason ~= "ReferencedInstallPlanNotFound") then
+                        numDegraded = numDegraded + 1
+                    elseif (condition.type == "CatalogSourcesUnhealthy" or condition.type == "InstallPlanFailed" or condition.type == "ResolutionFailed") and condition.status == "True" then
+                        numDegraded = numDegraded + 1
+                    end
+                end
+                if numDegraded == 0 and numPending == 0 then
+                    health_status.status = "Healthy"
+                    health_status.message = msg
+                    return health_status
+                elseif numPending > 0 and numDegraded == 0 and obj.spec.installPlanApproval == "Manual" then
+                    health_status.status = "Healthy"
+                    health_status.message = "An install plan for a subscription is pending installation but install plan approval is set to manual so considering this as healthy: " .. msg
+                    return health_status
+                elseif numPending > 0 and numDegraded == 0 then
+                    health_status.status = "Progressing"
+                    health_status.message = "An install plan for a subscription is pending installation"
+                    return health_status
+                else
+                    health_status.status = "Degraded"
+                    health_status.message = msg
+                    return health_status
+                end
+              end
+            end
+            return health_status
   grafana:
     enabled: false
     route:
@@ -50,6 +95,91 @@ spec:
     scopes: '[email,groups]'
   repo:
     replicas: 2
+{% if helm_secrets.enabled %}
+    env:
+      - name: HELM_PLUGINS
+        value: /custom-tools/helm-plugins/
+      - name: HELM_SECRETS_CURL_PATH
+        value: /custom-tools/curl
+      - name: HELM_SECRETS_SOPS_PATH
+        value: /custom-tools/sops
+      - name: HELM_SECRETS_KUBECTL_PATH
+        value: /custom-tools/kubectl
+      - name: HELM_SECRETS_VALS_PATH
+        value: /custom-tools/vals
+      - name: HELM_SECRETS_BACKEND
+        value: vals
+      - name: HELM_SECRETS_VALUES_ALLOW_SYMLINKS
+        value: 'false'
+      - name: HELM_SECRETS_VALUES_ALLOW_ABSOLUTE_PATH
+        value: 'true'
+      - name: HELM_SECRETS_VALUES_ALLOW_PATH_TRAVERSAL
+        value: 'false'
+      - name: HELM_SECRETS_WRAPPER_ENABLED
+        value: 'true'
+      - name: HELM_SECRETS_HELM_PATH
+        value: /usr/local/bin/helm
+      - name: HELM_SECRETS_LOAD_GPG_KEYS
+        value: /helm-secrets-private-keys/argocd.key
+    initContainers:
+      - args:
+          - cp /usr/bin/xargs /ubi-tools/xargs
+        command:
+          - sh
+          - '-c'
+        image: registry.access.redhat.com/rhel8/toolbox
+        name: download-xargs
+        resources: {}
+        securityContext:
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /ubi-tools
+            name: ubi-tools
+      - args:
+          - >
+            mkdir -p /custom-tools/helm-plugins
+
+            wget -qO-
+            https://github.com/jkroepke/helm-secrets/releases/download/v${HELM_SECRETS_VERSION}/helm-secrets.tar.gz
+            | tar -C /custom-tools/helm-plugins -xzf-;
+
+
+            wget -qO /custom-tools/curl
+            https://github.com/moparisthebest/static-curl/releases/latest/download/curl-amd64
+
+            wget -qO /custom-tools/sops
+            https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux
+
+
+            wget -qO-
+            https://github.com/helmfile/vals/releases/download/v${VALS_VERSION}/vals_${VALS_VERSION}_linux_amd64.tar.gz
+            | tar -xzf- -C /custom-tools/ vals;
+
+
+            cp /custom-tools/helm-plugins/helm-secrets/scripts/wrapper/helm.sh
+            /custom-tools/helm
+
+
+            chmod +x /custom-tools/*
+        command:
+          - sh
+          - '-ec'
+        env:
+          - name: HELM_SECRETS_VERSION
+            value: {{ helm_secrets.version }}
+          - name: VALS_VERSION
+            value: {{ helm_secrets.vals_version }}
+          - name: SOPS_VERSION
+            value: {{ helm_secrets.sops_version }}
+        image: registry.access.redhat.com/ubi9/go-toolset
+        name: download-tools
+        resources: {}
+        securityContext:
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /custom-tools
+            name: custom-tools
+{% endif %}
     resources:
       limits:
         cpu: '1'
@@ -57,6 +187,30 @@ spec:
       requests:
         cpu: 250m
         memory: 256Mi
+{% if helm_secrets.enabled %}
+    volumeMounts:
+      - mountPath: /helm-secrets-private-keys/
+        name: helm-secrets-private-keys
+      - mountPath: /custom-tools
+        name: custom-tools
+      - mountPath: /usr/local/sbin/helm
+        name: custom-tools
+        subPath: helm
+      - mountPath: /usr/bin/xargs
+        name: ubi-tools
+        subPath: xargs
+    volumes:
+      - emptyDir: {}
+        name: custom-tools
+      - emptyDir: {}
+        name: ubi-tools
+      - emptyDir: {}
+        name: home
+      - name: helm-secrets-private-keys
+        secret:
+          defaultMode: 420
+          secretName: openshift-gitops-gpg-private-keys
+{% endif %}
   sso:
     dex:
       openShiftOAuth: true

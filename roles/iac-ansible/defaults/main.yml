@@ -83,11 +83,12 @@ app_set_ready: False
 
 # Gitops Values
 gitops_version: 1.7
-gitops_helm_secrets_version: 3.15.0
-gitops_vals_version: 0.18.0
-gitops_sops_version: 3.7.3
-gitops_helm_version: 3.10.3
 gitops_namespace: "openshift-gitops"
+helm_secrets:
+  enabled: false
+  version: 4.4.2
+  vals_version: 0.24.0
+  sops_version: 3.7.3
 
 redhat_operators_catalog: redhat/redhat-operator-index:v4.12
 redhat_operators:
