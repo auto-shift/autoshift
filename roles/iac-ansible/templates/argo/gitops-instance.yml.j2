@@ -21,7 +21,6 @@ spec:
         memory: 256Mi
     route:
       enabled: true
-    host: 'argocd-server-{{ gitops_namespace }}.apps.{{ cluster_name }}.{{ base_domain }}'
     service:
       type: ''
   grafana:
