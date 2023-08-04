@@ -15,8 +15,8 @@
   when: oc_version is defined
 
 - name: Download OCP Binaries
-  block:
   when: oc_version != openshift_version
+  block:
     - name: Downloading and Unarchiving the OCP binaries
       ansible.builtin.unarchive:
         src: "{{ openshift.release_url }}/{{ openshift.release }}/{{ item }}-linux.tar.gz"
