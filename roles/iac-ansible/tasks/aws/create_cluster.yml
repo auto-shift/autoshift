@@ -5,7 +5,7 @@
 
 - name: Check for existing cluster
   ansible.builtin.uri:
-    url: temp.autoshift.dev
+    url: "{{ k8s_auth_host }}"
     validate_certs: false
   ignore_errors: true
   register: api_response
