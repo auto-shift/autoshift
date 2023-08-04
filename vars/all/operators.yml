@@ -38,7 +38,7 @@ redhat_operators:
     enabled: false
     name: openshift-gitops-operator
     channel: gitops-{{ gitops_version }}
-    installPlanApproval: Manual
+    installPlanApproval: Automatic
     source: redhat-operator-index
     sourceNamespace: openshift-marketplace
     gitops_version: 1.7
