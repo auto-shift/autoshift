@@ -2,6 +2,7 @@
 - name: Execute 'oc version' command and store output in result variable
   ansible.builtin.command: oc version
   register: oc_version_output
+  ignore_errors: true
 
 - name: Parse OC Binary Version
   ansible.builtin.set_fact:
