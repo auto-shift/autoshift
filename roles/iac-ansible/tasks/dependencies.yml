@@ -20,7 +20,8 @@
   when: oc_install_version_output.stdout_lines | length > 0
 
 - name: Download OCP Binaries
-  when: oc_version != openshift_version or oc_install_version != openshift_version
+  when: ( oc_version is undefined or oc_install_version is undefined) or
+  (oc_version != openshift_version or oc_install_version != openshift_version)
   block:
     - name: Downloading and Unarchiving the OCP binaries
       ansible.builtin.unarchive:
