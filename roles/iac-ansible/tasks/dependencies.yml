@@ -9,10 +9,20 @@
     oc_version: "{{ oc_version_output.stdout_lines[0].split(' ')[2] }}"
   when: oc_version_output.stdout_lines | length > 0
 
+- name: Execute 'openshift-install version' command and store output in result variable
+  ansible.builtin.command: openshift-install version
+  register: oc_install_version_output
+  ignore_errors: true
+
+- name: Parse openshift-install Binary Version
+  ansible.builtin.set_fact:
+    oc_install_version: "{{ oc_install_version_output.stdout_lines[0].split(' ')[2] }}"
+  when: oc_install_version_output.stdout_lines | length > 0
+
 - name: Display OC Binary Version
   ansible.builtin.debug:
-    msg: "OC Binary Version: {{ oc_version }}"
-  when: oc_version is defined
+    msg: "OC install Version: {{ oc_version }}"
+  when: oc_install_version is defined
 
 - name: Download OCP Binaries
   when: oc_version != openshift_version
