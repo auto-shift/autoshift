@@ -2,7 +2,7 @@
 - name: Execute 'oc version' command and store output in result variable
   ansible.builtin.command: oc version
   register: oc_version_output
-  ignore_errors: true
+  failed_when: false
 
 - name: Parse OC Binary Version
   ansible.builtin.set_fact:
@@ -12,7 +12,7 @@
 - name: Execute 'openshift-install version' command and store output in result variable
   ansible.builtin.command: openshift-install version
   register: oc_install_version_output
-  ignore_errors: true
+  failed_when: false
 
 - name: Parse openshift-install Binary Version
   ansible.builtin.set_fact:
