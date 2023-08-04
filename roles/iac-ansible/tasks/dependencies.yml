@@ -1,4 +1,18 @@
 ---
+- name: Execute 'oc version' command and store output in result variable
+  ansible.builtin.command: oc version
+  register: oc_version_output
+
+- name: Parse OC Binary Version
+  ansible.builtin.set_fact:
+    oc_version: "{{ oc_version_output.stdout_lines[0].split(' ')[2] }}"
+  when: oc_version_output.stdout_lines | length > 0
+
+- name: Display OC Binary Version
+  ansible.builtin.debug:
+    msg: "OC Binary Version: {{ oc_version }}"
+  when: oc_version is defined
+
 - name: Downloading and Unarchiving the OCP binaries
   ansible.builtin.unarchive:
     src: "{{ openshift.release_url }}/{{ openshift.release }}/{{ item }}-linux.tar.gz"

@@ -47,10 +47,10 @@ redhat_operators:
     gitops_sops_version: 3.7.3
     gitops_helm_version: 3.10.3
     gitops_namespace: "openshift-gitops"
-    argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
-    git_user: "{{ ocp_secrets.git_user }}"
-    git_token: "{{ ocp_secrets.git_token }}"
-    gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
+#    argocd_pgp_private_key: "{{ ocp_secrets.argocd_pgp_private_key }}"
+#    git_user: "{{ ocp_secrets.git_user }}"
+#    git_token: "{{ ocp_secrets.git_token }}"
+#    gitops_admin_passphrase: "{{ ocp_secrets.gitops_admin_pass }}"
 
   amq_broker:
     enabled: false
