@@ -1,13 +1,13 @@
-{{ if .Values.amq_broker_enabled }}
+{{ if .Values.amq_broker.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: amq-broker-rhel8
-  namespace: openshift-operators
+  name: {{ .Values.amq_broker.name }}
+  namespace: {{ .Values.amq_broker.namespace }}
 spec:
-  channel: 7.10.x
-  installPlanApproval: Manual
-  name: amq-broker-rhel8
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  channel: {{ .Values.amq_broker.channel }}
+  installPlanApproval: {{ .Values.amq_broker.installPlanApproval }}
+  name: {{ .Values.amq_broker.name }}
+  source: {{ .Values.amq_broker.source }}
+  sourceNamespace: {{ .Values.amq_broker.sourceNamespace }}
 {{ end }}

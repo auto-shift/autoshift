@@ -1,6 +1,14 @@
 # Default values for infra-nodes.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-gk_img_tag: v3.3.0-18
-allowed_git_repos:
-- repo: https://github.cms.gov
+gatekeeper:
+  name: gatekeeper-operator-product
+  namespace: openshift-operators
+  channel: stable
+  installPlanApproval: Manual
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  gk_img_tag: v3.3.0-18
+  allowed_git_repos:
+  - repo: https://github.cms.gov
+enable_gatekeeper_enforcement: true

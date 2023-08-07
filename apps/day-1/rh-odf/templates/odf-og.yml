@@ -1,10 +1,12 @@
-{{ if .Values.odf_enabled }}
+{{ if .Values.odf.enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-storage-operatorgroup
-  namespace: openshift-storage
+  name: {{ .Values.odf.operatorGroup }}
+  namespace: {{ .Values.odf.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   targetNamespaces:
-  - openshift-storage
+  - {{ .Values.odf.namespace }}
 {{ end }}

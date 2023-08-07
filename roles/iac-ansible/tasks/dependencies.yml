@@ -1,39 +1,56 @@
 ---
-- name: "Downloading and Unarchiving the OCP binaries in {{ home_dir }}, verison: {{ openshift.release }}"
-  unarchive:
-    src: "{{ openshift.release_url }}/{{ openshift.release }}/{{ item }}-linux.tar.gz"
-    dest: "{{ home_dir }}"
-    remote_src: yes
-    mode: 0775
-  loop:
-    - openshift-client
-    - openshift-install
+- name: Execute 'oc version' command and store output in result variable
+  ansible.builtin.command: oc version
+  register: oc_version_output
+  failed_when: false
 
-- name: Copy Binaries to /usr/local/bin/
-  copy:
-    src: "{{ home_dir }}/{{ item }}"
-    dest: "/usr/local/bin/{{ item }}"
-    mode: '0755'
-  become: yes
-  become_method: sudo
-  loop:
-    - oc
-    - openshift-install
-    - kubectl
+- name: Parse OC Binary Version
+  ansible.builtin.set_fact:
+    oc_version: "{{ oc_version_output.stdout_lines[0].split(' ')[1] }}"
+  when: oc_version_output.stdout_lines | length > 0
 
-- name: Remove Artifacts
-  file:
-    path: "{{ home_dir }}/{{ item }}"
-    state: absent
-  loop:
-    - oc
-    - openshift-install
-    - kubectl
-    - README.md
+- name: Execute 'openshift-install version' command and store output in result variable
+  ansible.builtin.command: openshift-install version
+  register: oc_install_version_output
+  failed_when: false
 
-- name: Remove salt
-  yum:
-    name: salt
-    state: absent
-  become: yes
-  become_method: sudo
+- name: Parse openshift-install Binary Version
+  ansible.builtin.set_fact:
+    oc_install_version: "{{ oc_install_version_output.stdout_lines[0].split(' ')[1] }}"
+  when: oc_install_version_output.stdout_lines | length > 0
+
+- name: Download OCP Binaries
+  when: ( oc_version is undefined or oc_install_version is undefined) or
+        (oc_version != openshift_version or oc_install_version != openshift_version)
+  block:
+    - name: Downloading and Unarchiving the OCP binaries
+      ansible.builtin.unarchive:
+        src: "{{ openshift.release_url }}/{{ openshift.release }}/{{ item }}-linux.tar.gz"
+        dest: "{{ home_dir }}"
+        remote_src: true
+        mode: '0775'
+      loop:
+        - openshift-client
+        - openshift-install
+
+    - name: Copy Binaries to /usr/local/bin/
+      ansible.builtin.copy:
+        src: "{{ home_dir }}/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        mode: '0755'
+      become: true
+      become_method: ansible.builtin.sudo
+      loop:
+        - oc
+        - openshift-install
+        - kubectl
+
+    - name: Remove Artifacts
+      ansible.builtin.file:
+        path: "{{ home_dir }}/{{ item }}"
+        state: absent
+      loop:
+        - oc
+        - openshift-install
+        - kubectl
+        - README.md

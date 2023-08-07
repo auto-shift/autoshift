@@ -1,0 +1,24 @@
+---
+- name: Create OpenShift Cluster
+  ansible.builtin.include_tasks: create_cluster.yml
+  when: create_cluster
+
+- name: Create OpenShift Cluster
+  ansible.builtin.include_tasks: create_cluster_acm.yml
+  when: create_cluster_acm
+
+- name: Gather Infra Facts
+  ansible.builtin.include_tasks: gather_infra_facts.yml
+
+# - name: Create S3 bucket
+#   aws_s3:
+#     bucket: "{{ organization }}-{{ cluster_name }}-backup"
+#     mode: create
+#     permission: bucket-owner-read
+#     encrypt: yes
+#   register: bucket_changed
+#   when: restore
+
+# - name: Restore Gitops
+#   include_tasks: restore_gitops.yml
+#   when: restore and not bucket_changed.changed and ( cluster_name == 'mgmt' or cluster_name == 'infra' )

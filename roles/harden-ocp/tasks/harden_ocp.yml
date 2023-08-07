@@ -1,8 +1,8 @@
 ---
 - name: Check {{ item }} ComplianceCheckResult Status
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
     api_version: compliance.openshift.io/v1alpha1
     kind: ComplianceCheckResult
     namespace: openshift-compliance
@@ -22,8 +22,8 @@
 - block: 
   - name: Check if {{ item }} Compliance Remediation Exists
     k8s_info:
-      api_key: "{{ K8S_AUTH_API_KEY }}"
-      host: "{{ K8S_AUTH_HOST }}"
+      api_key: "{{ k8s_auth_api_key }}"
+      host: "{{ k8s_auth_host }}"
       api_version: compliance.openshift.io/v1alpha1
       kind: ComplianceRemediation
       namespace: openshift-compliance
@@ -37,8 +37,8 @@
     delay: 10
   - name: Patch {{ item }} Remediation
     kubernetes.core.k8s_json_patch:
-      api_key: "{{ K8S_AUTH_API_KEY }}"
-      host: "{{ K8S_AUTH_HOST }}"
+      api_key: "{{ k8s_auth_api_key }}"
+      host: "{{ k8s_auth_host }}"
       api_version: compliance.openshift.io/v1alpha1
       kind: ComplianceRemediation
       namespace: openshift-compliance

@@ -2,7 +2,7 @@
 - name: Gather VPC Facts
   ec2_vpc_net_info:
     filters:
-      "tag:Name": "{{ vpc_name }}"
+      vpc-id: "{{ vpc_id }}"
   register: vpc_facts
 
 - name: Set VPC ID fact
@@ -31,8 +31,8 @@
 
 - name: Get OpenShift Infra Cluster Facts
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     kind: Infrastructure
     name: cluster
   register: infra_facts
@@ -43,8 +43,8 @@
 
 - name: Get Master Machine Facts
   k8s_info:
-    api_key: "{{ K8S_AUTH_API_KEY  }}"
-    host: "{{ K8S_AUTH_HOST }}"
+    api_key: "{{ k8s_auth_api_key  }}"
+    host: "{{ k8s_auth_host }}"
     api: machine.openshift.io/v1beta1
     kind: Machine
     namespace: openshift-machine-api

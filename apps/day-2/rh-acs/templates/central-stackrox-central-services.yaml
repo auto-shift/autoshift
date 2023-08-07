@@ -1,9 +1,9 @@
-﻿{{ if .Values.acs_central_cluster }}
+﻿{{ if .Values.mgmt_cluster }}
 apiVersion: platform.stackrox.io/v1alpha1
 kind: Central
 metadata:
   name: stackrox-central-services
-  namespace: stackrox
+  namespace: {{ .Values.acs.namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:

@@ -1,0 +1,156 @@
+---
+- name: Set Host for k8
+  ansible.builtin.set_fact:
+    k8s_auth_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+
+- name: Check for existing cluster
+  ansible.builtin.uri:
+    url: "{{ k8s_auth_host }}"
+    validate_certs: false
+  ignore_errors: true
+  register: api_response
+
+- name: Create Cluster
+  when: api_response.status == -1
+  block:
+    - name: "Gathering VPC facts from VPC"
+      amazon.aws.ec2_vpc_net_info:
+        filters:
+          vpc-id: "{{ vpc_id }}"
+      register: vpc_facts
+
+    - name: Gathering private subnet facts
+      amazon.aws.ec2_vpc_subnet_info:
+        filters:
+          vpc-id: "{{ vpc_id }}"
+          "tag:use": private
+      register: subnet_facts
+
+    - name: Gather Hosted Zones
+      amazon.aws.route53_info:
+        query: hosted_zone
+      register: hz_facts
+
+    - name: Define hosted_zone_id
+      ansible.builtin.set_fact:
+        hosted_zone_id: "{{ item.Id.split('/')[2] }}"
+      when: item.Name == cluster_name+'.'+base_domain+'.'
+      loop: "{{ hz_facts.list }}"
+
+    - name: Check if .ssh Directory Exists
+      ansible.builtin.stat:
+        path: "{{ home_dir }}/.ssh"
+      register: ssh_dir
+
+    - name: Create .ssh Directory
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.ssh"
+        state: directory
+        mode: '0700'
+      when: not ssh_dir.stat.exists
+
+    - name: Generate Deployment Keys
+      community.crypto.openssh_keypair:
+        path: "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}"
+        comment: "core@ocp.kubeadmin"
+      register: ssh_facts
+
+    - name: Set ssh key name fact
+      ansible.builtin.set_fact:
+        ssh_key: "{{ lookup('file', '{{ ssh_facts.filename }}.pub') }}"
+
+    - name: Creating installation directory
+      ansible.builtin.file:
+        path: "{{ install_dir }}"
+        state: directory
+
+    - name: Creating install-config.yaml
+      ansible.builtin.template:
+        src: install-config.yaml.j2
+        dest: "{{ install_dir }}/install-config.yaml"
+
+    - name: Create Manifests
+      ansible.builtin.shell: openshift-install create manifests --dir {{ install_dir }}
+
+    - name: Copy IngressController
+      ansible.builtin.copy:
+        src: cluster-ingress-default-ingresscontroller.yaml
+        dest: "{{ install_dir }}/manifests/cluster-ingress-default-ingresscontroller.yaml"
+
+    - name: Create OCP Cluster
+      ansible.builtin.script: openshift-install.sh {{ install_dir }} create
+
+    - name: Copy SSH key to install dir
+      ansible.builtin.copy:
+        src: "{{ home_dir }}/.ssh/id_rsa_{{ cluster_name }}"
+        dest: "{{ install_dir }}/auth/id_rsa_{{ cluster_name }}"
+
+    - name: Create .kube Directory
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.kube"
+        state: directory
+        mode: '0700'
+
+    - name: Copy kubeconfig to .kube Directory
+      ansible.builtin.copy:
+        src: "{{ install_dir }}/auth/kubeconfig"
+        dest: "{{ home_dir }}/.kube/config"
+        mode: '0600'
+
+- name: Store Kubeadmin
+  ansible.builtin.set_fact:
+    kubeadmin_password: "{{ lookup('file', vars['install_dir'] + '/auth/kubeadmin-password') }}"
+  no_log: true
+
+- name: Get token
+  ansible.builtin.shell: |
+    oc login {{ k8s_auth_host }} --insecure-skip-tls-verify=true -u kubeadmin -p {{ kubeadmin_password }}
+    oc whoami --show-token
+  register: kube_token
+  no_log: true
+
+- name: Set Key for k8
+  ansible.builtin.set_fact:
+    k8s_auth_api_key: "{{ kube_token.stdout_lines[kube_token.stdout_lines | length - 1] }}"
+  no_log: true
+
+- name: Get OpenShift Infra Cluster Facts
+  kubernetes.core.k8s_info:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    kind: Infrastructure
+    name: cluster
+  register: infra_facts
+
+- name: Set Infra ID
+  ansible.builtin.set_fact:
+    infra_id: "{{ infra_facts.resources[0].status.infrastructureName }}"
+
+- name: Store configuration in S3
+  when: api_response.status == '-1'
+  block:
+    - name: Create S3 bucket
+      amazon.aws.s3_bucket:
+        name: "{{ cluster_name }}-openshift-install-{{ infra_id }}"
+        state: present
+        encryption: AES256
+
+    - name: Compress install directory
+      community.general.archive:
+        path: "{{ install_dir }}"
+        dest: "{{ install_dir }}.tgz"
+        mode: '0700'
+
+    - name: Push install directory to S3 bucket
+      amazon.aws.s3_object:
+        bucket: "{{ cluster_name }}-openshift-install-{{ infra_id }}"
+        object: openshift_install.tgz
+        src: "{{ install_dir }}.tgz"
+        mode: put
+        encrypt: true
+        encryption_mode: AES256
+
+    - name: "Remove tar"
+      ansible.builtin.file:
+        path: "{{ install_dir }}.tgz"
+        state: absent

@@ -1,4 +1,4 @@
-{{ if .Values.gatekeeper_operator }}
+{{ if .Values.gatekeeper.enabled }}
 ---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sBuilds
@@ -6,7 +6,13 @@ metadata:
   name: no-dockerfile-builds
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "4"
 spec:
+{{- if .Values.enable_gatekeeper_enforcement }}
+  enforcementAction: deny
+{{- else }}
+  enforcementAction: warn
+{{- end }}
   match:
     kinds:
       - apiGroups: ["build.openshift.io"]
@@ -15,7 +21,7 @@ spec:
     sources:
       - source: dockerfile
     repos:
-{{- range $allowed_git_repos := $.Values.allowed_git_repos }}
+{{- range $allowed_git_repos := $.Values.gatekeeper.allowed_git_repos }}
       - {{ .repo }}
 {{- end }}
 {{ end }}

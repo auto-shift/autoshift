@@ -1,0 +1,41 @@
+{{ if .Values.enable_external_load_balancer }}
+kind: IngressController
+apiVersion: operator.openshift.io/v1
+metadata:
+  name: external
+  namespace: openshift-ingress-operator
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+{{ if .Values.custom_certs_enabled }}
+  defaultCertificate:
+    name: ingress-cert-secret
+{{ end }}
+  endpointPublishingStrategy:
+    loadBalancer:
+{{ if semverCompare "~4.12.0" .Values.openshift_version }}
+      allowedSourceRanges:
+      - "0.0.0.0/0"
+{{ end }}
+      providerParameters:
+        aws:
+          type: NLB
+        type: AWS
+      scope: External
+    type: LoadBalancerService
+  domain: external.apps.{{ .Values.cluster_name }}.{{ .Values.base_domain }}
+  routeSelector:
+      matchLabels:
+        momot.router: external
+  nodePlacement:
+    nodeSelector:
+      matchLabels:
+        node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      key: infra
+      value: reserved
+    - effect: NoExecute
+      key: infra
+      value: reserved
+{{ end }}

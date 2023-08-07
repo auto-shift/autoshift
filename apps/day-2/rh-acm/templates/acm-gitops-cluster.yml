@@ -6,6 +6,7 @@ metadata:
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "7"
 spec:
   argoServer:
     cluster: notused

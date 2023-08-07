@@ -1,9 +1,9 @@
 # yaml file to create namespace for Group Sync Operator
-{{ if .Values.oauth.groupsync_enabled }}
-apiVersion: project.openshift.io/v1
-kind: Project
+{{ if .Values.gso.enabled }}
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: group-sync-operator
+  name: {{ .Values.gso.namespace }}
   annotations:
     openshift.io/node-selector: ""
   labels:

@@ -1,17 +1,17 @@
-{{ if .Values.oadp_enabled }}
 apiVersion: velero.io/v1
 kind: Schedule
 metadata:
   name: resources-schedule
-  namespace: open-cluster-management-backup
+  namespace: {{ .Values.adp.namespace }}
   labels:
     app.kubernetes.io/instance: rh-adp
   annotations:
-    argocd.argoproj.io/sync-options: Replace=true
+    argocd.argoproj.io/sync-options: Prune=false,SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   schedule: 0 */1 * * *
   template:
-    defaultVolumesToRestic: true
+    defaultVolumesToRestic: false
     hooks: {}
     includeClusterResources: true
     excludedNamespaces:
@@ -23,7 +23,7 @@ spec:
       - open-cluster-management
       - open-cluster-management-agent
       - open-cluster-management-agent-addon
-      - open-cluster-management-backup
+      - {{ .Values.adp.namespace }}
       - open-cluster-management-hub
       - openshift
       - openshift-apiserver
@@ -95,37 +95,5 @@ spec:
       - stackrox
       - newrelic
       - fluent-bit-logging
-    includedResources:
-      - pods
-      - persistentvolumeclaims
-      - persistentvolumes
-      - clusterroles.rbac.authorization.k8s.io
-      - clusterrolebindings.rbac.authorization.k8s.io
-      - securitycontextconstraints.security.openshift.io
-      - serviceaccounts
-      - roles.rbac.authorization.k8s.io
-      - rolebindings.rbac.authorization.k8s.io
-      - secrets
-      - configmaps
-      - argocds.argoproj.io
-      - deployments.apps
-      - deploymentconfigs.apps.openshift.io
-      - statefulsets.apps
-      - daemonsets.apps
-      - replicasets.apps
-      - jobs.batch
-      - cronjobs.batch
-      - replicationcontrollers
-      - horizontalpodautoscalers.autoscaling
-      - services
-      - routes.route.openshift.io
-      - buildconfigs.build.openshift.io
-      - builds.build.openshift.io
-      - automationcontrollers.automationcontroller.ansible.com
-      - appprojects.argoproj.io
-      - application.argoproj.io
-    storageLocation: dpa-{{ .Values.cluster_name }}-1
+    storageLocation: {{ .Values.cluster_name }}-1
     ttl: 48h0m0s
-    volumeSnapshotLocations:
-      - dpa-{{ .Values.cluster_name }}-1
-{{ end }}

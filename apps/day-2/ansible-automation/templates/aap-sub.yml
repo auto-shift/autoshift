@@ -1,12 +1,14 @@
-{{ .Values.aap_enabled }}
+{{ .Values.aap.enabled  }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: ansible-automation-platform-operator
-  namespace: ansible-automation-platform
+  name: {{ .Values.aap.name }}
+  namespace: {{ .Values.aap.namespace }}
 spec:
-  installPlanApproval: Automatic
-  name: ansible-automation-platform-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  installPlanApproval: {{ .Values.aap.installPlanApproval }}
+  name: {{ .Values.aap.name }}
+  source: {{ .Values.aap.source }}
+  sourceNamespace: {{ .Values.aap.sourceNamespace }}
+{{ if .Values.aap.channel }}
+  channel: {{ .Values.aap.channel }}
 {{ end }}

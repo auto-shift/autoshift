@@ -1,3 +1,12 @@
 # Default values for rh-odf.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+odf:
+  name: odf-operator
+  namespace: openshift-storage
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+  operatorGroup: openshift-storage-operatorgroup
+  channel: 
+  ose_cli_image: registry.redhat.io/openshift4/ose-cli:v4.12.0

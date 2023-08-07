@@ -1,0 +1,13 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.serviceMesh.name }}
+  namespace: {{ .Values.serviceMesh.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  channel: {{ .Values.serviceMesh.channel }}
+  installPlanApproval: {{ .Values.serviceMesh.installPlanApproval }}
+  name: {{ .Values.serviceMesh.name }}
+  source: {{ .Values.serviceMesh.source }}
+  sourceNamespace: {{ .Values.serviceMesh.sourceNamespace }}

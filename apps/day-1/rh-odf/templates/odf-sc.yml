@@ -1,33 +1,34 @@
-{{ if .Values.odf_enabled }}
+{{ if .Values.odf.enabled }}
 apiVersion: ocs.openshift.io/v1
 kind: StorageCluster
 metadata:
   annotations:
-    uninstall.ocs.openshift.io/cleanup-policy: delete
-    uninstall.ocs.openshift.io/mode: graceful
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "5"
   name: ocs-storagecluster
-  namespace: openshift-storage
-  finalizers:
-    - storagecluster.ocs.openshift.io
+  namespace: {{ .Values.odf.namespace }}
 spec:
-  arbiter: {}
   encryption:
     enable: true
     kms: {}
-  externalStorage: {}
-  managedResources:
-    cephBlockPools: {}
-    cephConfig: {}
-    cephFilesystems: {}
-    cephObjectStoreUsers: {}
-    cephObjectStores: {}
-  nodeTopologies: {}
+  placement:
+    all:
+      tolerations:
+      - key: node.ocs.openshift.io/storage
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+      - effect: NoSchedule
+        key: infra
+        value: reserved
+      - effect: NoExecute
+        key: infra
+        value: reserved
   storageDeviceSets:
     - config: {}
       resources: {}
       placement: {}
-      name: ocs-deviceset-gp2
+      name: ocs-deviceset-gp3
       dataPVCTemplate:
         metadata: {}
         spec:
@@ -36,7 +37,7 @@ spec:
           resources:
             requests:
               storage: 2Ti
-          storageClassName: gp2
+          storageClassName: gp3-csi
           volumeMode: Block
         status: {}
       count: 1

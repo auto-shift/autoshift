@@ -1,6 +1,6 @@
-{{ if .Values.openshift_compliance_operator }}
-apiVersion: project.openshift.io/v1
-kind: Project
+{{ if .Values.compliance.enabled }}
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: openshift-compliance 
+  name: {{ .Values.compliance.namespace }}
 {{ end }}

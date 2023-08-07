@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: update-istio-tls
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+  namespace: "openshift-gitops"
+spec:
+  template:
+    spec:
+      containers:
+      - name: update-istio-tls
+        image: registry.redhat.io/openshift4/ose-cli:v4.11
+        command:
+            - "/bin/bash"
+            - "-c"
+            - >- 
+              oc patch route istio-ingressgateway -n istio-system -p '{"spec":{"tls":{"termination":"edge"}}}'
+      restartPolicy: Never
+      serviceAccountName: openshift-gitops-argocd-application-controller

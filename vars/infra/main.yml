@@ -1,7 +1,7 @@
-openshift_version: 4.9.31
-vpc_name: ocp-infra-east-dev
+openshift_version: 4.12.20
+vpc_id:
 cluster_name: infra
-base_domain: 
+base_domain: autoshift.dev
 region: us-east-1
 
 #LDAP vars

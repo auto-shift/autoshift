@@ -1,10 +1,10 @@
-{{ if .Values.openshift_compliance_operator }}
+{{ if .Values.compliance.enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: compliance-operator
-  namespace: openshift-compliance
+  name: {{ .Values.compliance.name }}
+  namespace: {{ .Values.compliance.namespace }}
 spec:
   targetNamespaces:
-  - openshift-compliance
+  - {{ .Values.compliance.namespace }}
 {{ end }}

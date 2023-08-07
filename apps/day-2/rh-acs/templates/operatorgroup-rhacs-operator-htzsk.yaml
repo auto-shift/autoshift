@@ -1,9 +1,9 @@
-﻿{{ if .Values.acs_enabled }}
+﻿{{ if .Values.acs.enabled }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   name: rhacs-operator
-  namespace: stackrox
+  namespace: {{ .Values.acs.namespace }}
   annotations:
     olm.providedAPIs: >-
       Central.v1alpha1.platform.stackrox.io,SecuredCluster.v1alpha1.platform.stackrox.io

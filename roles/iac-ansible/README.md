@@ -16,7 +16,7 @@ Role Variables
 | Variable | Description | Default |
 | -------- | ----------- | ------- |
 |pull_secret | OpenShift pull secret (cloud.redhat.com) | |
-|vpc_name | The value of the tag 'Name' of the desired target VPC | |
+|vpc_id | The value of the VPC ID of the target VPC | |
 |cluster_name | The desired cluster name (e.g. cluster, dev, infra) | |
 |openshift_version | The desired OpenShift version to deploy | latest |
 |base_domain | Base domain of the OpenShift cluster | cms.local |

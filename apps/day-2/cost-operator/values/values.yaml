@@ -1,0 +1,12 @@
+# Default values for rh-adp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+cluster_name:
+
+cost:
+  name: costmanagement-metrics-operator
+  namespace: costmanagement-metrics-operator
+  installPlanApproval: Manual
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  channel: stable

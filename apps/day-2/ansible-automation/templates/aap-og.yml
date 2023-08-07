@@ -1,10 +1,10 @@
-{{ .Values.aap_enabled }}
+{{ .Values.aap.enabled  }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: ansible-automation-platform
-  namespace: ansible-automation-platform
+  name: {{ .Values.aap.name }}
+  namespace: {{ .Values.aap.namespace }}
 spec:
   targetNamespaces:
-    - ansible-automation-platform
+    - {{ .Values.aap.namespace }}
 {{ end }}

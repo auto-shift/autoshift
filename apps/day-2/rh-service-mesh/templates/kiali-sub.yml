@@ -1,0 +1,13 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.kiali.name }}
+  namespace: {{ .Values.kiali.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  channel: {{ .Values.kiali.channel }}
+  installPlanApproval: {{ .Values.kiali.installPlanApproval }}
+  name: {{ .Values.kiali.name }}
+  source: {{ .Values.kiali.source }}
+  sourceNamespace: {{ .Values.kiali.sourceNamespace }}

@@ -46,6 +46,7 @@
     remove_kubeadmin: false
   vars_files:
     - vars/all/main.yml
+    - vars/all/operators.yml
     - "vars/{{ hostvars['localhost']['env'] }}/main.yml"
   roles: 
     - iac-ansible

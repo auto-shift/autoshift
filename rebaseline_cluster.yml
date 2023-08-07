@@ -28,25 +28,25 @@
   - name: "Include vars for {{ env }}"
     include_vars: "vars/{{ env }}/main.yml"
 
-  - name: set K8S_AUTH_HOST
+  - name: set k8s_auth_host
     set_fact: 
-      K8S_AUTH_HOST: "https://api.{{ env }}.{{ base_domain }}:6443"
+      k8s_auth_host: "https://api.{{ env }}.{{ base_domain }}:6443"
 
-  - name: Check if K8S_AUTH_API_KEY is defined
+  - name: Check if k8s_auth_api_key is defined
     set_fact: 
-      K8S_AUTH_API_KEY: "{{ lookup('env', 'K8S_AUTH_API_KEY') }}"
+      k8s_auth_api_key: "{{ lookup('env', 'k8s_auth_api_key') }}"
 
   - name: Confirm Cluster
     pause:
-      prompt: "Enter Auth Token for {{ K8S_AUTH_HOST }}"
+      prompt: "Enter Auth Token for {{ k8s_auth_host }}"
     register: auth_token
     delegate_to: localhost
-    when: K8S_AUTH_API_KEY == ""
+    when: k8s_auth_api_key == ""
 
   - name: Store Env
     set_fact:
-      K8S_AUTH_API_KEY: "{{ auth_token.user_input }}"
-    when: K8S_AUTH_API_KEY == ""
+      k8s_auth_api_key: "{{ auth_token.user_input }}"
+    when: k8s_auth_api_key == ""
     
 - name: Run Role
   hosts: localhost
@@ -64,8 +64,8 @@
     install_argo_apps: true
     test_argo_apps: true
     remove_kubeadmin: true
-    K8S_AUTH_API_KEY: "{{ hostvars['localhost']['K8S_AUTH_API_KEY'] }}"
-    K8S_AUTH_HOST: "{{ hostvars['localhost']['K8S_AUTH_HOST'] }}"
+    k8s_auth_api_key: "{{ hostvars['localhost']['k8s_auth_api_key'] }}"
+    k8s_auth_host: "{{ hostvars['localhost']['k8s_auth_host'] }}"
   vars_files:
     - vars/all/main.yml
     - "vars/{{ hostvars['localhost']['env'] }}/main.yml"

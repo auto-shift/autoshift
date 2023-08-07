@@ -1,15 +1,17 @@
-{{ if .Values.gatekeeper_operator }}
+{{ if .Values.gatekeeper.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   labels:
     operators.coreos.com/gatekeeper-operator-product.openshift-operators: ''
-  name: gatekeeper-operator-product
-  namespace: openshift-operators
+  name: {{ .Values.gatekeeper.name }}
+  namespace: {{ .Values.gatekeeper.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: gatekeeper-operator-product
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  channel: {{ .Values.gatekeeper.channel }}
+  installPlanApproval: {{ .Values.gatekeeper.installPlanApproval }}
+  name: {{ .Values.gatekeeper.name }}
+  source: {{ .Values.gatekeeper.source }}
+  sourceNamespace: {{ .Values.gatekeeper.sourceNamespace }}
 {{ end }}

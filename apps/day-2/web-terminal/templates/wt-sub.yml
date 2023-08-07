@@ -1,0 +1,13 @@
+{{ if .Values.wt.enabled }}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.wt.name | default "web-terminal" | quote }}
+  namespace: {{ .Values.wt.namespace | default "openshift-operators" | quote  }}
+spec:
+  channel: {{ .Values.wt.channel | default "fast" | quote  }}
+  installPlanApproval: {{ .Values.wt.installPlanApproval | default "Manual" | quote  }}
+  name: {{ .Values.wt.name | default "web-terminal" | quote  }}
+  source: {{ .Values.wt.source | default "redhat-operators" | quote  }}
+  sourceNamespace: {{ .Values.wt.sourceNamespace | default "openshift-marketplace" | quote  }}
+{{ end }}

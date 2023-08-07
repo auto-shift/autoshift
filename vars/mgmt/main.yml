@@ -1,8 +1,7 @@
-vpc_name: ocp-mgmt-east-prod
-
+vpc_id:
 cluster_name: mgmt
-openshift_version: 4.9.31
-base_domain: 
+openshift_version: 4.12.20
+base_domain: autoshift.dev
 region: us-east-1
 
 acs_central_cluster: true

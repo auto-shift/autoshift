@@ -1,9 +1,9 @@
-{{ if .Values.openshift_compliance_operator }}
+{{ if .Values.compliance.enabled }}
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ScanSetting
 metadata:
   name: default-ocs-storagecluster-ceph-rbd
-  namespace: openshift-compliance
+  namespace: {{ .Values.compliance.namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 autoUpdateRemediations: true 

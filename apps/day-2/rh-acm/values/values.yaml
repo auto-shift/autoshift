@@ -2,7 +2,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 cluster_name:
-acm_enabled:
-mgmt_cluster:
-cluster_set:
-acm_channel:
+acm: 
+  subName: acm-operator-subscription
+  namespace: open-cluster-management
+  channel: release-2.5
+  sourceNamespace: openshift-marketplace
+  source: redhat-operators
+  installPlanApproval: Manual
+  name: advanced-cluster-management
+acm_disable_hub_self_management: false

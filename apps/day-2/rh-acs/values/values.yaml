@@ -3,3 +3,10 @@
 # Declare variables to be passed into your templates.
 base_domain:
 cluster_name:
+acs:
+  channel: rhacs-3.73
+  installPlanApproval: Manual
+  name: rhacs-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  namespace: stackrox

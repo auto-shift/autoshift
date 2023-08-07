@@ -1,0 +1,32 @@
+{{ .Values.aap.enabled  }}
+apiVersion: automationcontroller.ansible.com/v1beta1
+kind: AutomationController
+metadata:
+  name: {{ .Values.cluster_name }}
+  namespace: {{ .Values.aap.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  create_preload_data: {{ .Values.aap.create_preload_data }}
+  route_tls_termination_mechanism: {{ .Values.aap.route_tls_termination_mechanism }}
+  garbage_collect_secrets: {{ .Values.aap.garbage_collect_secrets }}
+  ingress_type: {{ .Values.aap.ingress_type }}
+  loadbalancer_port: {{ .Values.aap.loadbalancer_port }}
+  projects_use_existing_claim: {{ .Values.aap.projects_use_existing_claim }}
+  image_pull_policy: {{ .Values.aap.image_pull_policy }}
+  projects_storage_size: {{ .Values.aap.projects_storage_size }}
+  task_privileged: {{ .Values.aap.task_privileged }}
+  projects_storage_access_mode: {{ .Values.aap.projects_storage_access_mode }}
+  projects_persistence: {{ .Values.aap.projects_persistence }}
+  replicas: {{ .Values.aap.replicas }}
+  admin_user: {{ .Values.aap.admin_user }}
+  loadbalancer_protocol: {{ .Values.aap.loadbalancer_protocol }}
+  nodeport_port: {{ .Values.aap.nodeport_port }}
+  topology_spread_constraints: |
+    - maxSkew: 1
+      topologyKey: "topology.kubernetes.io/zone"
+      whenUnsatisfiable: "ScheduleAnyway"
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/component: automationcontroller
+{{ end }}

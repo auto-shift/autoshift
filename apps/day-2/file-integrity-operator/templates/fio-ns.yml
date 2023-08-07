@@ -1,6 +1,6 @@
-{{ if .Values.file_integrity_operator }}
-apiVersion: project.openshift.io/v1
-kind: Project
+{{ if .Values.fio.enabled }}
+kind: Namespace
+apiVersion: v1
 metadata:
-  name: openshift-file-integrity
+  name: {{ .Values.fio.namespace }}
 {{ end }}

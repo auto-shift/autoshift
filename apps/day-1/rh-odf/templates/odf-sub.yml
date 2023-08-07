@@ -1,12 +1,17 @@
-{{ if .Values.odf_enabled }}
+{{ if .Values.odf.enabled }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: odf-operator
-  namespace: openshift-storage
+  name: {{ .Values.odf.name }}
+  namespace: {{ .Values.odf.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
-  name: odf-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
+  name: {{ .Values.odf.name }}
+  source: {{ .Values.odf.source }}
+  sourceNamespace: {{ .Values.odf.sourceNamespace }}
+  installPlanApproval: {{ .Values.odf.installPlanApproval }}
+{{ if .Values.odf.channel }}
+  channel: {{ .Values.odf.channel }}
+{{ end }}
 {{ end }}

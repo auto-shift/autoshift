@@ -4,4 +4,11 @@
 cluster_name:
 region:
 organization:
-oadp_enabled:
+adp:
+  channel: stable-1.0
+  nameSub: redhat-oadp-operator-subscription
+  namespace: open-cluster-management-backup
+  installPlanApproval: Manual
+  name: redhat-oadp-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace

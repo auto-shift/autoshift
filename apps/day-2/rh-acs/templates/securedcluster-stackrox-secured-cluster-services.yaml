@@ -1,9 +1,9 @@
-﻿{{ if .Values.acs_enabled }}
+﻿{{ if .Values.acs.enabled }}
 apiVersion: platform.stackrox.io/v1alpha1
 kind: SecuredCluster
 metadata:
   name: stackrox-secured-cluster-services
-  namespace: stackrox
+  namespace: {{ .Values.acs.namespace }}
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
@@ -30,5 +30,5 @@ spec:
       imageFlavor: Regular
     taintToleration: TolerateTaints
   clusterName: {{ .Values.cluster_name }}
-  centralEndpoint: "central-stackrox.apps.mgmt.{{ .Values.base_domain }}:443"
+  centralEndpoint: "central-stackrox.apps.{{ .Values.central_url }}.{{ .Values.base_domain }}:443"
 {{ end }}

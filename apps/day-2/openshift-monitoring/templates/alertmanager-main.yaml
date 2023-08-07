@@ -1,4 +1,4 @@
-{{ if .Values.openshift_monitoring_enabled }}
+{{ if .Values.openshift_monitoring.enabled }}
 kind: Secret
 apiVersion: v1
 metadata:

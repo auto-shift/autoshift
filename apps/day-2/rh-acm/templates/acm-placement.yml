@@ -1,11 +1,12 @@
 {{ if .Values.mgmt_cluster }}
-apiVersion: cluster.open-cluster-management.io/v1alpha1
+apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: "{{ .Values.organization }}-clusters"
+  name: momot-clusters
   namespace: openshift-gitops
   annotations:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "6"
 spec:
   predicates:
   - requiredClusterSelector:

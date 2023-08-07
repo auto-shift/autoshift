@@ -1,0 +1,12 @@
+{{ if .Values.cost.enabled }}
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cost-operator-group
+  namespace: {{ .Values.cost.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  targetNamespaces:
+    - {{ .Values.cost.namespace }}
+{{ end }}

@@ -7,7 +7,7 @@ spec:
   encryption:
     type: aescbc
   audit:
-    profile: Default
+    profile: WriteRequestBodies
   servingCerts:
     namedCertificates:
     - names: 
