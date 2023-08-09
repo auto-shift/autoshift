@@ -3,6 +3,9 @@
   ansible.builtin.include_tasks: dependencies.yml
   when: setup_dependencies
 
+- name: Run Preflight Checklist
+  ansible.builtin.include_tasks: preflight_create_cluster.yml
+
 - name: AWS Deploy
   ansible.builtin.include_tasks: aws/aws_main.yml
   when: platform == 'aws'
