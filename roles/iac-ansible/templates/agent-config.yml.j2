@@ -1,0 +1,31 @@
+kind: AgentConfig
+  metadata:
+    name: sno-cluster
+  rendezvousIP: 192.168.111.80 
+  hosts:
+    - hostname: master-0
+      interfaces:
+        - name: eno1
+          macAddress: 00:ef:44:21:e6:a5 
+      networkConfig:
+        interfaces:
+          - name: eno1
+            type: ethernet
+            state: up
+            mac-address: 00:ef:44:21:e6:a5
+            ipv4:
+              enabled: true
+              address:
+                - ip: 192.168.111.80 
+                  prefix-length: 23 
+              dhcp: false
+        dns-resolver:
+          config:
+            server:
+              - 192.168.111.1 
+        routes:
+          config:
+            - destination: 0.0.0.0/0
+              next-hop-address: 192.168.111.1 
+              next-hop-interface: eno1
+              table-id: 254

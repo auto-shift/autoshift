@@ -1,0 +1,3 @@
+---
+home_dir: "{{ lookup('env', 'HOME') }}"
+acm_cluster: true

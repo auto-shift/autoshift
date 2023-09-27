@@ -1,24 +1,4 @@
 # Gitops Values
-community_operators_catalog: redhat/community-operator-index:v4.12
-community_operators:
-  # Day 2 Apps
-  gso:
-    # ldap_groupsync vars
-    enabled: false
-    group_membership_attr: uniquemember
-    group_name_attr: cn
-    basedn: ou=momot,dc=cms,dc=hhs,dc=gov
-    user_name_attr: uid
-    user_uid_attr: dn
-    sync_schedule: 0,10,20,30,40,50 * * * *
-    # sub
-    name: group-sync-operator
-    namespace: group-sync-operator
-    installPlanApproval: Manual
-    source: community-operator-index
-    sourceNamespace: openshift-marketplace
-    channel: alpha
-
 redhat_operators_catalog: redhat/redhat-operator-index:v4.12
 redhat_operators:
   # Day 1 Apps

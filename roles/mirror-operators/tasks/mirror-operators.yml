@@ -1,0 +1,88 @@
+---
+- name: Download latest oc-mirror
+  ansible.builtin.get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/oc-mirror.tar.gz
+    dest: ~/oc-mirror.tar.gz
+    mode: '0755'
+
+- name: Extract oc-mirror
+  ansible.builtin.unarchive:
+    src: ~/oc-mirror.tar.gz
+    dest: ~/
+    remote_src: true
+
+- name: Make oc-mirror executable
+  ansible.builtin.file:
+    name: ~/oc-mirror
+    state: file
+    mode: '0755'
+
+- name: Create a Docker directory if it does not exist
+  ansible.builtin.file:
+    path: ~/.docker
+    state: directory
+    mode: '0755'
+
+- name: Create Docker Config json
+  ansible.builtin.template:
+    src: templates/pull-secret.j2
+    dest: ~/.docker/config.json
+    mode: '0755'
+
+- name: Add mirror pull secret
+  ansible.builtin.command: |
+    oc registry login
+    --registry artifactory.cloud.cms.gov
+    --auth-basic "{{ docker_service_account.account_name }}:{{ docker_service_account.account_password }}"
+    -a ~/.docker/config.json
+  changed_when: false
+
+- name: List olm redhat operators
+  ansible.builtin.command: ~/oc-mirror list operators --catalog=registry.redhat.io/{{ redhat_operators_catalog }}
+  changed_when: false
+  register: _redhat_operators_list
+
+- name: Populate default_channels_redhat
+  ansible.builtin.set_fact:
+    default_channels_redhat: "{{ default_channels_redhat | default({}) | combine({(item | split)[0]: (item | split)[-1]}) }}"
+  loop: "{{ _redhat_operators_list.stdout_lines }}"
+
+- name: List olm community operators
+  ansible.builtin.command: ~/oc-mirror list operators --catalog=registry.redhat.io/{{ community_operators_catalog }}
+  changed_when: false
+  register: _community_operators_list
+
+- name: Populate default_channels_community
+  ansible.builtin.set_fact:
+    default_channels_community: "{{ default_channels_community | default({}) | combine({(item | split)[0]: (item | split)[-1]}) }}"
+  loop: "{{ _community_operators_list.stdout_lines }}"
+
+- name: Create ImageSet Config File
+  ansible.builtin.template:
+    src: templates/imageset-configuration.yaml.j2
+    dest: ~/imageset-config.yaml
+    mode: '0755'
+
+- name: Mirror olm images
+  ansible.builtin.command: ~/oc-mirror --continue-on-error --config ~/imageset-config.yaml docker://{{ docker_registry }}
+  changed_when: false
+
+- name: Find oc yamls
+  ansible.builtin.find:
+    paths: './oc-mirror-workspace'
+    patterns: 'results-*'
+    recurse: false
+    file_type: directory
+  register: found_directories
+
+- name: Set path
+  ansible.builtin.set_fact:
+    oc_mirror_workspace: "{{ found_directories.files[0].path }}"
+
+- name: Cat Files
+  ansible.builtin.command: cat {{ item }}
+  with_items:
+    - "{{ oc_mirror_workspace }}/catalogSource-community-operator-index.yaml"
+    - "{{ oc_mirror_workspace }}/catalogSource-redhat-operator-index.yaml"
+    - "{{ oc_mirror_workspace }}/imageContentSourcePolicy.yaml"
+  changed_when: false

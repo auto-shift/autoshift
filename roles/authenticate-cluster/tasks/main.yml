@@ -1,0 +1,4 @@
+---
+- name: Get Authentication Token
+  ansible.builtin.include_tasks: get_auth_token.yml
+  when: acm_cluster

@@ -1,0 +1,24 @@
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+  operators:
+  - catalog: "registry.redhat.io/{{ community_operators_catalog }}"
+    packages:
+{% for community_app in community_operators | dict2items %}
+      - name: "{{ community_app.value.name}}"
+        channels:
+          - name: "{{ community_app.value.channel }}"
+{% if default_channels_community[community_app.value.name] != community_app.value.channel %}
+          - name: "{{ default_channels_community[community_app.value.name] }}"
+{% endif %}
+{% endfor %}
+  - catalog: "registry.redhat.io/{{ redhat_operators_catalog }}"
+    packages:
+{% for redhat_app in redhat_operators | dict2items %}
+      - name: "{{ redhat_app.value.name }}"
+        channels:
+          - name: "{{ redhat_app.value.channel }}"
+{% if default_channels_redhat[redhat_app.value.name] != redhat_app.value.channel %}
+          - name: "{{ default_channels_redhat[redhat_app.value.name] }}"
+{% endif %}
+{% endfor %}

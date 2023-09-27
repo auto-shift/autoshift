@@ -1,0 +1,93 @@
+---
+- name: Set go kubconfig template
+  ansible.builtin.set_fact:
+    go_kubeconfig_template: !unsafe "{{range .items}}{{.data.kubeconfig|base64decode}}{{end}}"
+
+- name: Get kubeconfig for cluster {{ cluster_name }}
+  ansible.builtin.command: |
+    oc get secret -l hive.openshift.io/cluster-deployment-name={{ cluster_name }},hive.openshift.io/secret-type=kubeconfig \
+    -n {{ cluster_name }} -o go-template --template="{{ go_kubeconfig_template }}"
+  changed_when: false
+  register: kubeconfig_secret
+  retries: 5
+  delay: 10
+  until: kubeconfig_secret.rc == 0
+
+- name: Set go password template
+  ansible.builtin.set_fact:
+    go_kubeuser_template: !unsafe "{{range .items}}{{.data.password|base64decode}}{{end}}"
+
+- name: Get kubeadmincreds pass for cluster {{ cluster_name }}
+  ansible.builtin.command: |
+    oc get secret -l hive.openshift.io/cluster-deployment-name={{ cluster_name }},hive.openshift.io/secret-type=kubeadmincreds \
+    -n {{ cluster_name }} -o go-template --template="{{ go_kubeuser_template }}"
+  changed_when: false
+  register: kube_pass
+  retries: 5
+  delay: 10
+  until: kube_pass.rc == 0
+
+- name: Set go username template
+  ansible.builtin.set_fact:
+    go_kubepass_template: !unsafe "{{range .items}}{{.data.username|base64decode}}{{end}}"
+
+- name: Get kubeadmincreds user for cluster {{ cluster_name }}
+  ansible.builtin.command: |
+    oc get secret -l hive.openshift.io/cluster-deployment-name={{ cluster_name }},hive.openshift.io/secret-type=kubeadmincreds \
+    -n {{ cluster_name }} -o go-template --template="{{ go_kubepass_template }}"
+  changed_when: false
+  register: kube_user
+  retries: 5
+  delay: 10
+  until: kube_user.rc == 0
+
+- name: Set Host for k8
+  ansible.builtin.set_fact:
+    k8s_auth_host: "https://api.{{ cluster_name }}.{{ base_domain }}:6443"
+
+- name: Create .kube Directory
+  ansible.builtin.file:
+    path: "{{ home_dir }}/.kube"
+    state: directory
+    mode: '0700'
+
+- name: Copy kubeconfig to .kube Directory
+  ansible.builtin.template:
+    src: kubeconfig.j2
+    dest: "{{ home_dir }}/.kube/config"
+    mode: '0600'
+
+- name: Get token if user is kubeadmin
+  when:
+    - kube_user.stdout == "kubeadmin"
+    - k8s_auth_api_key is not defined
+  block:
+    - name: Get token
+      ansible.builtin.shell: |
+        oc login {{ k8s_auth_host }} -u {{ kube_user.stdout }} -p {{ kube_pass.stdout }} --insecure-skip-tls-verify=true
+        oc whoami --show-token
+      changed_when: false
+      register: kube_token
+      no_log: true
+
+    - name: Set Key for k8s
+      ansible.builtin.set_fact:
+        k8s_auth_api_key: "{{ kube_token.stdout_lines[kube_token.stdout_lines | length - 1] }}"
+      no_log: true
+  # End block
+
+- name: Set token if not kubeadmin
+  ansible.builtin.set_fact:
+    k8s_auth_api_key: "{{ kube_pass.stdout }}"
+  no_log: true
+  when: kube_user.stdout != "kubeadmin"
+
+- name: Test Cluster Connection
+  kubernetes.core.k8s_cluster_info:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    validate_certs: false
+  register: api_status
+  retries: 10
+  delay: 60
+  until: api_status.connection is defined and api_status.connection.host == k8s_auth_host

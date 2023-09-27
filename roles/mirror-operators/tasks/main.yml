@@ -1,0 +1,3 @@
+---
+- name: mirror_operators
+  include_tasks: mirror-operators.yml
