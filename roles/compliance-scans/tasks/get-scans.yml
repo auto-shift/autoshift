@@ -43,7 +43,7 @@
 
 - name: Publish to Artifactory
   ansible.builtin.uri:
-    url: "https://artifactory.cloud.cms.gov/artifactory/momot-compliance-scan/{{ scans_filename }}"
+    url: "https://{{ artifactory_url }}/artifactory/compliance-scans/{{ scans_filename }}"
     src: "./{{ scans_filename }}"
     method: PUT
     return_content: true
