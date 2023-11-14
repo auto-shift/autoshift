@@ -1,0 +1,3 @@
+---
+# defaults file for compliance-scans
+home_dir: "{{ lookup('env', 'HOME') }}"

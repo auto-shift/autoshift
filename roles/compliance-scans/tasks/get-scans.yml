@@ -1,0 +1,57 @@
+---
+- name: Create pv-extract
+  kubernetes.core.k8s:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    state: present
+    template: 'pv_extract.j2'
+    wait: true
+    wait_sleep: 10
+    wait_timeout: 300
+
+- name: Copy reports from pv-extract
+  kubernetes.core.k8s_cp:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    namespace: "{{ redhat_operators.compliance.namespace }}"
+    pod: pv-extract
+    remote_path: "/html-reports"
+    local_path: "html"
+    state: from_pod
+
+- name: Delete pv-extract
+  kubernetes.core.k8s:
+    api_key: "{{ k8s_auth_api_key }}"
+    host: "{{ k8s_auth_host }}"
+    state: absent
+    template: 'pv_extract.j2'
+
+- name: Get Current Time for File Name
+  ansible.builtin.set_fact:
+    currenttime: "{{ ansible_date_time.iso8601_basic_short }}"
+
+- name: Set Tar File Name
+  ansible.builtin.set_fact:
+    scans_filename: "scans-{{ cluster_name }}-{{ currenttime }}.tar.gz"
+
+- name: Tar gzip {{ scans_filename }}
+  community.general.archive:
+    path: html
+    dest: "./{{ scans_filename }}"
+    format: gz
+    mode: "0755"
+
+- name: Publish to Artifactory
+  ansible.builtin.uri:
+    url: "https://artifactory.cloud.cms.gov/artifactory/momot-compliance-scan/{{ scans_filename }}"
+    src: "./{{ scans_filename }}"
+    method: PUT
+    return_content: true
+    user: "{{ docker_service_account.account_name }}"
+    password: "{{ docker_service_account.account_password }}"
+    force_basic_auth: true
+    status_code: 201
+    headers:
+      Content-Type: application/octet-stream
+      Accept: application/json
+  no_log: true

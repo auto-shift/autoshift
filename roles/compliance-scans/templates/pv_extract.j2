@@ -1,0 +1,121 @@
+apiVersion: "v1"
+kind: Pod
+metadata:
+  name: pv-extract
+  namespace: "{{ redhat_operators.compliance.namespace }}"
+spec:
+  initContainers:
+      - args:
+          - >
+            mkdir -p /tmp/workspace
+            
+            for scan in `ls /report/`; do
+              max=0
+              for x in `ls /report/$scan/`; do
+                if [[ $x =~ ^-?[0-9]+$ ]]
+                then
+                  n=${x##*/};                
+                  [ "$n" -gt "$max" ] && max=$n;
+                fi
+              done
+              cp /report/$scan/$max/* /tmp/workspace
+            done
+
+            cd /tmp/workspace
+
+            for i in $(ls); do 
+              bzip2 -d $i
+            done
+
+            for file in *.xml.bzip2.out; do
+                mv -- "$file" "${file%.xml.bzip2.out}.xml"
+            done
+
+            cp *.xml /xml-reports
+        command:
+          - sh
+          - '-c'
+        image: "registry.access.redhat.com/rhel8/toolbox"
+        name: create-xml
+        resources: {}
+        volumeMounts:
+          - mountPath: "/xml-reports"
+            name: xml-reports
+          - mountPath: "/report/rhcos4-moderate-worker"
+            name: rhcos4-moderate-worker
+          - mountPath: "/report/rhcos4-moderate-master"
+            name: rhcos4-moderate-master
+          - mountPath: "/report/ocp4-cis"
+            name: ocp4-cis
+          - mountPath: "/report/ocp4-cis-node-master"
+            name: ocp4-cis-node-master
+          - mountPath: "/report/ocp4-cis-node-worker"
+            name: ocp4-cis-node-worker
+          - mountPath: "/report/ocp4-e8"
+            name: ocp4-e8
+          - mountPath: "/report/ocp4-moderate"
+            name: ocp4-moderate
+          - mountPath: "/report/rhcos4-e8-master"
+            name: rhcos4-e8-master
+          - mountPath: "/report/rhcos4-e8-worker"
+            name: rhcos4-e8-worker
+      - args:
+          - >
+            cd /xml-reports
+
+            for i in $(ls); do 
+              echo "generate report $i"
+              oscap xccdf generate report $i > $(echo "$i" | cut -f 1 -d '.').html
+            done
+
+            cp *.html /html-reports
+        command:
+          - sh
+          - '-c'
+        image: "registry.redhat.io/compliance/openshift-compliance-openscap-rhel8:v1.1"
+        name: create-htmls
+        resources: {}
+        volumeMounts:
+          - mountPath: "/html-reports"
+            name: html-reports
+          - mountPath: "/xml-reports"
+            name: xml-reports
+  containers:
+    - name: pv-extract-pod
+      image: registry.access.redhat.com/ubi8/ubi
+      command: ["sleep", "3000"]
+      volumeMounts:
+      - mountPath: "/html-reports"
+        name: html-reports
+  volumes:
+    - name: xml-reports
+      emptyDir: {}
+    - name: html-reports
+      emptyDir: {}
+    - name: rhcos4-moderate-worker
+      persistentVolumeClaim:
+        claimName: rhcos4-moderate-worker
+    - name: rhcos4-moderate-master
+      persistentVolumeClaim:
+        claimName: rhcos4-moderate-master
+    - name: ocp4-cis
+      persistentVolumeClaim:
+        claimName: ocp4-cis
+    - name: ocp4-cis-node-master
+      persistentVolumeClaim:
+        claimName: ocp4-cis-node-master
+    - name: ocp4-cis-node-worker
+      persistentVolumeClaim:
+        claimName: ocp4-cis-node-worker
+    - name: ocp4-e8
+      persistentVolumeClaim:
+        claimName: ocp4-e8
+    - name: ocp4-moderate
+      persistentVolumeClaim:
+        claimName: ocp4-moderate
+    - name: rhcos4-e8-master
+      persistentVolumeClaim:
+        claimName: rhcos4-e8-master
+    - name: rhcos4-e8-worker
+      persistentVolumeClaim:
+        claimName: rhcos4-e8-worker

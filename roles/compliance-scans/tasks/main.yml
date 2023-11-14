@@ -1,0 +1,3 @@
+---
+- name: Get Scans
+  ansible.builtin.include_tasks: get-scans.yml
