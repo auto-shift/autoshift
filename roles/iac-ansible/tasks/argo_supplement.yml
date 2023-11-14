@@ -3,52 +3,6 @@
   ansible.builtin.set_fact:
     docker_artifactory_auth: "{{ svc_acct_name }}:{{ svc_acct_password }}"
 
-- name: Create Secret for New Relic
-  kubernetes.core.k8s_info:
-    api_key: "{{ k8s_auth_api_key }}"
-    host: "{{ k8s_auth_host }}"
-    kind: Secret
-    name: kube-etcd-client-certs
-    namespace: openshift-monitoring
-  register: etcd_client_certs
-
-- name: Add New Relic App
-  kubernetes.core.k8s:
-    api_key: "{{ k8s_auth_api_key }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    definition: "{{ lookup('template', 'new-relic.yml.j2') }}"
-  when: new_relic_enabled
-
-- name: Create Secret for New Relic 
-  kubernetes.core.k8s:
-    api_key: "{{ k8s_auth_api_key }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    definition:
-      kind: Secret
-      apiVersion: v1
-      metadata:
-        name: kube-etcd-client-certs
-        namespace: newrelic
-      data:
-        cacert: "{{ etcd_client_certs.resources[0].data['etcd-client-ca.crt'] }}"
-        cert: "{{ etcd_client_certs.resources[0].data['etcd-client.crt'] }}"
-        key: "{{ etcd_client_certs.resources[0].data['etcd-client.key'] }}"
-      type: Opaque
-  when: new_relic_enabled
-
-- name: Create Fluent Bit App
-  k8s:
-    api_key: "{{ k8s_auth_api_key  }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    definition: "{{ lookup('template', 'fluent-bit.yml.j2') }}"
-  when: fluentbit_enabled
-
-- name: Link Docker Config
-  shell: oc secrets link default docker-artifactory --for=pull -n newrelic
-
 - name: Create OpenShift Custom Web Console URL Certificate Secret
   k8s:
     api_key: "{{ k8s_auth_api_key  }}"
@@ -67,22 +21,6 @@
     name: router-default
     namespace: openshift-ingress
   register: ingress_facts
-
-- name: Set Ingress Hostname Fact
-  set_fact:
-    ingress_hostname: "{{ ingress_facts.resources[0].status.loadBalancer.ingress[0].hostname }}"
-
-- name: Add Custom Console DNS Entry to Route 53
-  route53:
-    state: present
-    zone: "{{ cluster_name }}.{{ base_domain }}."
-    record: "openshift.{{ cluster_name }}.{{ base_domain }}"
-    type: CNAME
-    ttl: 300
-    value: "{{ ingress_hostname }}."
-    private_zone: true
-    overwrite: true
-  when: custom_console
 
 - name: Create Group Sync Operator Namespace 
   k8s:
@@ -125,40 +63,6 @@
     - "{{ lookup('template','secrets/' + 'ldap-ca-config-map.yml.j2') }}"
   no_log: true
   when: oauth.ldap_enabled
-
-- name: Create Secret for Okta 
-  k8s:
-    api_key: "{{ k8s_auth_api_key  }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    force: yes
-    definition: "{{ lookup('template','secrets/' + 'openid-okta-secret.yml.j2') }}"
-  when: oauth.okta_oath_enabled
-
-- name: Create Logging Namespace 
-  k8s:
-    api_key: "{{ k8s_auth_api_key  }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    definition: 
-      apiVersion: project.openshift.io/v1
-      kind: Project
-      metadata:
-        annotations:
-          openshift.io/node-selector: ''
-        labels:
-          openshift.io/cluster-monitoring: 'true'
-        name: openshift-logging
-  when: openshift_logging.enabled
-
-- name: Create Secret for Cloudwatch 
-  k8s:
-    api_key: "{{ k8s_auth_api_key  }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    force: yes
-    definition: "{{ lookup('template','secrets/' + 'cw-secret.yml.j2') }}"
-  when: cw_log_forwarding_enabled
 
 - name: Create Custom Ingress Certificate Workloads
   k8s:
@@ -220,15 +124,6 @@
       [default]
       aws_access_key_id = {{ ocp_install_aws_access_key }}
       aws_secret_access_key = {{ ocp_install_aws_secret_key }}
-  when: oadp_enabled
-
-- name: Create Secret for ADP 
-  k8s:
-    api_key: "{{ k8s_auth_api_key  }}"
-    host: "{{ k8s_auth_host }}"
-    state: present
-    force: yes
-    definition: "{{ lookup('template','secrets/' + 'adp-cloud-credentials.yml.j2') }}"
   when: oadp_enabled
 
 - name: Disable Server Version CR
